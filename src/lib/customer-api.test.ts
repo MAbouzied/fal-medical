@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { bookingDepartments } from '../data/booking-departments.ts';
-import { formServiceCatalog, OTHER_FORM_SERVICE } from '../data/form-landing.ts';
+import { formServiceCatalog } from '../data/form-landing.ts';
 import {
   assertCustomerRequestAllowed,
   createMemoryRateLimiter,
@@ -46,22 +46,20 @@ describe('parseCustomerLeadBody', () => {
     assert.equal(result.lead.service, 'زراعة الأسنان');
   });
 
-  it('accepts other services for dentistry and dermatology', () => {
-    for (const department of ['أسنان', 'جلدية'] as const) {
-      const result = parseCustomerLeadBody({
-        name: 'عبدالله محمد',
-        phone: '0551234567',
-        department,
-        service: OTHER_FORM_SERVICE,
-        locale: 'ar',
-        consent: true,
-      }, { page: '/form', departments: ['أسنان', 'جلدية'], services: formServiceCatalog });
+  it('accepts dermatology form services with the matching specialty', () => {
+    const result = parseCustomerLeadBody({
+      name: 'عبدالله محمد',
+      phone: '0551234567',
+      department: 'جلدية',
+      service: 'قسم الليزر',
+      locale: 'ar',
+      consent: true,
+    }, { page: '/form', departments: ['أسنان', 'جلدية'], services: formServiceCatalog });
 
-      assert.equal(result.ok, true);
-      if (!result.ok || result.kind !== 'lead') throw new Error('expected lead');
-      assert.equal(result.lead.department, department);
-      assert.equal(result.lead.service, OTHER_FORM_SERVICE);
-    }
+    assert.equal(result.ok, true);
+    if (!result.ok || result.kind !== 'lead') throw new Error('expected lead');
+    assert.equal(result.lead.department, 'جلدية');
+    assert.equal(result.lead.service, 'قسم الليزر');
   });
 
   it('rejects a service that does not belong to the specialty', () => {
@@ -69,7 +67,7 @@ describe('parseCustomerLeadBody', () => {
       name: 'عبدالله محمد',
       phone: '0551234567',
       department: 'أسنان',
-      service: 'الليزر',
+      service: 'قسم الليزر',
       locale: 'ar',
       consent: true,
     }, { departments: ['أسنان', 'جلدية'], services: formServiceCatalog });

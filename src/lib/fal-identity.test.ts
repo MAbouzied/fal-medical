@@ -111,9 +111,8 @@ describe('Fal identity without Beauty Corner leftovers', () => {
     const en = getFormLandingCopy('en');
     assert.match(ar.pageTitle, /فال/);
     assert.match(en.pageTitle, /Fal/);
-    assert.doesNotMatch(ar.branchesHeading, /أقرب فرع/);
-    assert.doesNotMatch(en.branchesHeading, /nearest branch/i);
-    assert.match(ar.branchesHeading, /عيادت/);
+    assert.match(ar.branchesHeading, /أقرب فرع/);
+    assert.match(en.branchesHeading, /nearest branch/i);
     const form = await readSrc('../components/contact/FormLandingPage.astro');
     assert.match(form, /rounded-\[var\(--radius-button\)\]/);
     assert.doesNotMatch(form, /rounded-full/);

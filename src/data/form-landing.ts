@@ -4,12 +4,22 @@ import { clinicServices } from './services.ts';
 
 type Locale = 'ar' | 'en';
 
-export const formSpecialties = ['أسنان', 'جلدية', 'تغذية', 'نساء وولادة', 'علاج طبيعي'] as const;
-export const OTHER_FORM_SERVICE = 'خدمات أخرى';
-const otherFormServiceLabel = {
-  ar: OTHER_FORM_SERVICE,
-  en: 'Other services',
-} as const;
+export const formSpecialties = ['أسنان', 'جلدية'] as const;
+
+export const formDermatologyServices = [
+  'قسم النحت و الاذابة',
+  'قسم الفيلر',
+  'قسم البوتكس',
+  'قسم النضارة',
+  'قسم الهيدرافيشل',
+  'قسم اللايت',
+  'قسم علاج البشرة و الشعر',
+  'قسم الليزر',
+] as const;
+
+export const formDentalServices = clinicServices
+  .filter((service) => service.department === 'أسنان')
+  .map((service) => service.title);
 
 export type FormServiceOption = {
   value: string;
@@ -22,42 +32,52 @@ export type FormServiceGroup = {
   services: ReadonlyArray<FormServiceOption>;
 };
 
-export const formServiceValues = [...clinicServices.map((service) => service.title), OTHER_FORM_SERVICE];
-
 export const formServiceCatalog = [
-  ...clinicServices.map((service) => ({
-    department: service.department,
-    title: service.title,
+  ...formDentalServices.map((title) => ({
+    department: 'أسنان' as const,
+    title,
   })),
-  ...formSpecialties.map((department) => ({
-    department,
-    title: OTHER_FORM_SERVICE,
+  ...formDermatologyServices.map((title) => ({
+    department: 'جلدية' as const,
+    title,
   })),
 ];
 
-export const acceptedLeadDepartments = [...formSpecialties, ...bookingDepartments, ...formServiceValues];
+export const acceptedLeadDepartments = [
+  ...formSpecialties,
+  ...bookingDepartments,
+  ...formDentalServices,
+  ...formDermatologyServices,
+];
+
+function formServiceLabel(title: string, locale: Locale): string {
+  if (locale === 'ar') return title;
+  const service = clinicServices.find((entry) => entry.title === title);
+  if (service) {
+    return servicesEn[service.id]?.title ?? title;
+  }
+  return departmentsEn[title as keyof typeof departmentsEn] ?? title;
+}
 
 export function specialtyForServiceTitle(title: string): string {
-  return clinicServices.find((service) => service.title === title)?.department ?? '';
+  const clinicMatch = clinicServices.find((service) => service.title === title)?.department;
+  if (clinicMatch) return clinicMatch;
+  if ((formDermatologyServices as readonly string[]).includes(title)) return 'جلدية';
+  return '';
 }
 
 export function getFormServiceGroups(locale: Locale): ReadonlyArray<FormServiceGroup> {
-  return formSpecialties.map((department) => ({
-    department,
-    label: locale === 'en' ? departmentsEn[department] : department,
-    services: [
-      ...clinicServices
-        .filter((service) => service.department === department)
-        .map((service) => ({
-          value: service.title,
-          label: locale === 'en' ? (servicesEn[service.id]?.title ?? service.title) : service.title,
-        })),
-      {
-        value: OTHER_FORM_SERVICE,
-        label: otherFormServiceLabel[locale],
-      },
-    ],
-  }));
+  return formSpecialties.map((department) => {
+    const services = department === 'أسنان' ? formDentalServices : formDermatologyServices;
+    return {
+      department,
+      label: locale === 'en' ? departmentsEn[department] : department,
+      services: services.map((value) => ({
+        value,
+        label: formServiceLabel(value, locale),
+      })),
+    };
+  });
 }
 
 export type FormLandingCopy = {
@@ -103,7 +123,7 @@ const copy = {
     homeHref: '/',
     formHref: '/form',
     branchesEyebrow: 'موقعنا',
-    branchesHeading: 'زُرنا في عيادتنا بحفر الباطن',
+    branchesHeading: 'زُرنا في أقرب فرع',
     addressLabel: 'العنوان',
     hoursLabel: 'ساعات العمل',
     phoneLabel: 'الهاتف',
@@ -136,7 +156,7 @@ const copy = {
     homeHref: '/en',
     formHref: '/en/form',
     branchesEyebrow: 'Visit us',
-    branchesHeading: 'Visit our clinic in Hafar Al Batin',
+    branchesHeading: 'Visit our nearest branch',
     addressLabel: 'Address',
     hoursLabel: 'Working hours',
     phoneLabel: 'Phone',

@@ -96,16 +96,7 @@ const callHref = buildPhoneUrl();
               <dt class="sr-only">{copy.hoursLabel}</dt>
               <dd class="flex items-start gap-2">
                 <AssetIcon src="/assets/clock.svg" size="sm" class="mt-0.5 text-primary" />
-                <span class="min-w-0 flex-1">
-                  <ul class="space-y-1">
-                    {contact.hoursRows.map(([day, hours]) => (
-                      <li class="flex justify-between gap-3">
-                        <span>{day}</span>
-                        <span>{hours}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </span>
+                <span>{contact.hours}</span>
               </dd>
             </div>
             {

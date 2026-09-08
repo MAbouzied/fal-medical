@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { describe, it } from 'node:test';
-import { clinicServices } from './services.ts';
 import {
   acceptedLeadDepartments,
+  formDermatologyServices,
+  formDentalServices,
   getFormLandingCopy,
   getFormServiceGroups,
-  OTHER_FORM_SERVICE,
 } from './form-landing.ts';
 import { bookingDepartments } from './booking-departments.ts';
 
@@ -25,52 +25,49 @@ describe('form landing copy', () => {
     assert.match(ar.pageTitle, /فال/);
     assert.equal(ar.specialty, 'التخصص');
     assert.equal(en.specialty, 'Specialty');
+    assert.equal(ar.service, 'الخدمة المطلوبة');
+    assert.equal(en.service, 'Requested service');
     assert.equal(ar.callAction, 'اتصال');
     assert.equal(ar.locationAction, 'الموقع');
-    assert.doesNotMatch(ar.branchesHeading, /أقرب فرع/);
-    assert.doesNotMatch(en.branchesHeading, /nearest branch/i);
+    assert.match(ar.branchesHeading, /أقرب فرع/);
+    assert.match(en.branchesHeading, /nearest branch/i);
   });
 
-  it('groups services from the services page by department', () => {
+  it('groups services by dentistry and dermatology like the reference form', () => {
     const arGroups = getFormServiceGroups('ar');
     const enGroups = getFormServiceGroups('en');
     const ar = getFormLandingCopy('ar');
     const en = getFormLandingCopy('en');
 
-    assert.deepEqual(arGroups.map((group) => group.department), [
-      'أسنان',
-      'جلدية',
-      'تغذية',
-      'نساء وولادة',
-      'علاج طبيعي',
-    ]);
+    assert.deepEqual(arGroups.map((group) => group.department), ['أسنان', 'جلدية']);
     assert.equal(arGroups[0]?.label, 'أسنان');
     assert.equal(enGroups[0]?.label, 'Dentistry');
     assert.equal(enGroups[1]?.label, 'Dermatology');
-    assert.equal(enGroups[2]?.label, 'Nutrition');
+
+    assert.deepEqual(
+      arGroups[0]?.services.map((service) => service.value),
+      formDentalServices,
+    );
+    assert.deepEqual(
+      arGroups[1]?.services.map((service) => service.value),
+      formDermatologyServices,
+    );
 
     const arValues = arGroups.flatMap((group) => group.services.map((service) => service.value));
-    const serviceTitles = clinicServices.map((service) => service.title);
-    const expectedValues = [
-      ...serviceTitles,
-      OTHER_FORM_SERVICE,
-      OTHER_FORM_SERVICE,
-      OTHER_FORM_SERVICE,
-      OTHER_FORM_SERVICE,
-      OTHER_FORM_SERVICE,
-    ];
-    assert.deepEqual([...arValues].sort(), [...expectedValues].sort());
-    assert.equal(ar.departments.length, clinicServices.length + 5);
-    assert.ok(arGroups.every((group) => group.services.at(-1)?.value === OTHER_FORM_SERVICE));
-    assert.equal(arGroups[0]?.services.at(-1)?.label, 'خدمات أخرى');
-    assert.equal(enGroups[0]?.services.at(-1)?.label, 'Other services');
+    assert.deepEqual(arValues, [...formDentalServices, ...formDermatologyServices]);
+    assert.equal(ar.departments.length, formDentalServices.length + formDermatologyServices.length);
+    assert.equal(enGroups[1]?.services[0]?.label, 'Body Contouring & Fat Dissolving');
     assert.notEqual(en.departments[0]?.label, en.departments[0]?.value);
     assert.ok(acceptedLeadDepartments.includes('أسنان'));
     assert.ok(acceptedLeadDepartments.includes(bookingDepartments[0]));
-    assert.ok(acceptedLeadDepartments.includes(clinicServices[0]!.title));
-    assert.equal(arValues.includes('الفيلر والبوتوكس'), true);
-    assert.equal(arValues.includes('النحت'), true);
-    assert.equal(arValues.includes('تنظيف البشرة الهيدرافيشل'), true);
+    assert.ok(acceptedLeadDepartments.includes(formDentalServices[0]!));
+    assert.equal(arValues.includes('الفيلر والبوتوكس'), false);
+    assert.equal(arValues.includes('النحت'), false);
+    assert.equal(arValues.includes('تنظيف البشرة الهيدرافيشل'), false);
+    assert.equal(arValues.includes(formDermatologyServices[1]!), true);
+    assert.equal(arValues.includes('قسم البوتكس'), true);
+    assert.equal(arValues.includes('قسم الليزر'), true);
+    assert.equal(arValues.includes('زراعة الأسنان'), true);
   });
 
   it('posts landing leads to the customers API without home chrome or extra message', async () => {
@@ -89,6 +86,8 @@ describe('form landing copy', () => {
     assert.match(source, /buildWhatsAppUrl/);
     assert.match(source, /buildPhoneUrl/);
     assert.match(source, /clinicMapUrl/);
+    assert.match(source, /contact\.hours/);
+    assert.doesNotMatch(source, /hoursRows/);
     assert.doesNotMatch(source, /data-form-landing-crumb/);
     assert.doesNotMatch(source, /offersHref/);
     assert.doesNotMatch(source, /goFullSite/);
