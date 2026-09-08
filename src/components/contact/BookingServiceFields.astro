@@ -1,0 +1,124 @@
+---
+import ServiceDepartmentOptions from './ServiceDepartmentOptions.astro';
+import { getFormServiceGroups, specialtyForServiceTitle } from '../../data/form-landing';
+import type { Locale } from '../../lib/i18n/localize';
+
+export interface Props {
+  locale?: Locale;
+  fieldClass: string;
+  labelClass?: string;
+  specialtyLabel: string;
+  serviceLabel: string;
+  specialtyPlaceholder: string;
+  servicePlaceholder: string;
+  defaultSpecialty?: string;
+  defaultService?: string;
+  specialtyId?: string;
+  serviceId?: string;
+  specialtyDescribedBy?: string;
+  serviceDescribedBy?: string;
+}
+
+const {
+  locale = 'ar',
+  fieldClass,
+  labelClass = 'grid gap-2 text-sm text-muted',
+  specialtyLabel,
+  serviceLabel,
+  specialtyPlaceholder,
+  servicePlaceholder,
+  defaultSpecialty = '',
+  defaultService = '',
+  specialtyId,
+  serviceId,
+  specialtyDescribedBy,
+  serviceDescribedBy,
+} = Astro.props;
+
+const groups = getFormServiceGroups(locale);
+const selectedSpecialty = defaultSpecialty || specialtyForServiceTitle(defaultService);
+---
+
+<div class="grid gap-4" data-specialty-service-fields>
+  {
+    specialtyId ? (
+      <div class="grid gap-2">
+        <label for={specialtyId} class={labelClass}>
+          {specialtyLabel}
+        </label>
+        <select
+          id={specialtyId}
+          class={fieldClass}
+          name="department"
+          required
+          data-specialty-select
+          aria-describedby={specialtyDescribedBy}
+        >
+          <option value="">{specialtyPlaceholder}</option>
+          {groups.map((group) => (
+            <option value={group.department} selected={group.department === selectedSpecialty}>
+              {group.label}
+            </option>
+          ))}
+        </select>
+        <slot name="specialty-error" />
+      </div>
+    ) : (
+      <label class={labelClass}>
+        {specialtyLabel}
+        <select class={fieldClass} name="department" required data-specialty-select>
+          <option value="">{specialtyPlaceholder}</option>
+          {groups.map((group) => (
+            <option value={group.department} selected={group.department === selectedSpecialty}>
+              {group.label}
+            </option>
+          ))}
+        </select>
+      </label>
+    )
+  }
+
+  {
+    serviceId ? (
+      <div class="grid gap-2">
+        <label for={serviceId} class={labelClass}>
+          {serviceLabel}
+        </label>
+        <select
+          id={serviceId}
+          class={fieldClass}
+          name="service"
+          required
+          data-service-select
+          aria-describedby={serviceDescribedBy}
+        >
+          <ServiceDepartmentOptions
+            locale={locale}
+            placeholder={servicePlaceholder}
+            selectedValue={defaultService}
+          />
+        </select>
+        <slot name="service-error" />
+      </div>
+    ) : (
+      <label class={labelClass}>
+        {serviceLabel}
+        <select class={fieldClass} name="service" required data-service-select>
+          <ServiceDepartmentOptions
+            locale={locale}
+            placeholder={servicePlaceholder}
+            selectedValue={defaultService}
+          />
+        </select>
+      </label>
+    )
+  }
+</div>
+
+<script>
+  import { bindSpecialtyServiceFields } from '../../lib/form-specialty-service';
+
+  const bindFields = () => bindSpecialtyServiceFields();
+  bindFields();
+  document.addEventListener('astro:page-load', bindFields);
+</script>

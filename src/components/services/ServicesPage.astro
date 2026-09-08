@@ -1,0 +1,64 @@
+---
+import FaqSection from '../sections/FaqSection.astro';
+import ServiceFeatureRow from './ServiceFeatureRow.astro';
+import ServicesCatalog from './ServicesCatalog.astro';
+import ServicesConsultBand from './ServicesConsultBand.astro';
+import DevicesGrid from '../devices/DevicesGrid.astro';
+import PillLabel from '../ui/PillLabel.astro';
+import { faqItems } from '../../data/faq';
+import { resolveServiceFeatureBlocks } from '../../data/service-features';
+import type { Locale } from '../../lib/i18n/localize';
+import { isEnglish, localizeFaq, ui } from '../../lib/i18n/localize';
+
+export interface Props {
+  locale?: Locale;
+}
+
+const { locale = 'ar' } = Astro.props;
+const en = isEnglish(locale);
+const copy = ui(locale);
+const blocks = resolveServiceFeatureBlocks(locale);
+const faqs = en ? localizeFaq('en') : faqItems;
+
+const text = en
+  ? {
+      badge: copy!.pages.servicesEyebrow,
+      heading: copy!.pages.servicesHeading,
+      intro: copy!.pages.servicesIntro,
+      faqTitle: copy!.pages.servicesFaqTitle,
+    }
+  : {
+      badge: 'تخصصاتنا',
+      heading: 'خدمات مصمّمة لإطلالة مميزة',
+      intro: 'من تفاصيل الابتسامة إلى ملامح الوجه، نتكفّل برحلة متكاملة نحو ثقة أكبر.',
+      faqTitle: 'إجابات على أهم استفساراتك',
+    };
+---
+
+<section class="bg-surface pt-16 pb-8 sm:pt-24 sm:pb-12">
+  <div class="mx-auto flex max-w-[38.75rem] flex-col items-center gap-3 px-4 text-center">
+    <PillLabel text={text.badge} />
+    <h1 class="text-display font-black text-ink">{text.heading}</h1>
+    <p class="text-[1.0625rem] leading-[1.7] text-pretty text-muted">
+      {text.intro}
+    </p>
+  </div>
+</section>
+
+<section class="bg-surface" aria-label={en ? 'Featured specialties' : 'التخصصات المميزة'}>
+  <div class="page-container">
+    {blocks.map((block, index) => (
+      <ServiceFeatureRow block={block} locale={locale} eager={index === 0} />
+    ))}
+  </div>
+</section>
+
+<ServicesCatalog locale={locale} />
+<DevicesGrid locale={locale} />
+<ServicesConsultBand locale={locale} />
+<FaqSection
+  items={faqs}
+  locale={locale}
+  title={text.faqTitle}
+  variant="list"
+/>

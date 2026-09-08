@@ -1,0 +1,84 @@
+---
+import { clinicFacts } from '../../../data/clinic-facts';
+import BookingSection from '../../../components/services/BookingSection.astro';
+import ServiceDetailContent from '../../../components/services/ServiceDetailContent.astro';
+import DoctorCard from '../../../components/doctors/DoctorCard.astro';
+import FaqSection from '../../../components/sections/FaqSection.astro';
+import Breadcrumbs from '../../../components/seo/Breadcrumbs.astro';
+import SectionHeading from '../../../components/ui/SectionHeading.astro';
+import { doctors } from '../../../data/doctors';
+import { clinicServices, getServiceById } from '../../../data/services';
+import { localizeFaq, localizeService, ui } from '../../../lib/i18n/localize';
+import {
+  buildBreadcrumbSchema,
+  buildServiceSchema,
+  buildWebPageSchema,
+} from '../../../lib/schema';
+import Layout from '../../../layouts/Layout.astro';
+
+export function getStaticPaths() {
+  return clinicServices.map((service) => ({ params: { id: service.id } }));
+}
+
+const service = getServiceById(Astro.params.id!);
+if (!service) return Astro.redirect('/en/services');
+
+const localized = localizeService(service, 'en');
+const relatedDoctors = doctors.filter((doctor) => doctor.specialty === service.doctorSpecialty).slice(0, 3);
+const doctorsToShow = relatedDoctors.length > 0 ? relatedDoctors : doctors.slice(0, 3);
+const site = Astro.site!;
+const copy = ui('en')!;
+const faqItems = localizeFaq('en');
+const servicePath = `/en/services/${service.id}`;
+const mainEntityId = `${new URL(servicePath, site).href}#service`;
+const title = `${localized.title} in ${clinicFacts.cityEn} | Fal Clinic`;
+const description =
+  localized.description.length < 140
+    ? `${localized.description} Book at Fal Clinic in ${clinicFacts.cityEn}.`
+    : localized.description;
+---
+
+<Layout
+  title={title}
+  description={description}
+  locale="en"
+  schemas={[
+    buildWebPageSchema({
+      site,
+      path: servicePath,
+      name: title,
+      description,
+      locale: 'en',
+      mainEntityId,
+    }),
+    buildBreadcrumbSchema(site, [
+      { name: copy.nav.home, path: '/en' },
+      { name: copy.nav.services, path: '/en/services' },
+      { name: localized.title, path: servicePath },
+    ]),
+    buildServiceSchema(site, localized, 'en'),
+  ]}
+>
+  <Breadcrumbs
+    locale="en"
+    items={[
+      { name: 'Home', href: '/en' },
+      { name: 'Services', href: '/en/services' },
+      { name: localized.title },
+    ]}
+  />
+  <ServiceDetailContent service={service} locale="en" />
+  <BookingSection locale="en" />
+  <section class="py-14 sm:py-24" aria-labelledby="service-team-heading">
+    <div class="page-container">
+      <div id="service-team-heading">
+        <SectionHeading eyebrow={copy.nav.doctors} title={copy.pages.doctorsHeading} />
+      </div>
+      <div class="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
+        {doctorsToShow.map((doctor) => <DoctorCard doctor={doctor} locale="en" />)}
+      </div>
+    </div>
+  </section>
+
+  <FaqSection items={faqItems} locale="en" />
+</Layout>

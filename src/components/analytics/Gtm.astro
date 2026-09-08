@@ -1,0 +1,84 @@
+---
+import { isGtmConfigured } from '../../lib/gtm';
+---
+
+{isGtmConfigured && (
+  <script>
+    import {
+      ANALYTICS_CONSENT_GRANTED_EVENT,
+      readAnalyticsConsent,
+    } from '../../lib/analytics/consent';
+    import {
+      GTM_ID,
+      GtmEvents,
+      isGtmEnabled,
+      loadGtmContainer,
+      pushGtmEvent,
+      resolveContactEvent,
+      resolveCtaLocation,
+    } from '../../lib/gtm';
+
+    const scheduleLoad = () => {
+      if (!isGtmEnabled()) return;
+      const run = () => loadGtmContainer(GTM_ID);
+      const idle = (window as Window & {
+        requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      }).requestIdleCallback;
+      if (typeof idle === 'function') {
+        idle(run, { timeout: 2_000 });
+      } else {
+        globalThis.setTimeout(run, 1);
+      }
+    };
+
+    if (readAnalyticsConsent() === 'granted') scheduleLoad();
+    window.addEventListener(ANALYTICS_CONSENT_GRANTED_EVENT, scheduleLoad);
+
+    const bindContactTracking = () => {
+      if (document.documentElement.dataset.gtmContactBound === 'true') return;
+      document.documentElement.dataset.gtmContactBound = 'true';
+
+      document.addEventListener(
+        'click',
+        (event) => {
+          if (!isGtmEnabled()) return;
+          const target = event.target;
+          if (!(target instanceof Element)) return;
+
+          const link = target.closest('a[href]');
+          if (!(link instanceof HTMLAnchorElement)) return;
+
+          const eventName = resolveContactEvent(link.href);
+          if (!eventName) return;
+
+          pushGtmEvent(eventName, {
+            link_url: link.href,
+            link_text: (link.textContent || '').trim().slice(0, 80),
+            cta_location: resolveCtaLocation(link),
+            contact_method:
+              eventName === GtmEvents.contactWhatsapp
+                ? 'whatsapp'
+                : eventName === GtmEvents.contactCall
+                  ? 'call'
+                  : 'email',
+          });
+        },
+        true,
+      );
+    };
+
+    bindContactTracking();
+
+    // astro:after-swap fires only on SPA navigations (View Transitions), not on
+    // the initial page load. GTM's own gtm.js handles the first page_view when
+    // the container script is loaded, avoiding a double send for returning
+    // consented users who would otherwise see two page_view hits on first load.
+    document.addEventListener('astro:after-swap', () => {
+      if (!isGtmEnabled()) return;
+      pushGtmEvent('page_view', {
+        page_title: document.title,
+        page_location: window.location.href,
+      });
+    });
+  </script>
+)}

@@ -1,0 +1,127 @@
+---
+export const prerender = false;
+
+import BlogUnavailable from '../../components/blog/BlogUnavailable.astro';
+import Breadcrumbs from '../../components/seo/Breadcrumbs.astro';
+import BookingSection from '../../components/services/BookingSection.astro';
+import Layout from '../../layouts/Layout.astro';
+import {
+  buildBlogPostingSchema,
+  buildBreadcrumbSchema,
+  buildWebPageSchema,
+} from '../../lib/schema';
+import BlogArticle from '../../modules/blog/components/BlogArticle.astro';
+import {
+  articleSeoDescription,
+  articleSeoTitle,
+  blogPath,
+  normalizeBlogSlugParam,
+  readingTimeForPost,
+  type BlogPost,
+} from '../../modules/blog';
+import {
+  BLOG_CACHE_MAX_AGE_SECONDS,
+  BLOG_CACHE_SWR_SECONDS,
+  blogArticleCacheTags,
+} from '../../modules/blog/cache';
+import {
+  loadPublicBlogPost,
+  loadPublicRelatedPosts,
+} from '../../modules/blog/lib/load-public-blog';
+
+const slug = normalizeBlogSlugParam(Astro.params.slug);
+
+if (!slug) {
+  return new Response(null, { status: 404, statusText: 'Not Found' });
+}
+
+const result = await loadPublicBlogPost(slug);
+if (!result.ok && result.kind === 'not_found') {
+  return new Response(null, { status: 404, statusText: 'Not Found' });
+}
+
+if (!result.ok) {
+  Astro.response.status = 503;
+  Astro.response.headers.set('Retry-After', '120');
+  Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+}
+
+const post = result.ok ? result.data : null;
+
+let relatedPosts: BlogPost[] = [];
+if (post) {
+  relatedPosts = await loadPublicRelatedPosts(post, 3);
+
+  if (Astro.cache.enabled) {
+    Astro.cache.set({
+      maxAge: BLOG_CACHE_MAX_AGE_SECONDS,
+      swr: BLOG_CACHE_SWR_SECONDS,
+      tags: blogArticleCacheTags(post.id),
+    });
+  }
+}
+
+const site = Astro.site!;
+const path = post ? blogPath(post.slug) : '/blogs';
+const title = post ? articleSeoTitle(post) : 'المقال غير متاح مؤقتاً | فال';
+const description = post ? articleSeoDescription(post) : 'تعذر تحميل المقال حالياً.';
+const readingTimeMinutes = post ? readingTimeForPost(post) : 1;
+const mainEntityId = `${new URL(path, site).href}#blogposting`;
+---
+
+{post ? (
+  <Layout
+    title={title}
+    description={description}
+    image={post.cover.src}
+    imageWidth={post.cover.width}
+    imageHeight={post.cover.height}
+    imageAlt={post.cover.alt}
+    ogType="article"
+    article={{
+      publishedTime: post.publishedAt,
+      modifiedTime: post.updatedAt ?? post.publishedAt,
+      author: post.author.name,
+      section: post.category.label,
+      tags: [post.category.label],
+    }}
+    schemas={[
+      buildWebPageSchema({
+        site,
+        path,
+        name: title,
+        description,
+        mainEntityId,
+      }),
+      buildBreadcrumbSchema(site, [
+        { name: 'الرئيسية', path: '/' },
+        { name: 'المدونة', path: '/blogs' },
+        { name: post.title, path },
+      ]),
+      buildBlogPostingSchema({
+        site,
+        post,
+        path,
+        readingTimeMinutes,
+      }),
+    ]}
+  >
+    <Breadcrumbs
+      items={[
+        { name: 'الرئيسية', href: '/' },
+        { name: 'المدونة', href: '/blogs' },
+        { name: post.title },
+      ]}
+    />
+    <div class="page-container">
+      <BlogArticle post={post} relatedPosts={relatedPosts} />
+    </div>
+    <BookingSection />
+  </Layout>
+) : (
+  <BlogUnavailable
+    title="المقال غير متاح مؤقتاً | فال"
+    heading="المقال غير متاح مؤقتاً"
+    body="تعذر تحميل هذا المقال حالياً. يرجى المحاولة بعد قليل أو العودة إلى قائمة المدونة."
+  />
+)}

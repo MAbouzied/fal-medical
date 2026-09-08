@@ -1,0 +1,85 @@
+---
+import { specialties } from '../../data/doctors';
+import type { Locale } from '../../lib/i18n/localize';
+import { isEnglish, localizeSpecialty } from '../../lib/i18n/localize';
+import AssetIcon from '../ui/AssetIcon.astro';
+
+export interface Props {
+  locale?: Locale;
+}
+
+const { locale = 'ar' } = Astro.props;
+const en = isEnglish(locale);
+const filterSpecialties = specialties.filter((specialty) => specialty !== 'خدمات الليزر');
+
+function filterLabel(specialty: (typeof specialties)[number]): string {
+  if (specialty === 'الأمراض الجلدية والتجميل') {
+    return en ? 'Dermatology doctors' : 'أطباء الجلدية';
+  }
+  return localizeSpecialty(specialty, locale);
+}
+---
+
+<aside class="lg:w-96 lg:shrink-0" aria-label={en ? 'Filter doctors' : 'تصفية الأطباء'}>
+  <details class="doctor-filters group rounded-2xl border border-border bg-surface sm:rounded-3xl lg:rounded-none lg:border-0" open>
+    <summary class="flex min-h-12 cursor-pointer list-none items-center justify-between px-4 text-sm font-bold sm:min-h-14 sm:px-5 sm:text-base lg:hidden">
+      {en ? 'Filter results' : 'تصفية النتائج'}
+      <AssetIcon src="/assets/chevron-down.svg" size="sm" class="transition-transform group-open:rotate-180" />
+    </summary>
+    <div class="space-y-4 border-t border-border p-3 sm:space-y-6 sm:p-4 lg:border-0 lg:px-4 lg:py-2">
+      <label class="relative block">
+        <span class="sr-only">{en ? 'Search for a doctor' : 'ابحث عن طبيب'}</span>
+        <input
+          id="doctor-search"
+          type="search"
+          placeholder={en ? 'Looking for a doctor?' : 'تبحث عن طبيب؟'}
+          class="h-12 w-full rounded-full border border-border-control bg-surface pe-4 ps-11 text-base shadow-[var(--shadow-control)] placeholder:text-placeholder"
+        />
+        <AssetIcon src="/assets/search.svg" class="pointer-events-none absolute start-4 top-1/2 -translate-y-1/2" />
+      </label>
+
+      <fieldset class="border-y border-border py-4">
+        <legend class="sr-only">{en ? 'Specialty' : 'التخصص'}</legend>
+        <div class="space-y-1">
+          {filterSpecialties.map((specialty, index) => (
+            <label class="block cursor-pointer">
+              <input
+                type="radio"
+                name="specialty"
+                value={specialty}
+                class="peer sr-only"
+                checked={index === 0}
+              />
+              <span class="flex min-h-12 items-center rounded-lg px-3 text-sm peer-checked:bg-surface-accent peer-checked:font-bold peer-checked:text-primary peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-focus">
+                {filterLabel(specialty)}
+              </span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <button id="reset-filters" type="button" class="min-h-11 w-full rounded-full border border-border text-sm font-bold hover:border-primary hover:text-primary">
+        {en ? 'Reset filters' : 'إعادة ضبط التصفية'}
+      </button>
+    </div>
+  </details>
+</aside>
+
+<script>
+  const bindDoctorFilters = () => {
+    const responsiveFilterDisclosure = document.querySelector<HTMLDetailsElement>('.doctor-filters');
+    if (!responsiveFilterDisclosure || responsiveFilterDisclosure.dataset.bound === 'true') return;
+    responsiveFilterDisclosure.dataset.bound = 'true';
+
+    const desktopFilterQuery = window.matchMedia('(min-width: 64rem)');
+
+    const syncFilterDisclosure = (event: MediaQueryList | MediaQueryListEvent) => {
+      responsiveFilterDisclosure.open = event.matches;
+    };
+
+    syncFilterDisclosure(desktopFilterQuery);
+    desktopFilterQuery.addEventListener('change', syncFilterDisclosure);
+  };
+
+  document.addEventListener('astro:page-load', bindDoctorFilters);
+</script>

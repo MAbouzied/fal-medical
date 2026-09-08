@@ -1,0 +1,51 @@
+---
+import ServicesPage from '../../../components/services/ServicesPage.astro';
+import { clinicServices } from '../../../data/services';
+import { localizeService, ui } from '../../../lib/i18n/localize';
+import {
+  buildBreadcrumbSchema,
+  buildItemListSchema,
+  buildWebPageSchema,
+} from '../../../lib/schema';
+import Layout from '../../../layouts/Layout.astro';
+
+const site = Astro.site!;
+const copy = ui('en')!;
+const title = copy.pages.servicesTitle;
+const description = copy.pages.servicesDescription;
+const localizedServices = clinicServices.map((service) => localizeService(service, 'en'));
+---
+
+<Layout
+  title={title}
+  description={description}
+  locale="en"
+  schemas={[
+    buildWebPageSchema({
+      site,
+      path: '/en/services',
+      name: title,
+      description,
+      locale: 'en',
+    }),
+    buildBreadcrumbSchema(site, [
+      { name: copy.nav.home, path: '/en' },
+      { name: copy.nav.services, path: '/en/services' },
+    ]),
+    buildItemListSchema({
+      site,
+      path: '/en/services',
+      name: 'Fal Clinic services',
+      description,
+      itemType: 'Service',
+      items: localizedServices.map((service) => ({
+        name: service.title,
+        path: `/en/services/${service.id}`,
+        description: service.description,
+        image: service.heroImage,
+      })),
+    }),
+  ]}
+>
+  <ServicesPage locale="en" />
+</Layout>

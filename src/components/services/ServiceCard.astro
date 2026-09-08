@@ -1,0 +1,42 @@
+---
+import type { ClinicService } from '../../data/services';
+import type { Locale } from '../../lib/i18n/localize';
+import { isEnglish, localizeDepartment, localizeService } from '../../lib/i18n/localize';
+
+export interface Props {
+  service: ClinicService;
+  locale?: Locale;
+  hidden?: boolean;
+}
+
+const { service: rawService, locale = 'ar', hidden = false } = Astro.props;
+const service = localizeService(rawService, locale);
+const en = isEnglish(locale);
+const href = en ? `/en/services/${service.id}` : `/services/${service.id}`;
+
+const iconBackgrounds: Record<string, string> = {
+  'أسنان': 'bg-success-soft',
+  'جلدية': 'bg-surface-accent',
+};
+---
+
+<a
+  href={href}
+  class="flex min-h-48 flex-col items-start rounded-[var(--radius-card)] border border-border bg-surface p-5 shadow-[var(--shadow-card)] transition-transform hover:-translate-y-0.5 sm:min-h-56 sm:p-8"
+  data-service-card
+  data-department={service.department}
+  hidden={hidden}
+  aria-label={en ? `View ${service.title} details` : `عرض تفاصيل خدمة ${service.title}`}
+>
+  <span
+    class:list={[
+      'flex size-14 shrink-0 items-center justify-center rounded-full',
+      iconBackgrounds[service.department],
+    ]}
+  >
+    <img src={service.icon} alt="" width="24" height="24" aria-hidden="true" />
+  </span>
+  <p class="mt-4 text-xs font-bold text-primary">{localizeDepartment(service.department, locale)}</p>
+  <h3 class="mt-2 text-xl font-bold tracking-tight text-ink">{service.title}</h3>
+  <p class="mt-2 text-base leading-7 text-muted">{service.description}</p>
+</a>

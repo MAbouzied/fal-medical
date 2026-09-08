@@ -1,0 +1,73 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "fal",
+  "main": "@astrojs/cloudflare/entrypoints/server",
+  // Keep this at or below the workerd version bundled with the local Wrangler CLI.
+  "compatibility_date": "2026-08-08",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  // Temporarily enabled so the Worker is reachable while falclinic.com
+  // stays on a different Cloudflare account/zone that this login cannot bind.
+  "workers_dev": true,
+  "preview_urls": true,
+  "observability": {
+    "enabled": true
+  },
+  // Required by astro.config.mjs `cache: { provider: cacheCloudflare() }`.
+  "cache": {
+    "enabled": true
+  },
+  // Never SPA-fallback unknown paths to index.html.
+  // Keep assets-first so `public/_redirects` can 301 legacy WordPress URLs.
+  // Misses then reach the Astro Worker (middleware + 404.astro).
+  // html_handling drops trailing slashes for real *.html files.
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "./dist",
+    "not_found_handling": "none",
+    "html_handling": "drop-trailing-slash",
+    "run_worker_first": false
+  },
+  "images": {
+    "binding": "IMAGES"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "SESSION"
+    }
+  ],
+  "ratelimits": [
+    {
+      "name": "CUSTOMER_RATE_LIMITER",
+      "namespace_id": "1001",
+      "simple": {
+        "limit": 10,
+        "period": 60
+      }
+    }
+  ],
+  "env": {
+    "staging": {
+      "name": "fal-staging",
+      "workers_dev": true,
+      "preview_urls": true,
+      "images": {
+        "binding": "IMAGES"
+      },
+      "kv_namespaces": [
+        {
+          "binding": "SESSION"
+        }
+      ],
+      "ratelimits": [
+        {
+          "name": "CUSTOMER_RATE_LIMITER",
+          "namespace_id": "1002",
+          "simple": {
+            "limit": 10,
+            "period": 60
+          }
+        }
+      ]
+    }
+  }
+}

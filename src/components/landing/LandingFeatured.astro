@@ -1,0 +1,55 @@
+---
+import { resolveLandingPage } from '../../data/landing';
+import type { Locale } from '../../lib/i18n/localize';
+import ButtonLink from '../ui/ButtonLink.astro';
+import PillLabel from '../ui/PillLabel.astro';
+import SitePicture from '../ui/SitePicture.astro';
+
+export interface Props {
+  locale?: Locale;
+}
+
+const { locale = 'ar' } = Astro.props;
+const page = resolveLandingPage(locale);
+---
+
+<section class="bg-surface py-12 sm:py-24" aria-labelledby="featured-heading">
+  <div class="page-container">
+    <div class="grid items-center gap-10 rounded-[var(--radius-section)] bg-footer px-5 py-10 sm:px-8 sm:py-16 lg:grid-cols-2 lg:gap-16 lg:px-12">
+      <div class="flex flex-col items-start gap-4 lg:col-start-2">
+        <PillLabel text={page.featured.eyebrow} />
+        <h2 id="featured-heading" class="text-display font-black text-white">{page.featured.title}</h2>
+        <p class="max-w-md text-[1.0625rem] leading-[1.8] text-on-dark/75">{page.featured.text}</p>
+        <ul class="mt-2 w-full space-y-3.5">
+          {page.featured.points.map((point) => (
+            <li class="flex items-center gap-3.5">
+              <span
+                class="grid size-[1.875rem] shrink-0 place-items-center rounded-full border border-primary text-[0.8125rem] text-icon-accent"
+                aria-hidden="true"
+              >
+                ✓
+              </span>
+              <div>
+                <h3 class="text-[0.9375rem] font-bold text-on-dark">{point.title}</h3>
+                <p class="text-[0.8125rem] leading-[1.6] text-on-dark/60">{point.text}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+        <ButtonLink href={page.featured.href} size="lg" class="mt-2">
+          {page.featured.cta}
+        </ButtonLink>
+      </div>
+
+      <div class="overflow-hidden rounded-[2.125rem] border border-border lg:col-start-1 lg:row-start-1">
+        <SitePicture
+          src={page.featured.imageSrc}
+          alt={page.featured.imageAlt}
+          widths={[480, 768, 960, 1200]}
+          sizes="(max-width: 1024px) calc(100vw - 2rem), 40vw"
+          class="aspect-[5/4] w-full object-cover"
+        />
+      </div>
+    </div>
+  </div>
+</section>

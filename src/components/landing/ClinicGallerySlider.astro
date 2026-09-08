@@ -1,0 +1,222 @@
+---
+import { clinicGallerySlides } from '../../data/clinic-gallery';
+import type { Locale } from '../../lib/i18n/localize';
+import { isEnglish } from '../../lib/i18n/localize';
+import SitePicture from '../ui/SitePicture.astro';
+
+export interface Props {
+  locale?: Locale;
+}
+
+const { locale = 'ar' } = Astro.props;
+const en = isEnglish(locale);
+const slides = clinicGallerySlides;
+const regionLabel = en ? 'Clinic interior gallery' : 'معرض صور من داخل العيادة';
+const previousLabel = en ? 'Previous photo' : 'الصورة السابقة';
+const nextLabel = en ? 'Next photo' : 'الصورة التالية';
+---
+
+<div
+  class="clinic-gallery mt-6 sm:mt-8"
+  data-clinic-gallery
+  data-interval="5500"
+>
+  <div
+    class="relative overflow-hidden rounded-[var(--radius-card)] bg-surface shadow-[var(--shadow-card)]"
+    role="region"
+    aria-roledescription="carousel"
+    aria-label={regionLabel}
+  >
+    <div class="relative aspect-[4/3] w-full sm:aspect-[16/9]">
+      {slides.map((slide, index) => (
+        <figure
+          class="clinic-gallery__slide absolute inset-0 m-0"
+          data-slide
+          data-active={index === 0 ? 'true' : 'false'}
+          aria-hidden={index === 0 ? 'false' : 'true'}
+        >
+          <SitePicture
+            src={slide.src}
+            alt={en ? slide.altEn : slide.altAr}
+            widths={[640, 960, 1280, 1600]}
+            sizes="(max-width: 1024px) calc(100vw - 2rem), 76rem"
+            class="size-full object-cover"
+            loading={index === 0 ? 'eager' : 'lazy'}
+            fetchpriority={index === 0 ? 'high' : 'auto'}
+          />
+          <figcaption
+            class="absolute inset-x-0 bottom-0 flex items-end bg-gradient-to-t from-ink/70 to-transparent px-4 pb-12 pt-16 sm:px-6 sm:pb-14"
+          >
+            <span
+              class="rounded-full bg-surface/95 px-3 py-1 text-xs font-bold text-ink shadow-[var(--shadow-control)]"
+            >
+              {en ? slide.captionEn : slide.captionAr}
+            </span>
+          </figcaption>
+        </figure>
+      ))}
+    </div>
+
+    <button
+      type="button"
+      class="clinic-gallery__nav absolute top-1/2 inline-flex size-10 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-surface/95 text-ink shadow-[var(--shadow-control)] ltr:left-3 rtl:right-3 sm:size-11"
+      data-gallery-prev
+      aria-label={previousLabel}
+    >
+      <span aria-hidden="true" class="text-lg ltr:rotate-180 rtl:rotate-0">‹</span>
+    </button>
+    <button
+      type="button"
+      class="clinic-gallery__nav absolute top-1/2 inline-flex size-10 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-surface/95 text-ink shadow-[var(--shadow-control)] ltr:right-3 rtl:left-3 sm:size-11"
+      data-gallery-next
+      aria-label={nextLabel}
+    >
+      <span aria-hidden="true" class="text-lg ltr:rotate-0 rtl:rotate-180">‹</span>
+    </button>
+
+    <div class="absolute inset-x-0 bottom-3 flex justify-center gap-2">
+      {slides.map((slide, index) => (
+        <button
+          type="button"
+          class="clinic-gallery__dot size-2.5 rounded-full"
+          data-gallery-dot
+          data-active={index === 0 ? 'true' : 'false'}
+          aria-label={en ? `Show ${slide.captionEn} ${index + 1}` : `عرض ${slide.captionAr} ${index + 1}`}
+        ></button>
+      ))}
+    </div>
+  </div>
+</div>
+
+<style>
+  .clinic-gallery__slide {
+    opacity: 0;
+    transition: opacity 800ms ease-in-out;
+    pointer-events: none;
+  }
+
+  .clinic-gallery__slide[data-active='true'] {
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 1;
+  }
+
+  .clinic-gallery__dot {
+    background: var(--color-surface);
+    box-shadow: var(--shadow-control);
+    opacity: 0.7;
+  }
+
+  .clinic-gallery__dot[data-active='true'] {
+    background: var(--color-primary);
+    opacity: 1;
+  }
+
+  .clinic-gallery__nav:hover {
+    border-color: color-mix(in srgb, var(--color-primary) 40%, var(--color-border));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .clinic-gallery__slide {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  function initClinicGallery(root: HTMLElement) {
+    const slides = [...root.querySelectorAll<HTMLElement>('[data-slide]')];
+    const dots = [...root.querySelectorAll<HTMLButtonElement>('[data-gallery-dot]')];
+    const prev = root.querySelector<HTMLButtonElement>('[data-gallery-prev]');
+    const next = root.querySelector<HTMLButtonElement>('[data-gallery-next]');
+    const viewport = root.querySelector<HTMLElement>('[role="region"]');
+    if (slides.length < 2 || !viewport) return;
+
+    let index = 0;
+    const intervalMs = Number(root.dataset.interval ?? 5500);
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let timer: number | undefined;
+    let pointerStartX: number | null = null;
+
+    const show = (nextIndex: number) => {
+      index = (nextIndex + slides.length) % slides.length;
+      slides.forEach((slide, slideIndex) => {
+        const active = slideIndex === index;
+        slide.dataset.active = active ? 'true' : 'false';
+        slide.setAttribute('aria-hidden', active ? 'false' : 'true');
+      });
+      dots.forEach((dot, dotIndex) => {
+        dot.dataset.active = dotIndex === index ? 'true' : 'false';
+      });
+    };
+
+    const stop = () => {
+      if (timer !== undefined) window.clearInterval(timer);
+      timer = undefined;
+    };
+
+    const start = () => {
+      if (reduceMotion || document.hidden) return;
+      stop();
+      timer = window.setInterval(() => show(index + 1), intervalMs);
+    };
+
+    prev?.addEventListener('click', () => {
+      show(index - 1);
+      start();
+    });
+    next?.addEventListener('click', () => {
+      show(index + 1);
+      start();
+    });
+    dots.forEach((dot, dotIndex) => {
+      dot.addEventListener('click', () => {
+        show(dotIndex);
+        start();
+      });
+    });
+
+    viewport.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        const rtl = getComputedStyle(root).direction === 'rtl';
+        show(rtl ? index + 1 : index - 1);
+        start();
+      }
+      if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        const rtl = getComputedStyle(root).direction === 'rtl';
+        show(rtl ? index - 1 : index + 1);
+        start();
+      }
+    });
+    viewport.tabIndex = 0;
+
+    viewport.addEventListener('pointerdown', (event) => {
+      pointerStartX = event.clientX;
+    });
+    viewport.addEventListener('pointerup', (event) => {
+      if (pointerStartX === null) return;
+      const delta = event.clientX - pointerStartX;
+      pointerStartX = null;
+      if (Math.abs(delta) < 40) return;
+      const rtl = getComputedStyle(root).direction === 'rtl';
+      const goingNext = rtl ? delta > 0 : delta < 0;
+      show(goingNext ? index + 1 : index - 1);
+      start();
+    });
+
+    root.addEventListener('mouseenter', stop);
+    root.addEventListener('mouseleave', start);
+    root.addEventListener('focusin', stop);
+    root.addEventListener('focusout', start);
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stop();
+      else start();
+    });
+
+    start();
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-clinic-gallery]').forEach(initClinicGallery);
+</script>

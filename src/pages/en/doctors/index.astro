@@ -1,0 +1,106 @@
+---
+import DoctorsDirectory from '../../../components/doctors/DoctorsDirectory.astro';
+import FaqSection from '../../../components/sections/FaqSection.astro';
+import SectionHeading from '../../../components/ui/SectionHeading.astro';
+import { doctors } from '../../../data/doctors';
+import { localizeDoctor, localizeFaq, ui } from '../../../lib/i18n/localize';
+import {
+  buildBreadcrumbSchema,
+  buildItemListSchema,
+  buildWebPageSchema,
+} from '../../../lib/schema';
+import Layout from '../../../layouts/Layout.astro';
+
+const site = Astro.site!;
+const copy = ui('en')!;
+const title = copy.pages.doctorsTitle;
+const description = copy.pages.doctorsDescription;
+const faqItems = localizeFaq('en');
+const localizedDoctors = doctors.map((doctor) => localizeDoctor(doctor, 'en'));
+---
+
+<Layout
+  title={title}
+  description={description}
+  locale="en"
+  schemas={[
+    buildWebPageSchema({
+      site,
+      path: '/en/doctors',
+      name: title,
+      description,
+      locale: 'en',
+    }),
+    buildBreadcrumbSchema(site, [
+      { name: copy.nav.home, path: '/en' },
+      { name: copy.nav.doctors, path: '/en/doctors' },
+    ]),
+    buildItemListSchema({
+      site,
+      path: '/en/doctors',
+      name: 'Fal Clinic doctors',
+      description,
+      itemType: 'Physician',
+      items: localizedDoctors.map((doctor) => ({
+        name: doctor.name,
+        path: `/en/doctors/${doctor.id}`,
+        description: doctor.summary,
+        image: doctor.image,
+      })),
+    }),
+  ]}
+>
+  <section class="py-14 sm:py-24">
+    <div class="page-container">
+      <SectionHeading eyebrow={copy.nav.doctors} title={copy.pages.doctorsHeading} description={description} level={1} />
+    </div>
+  </section>
+  <DoctorsDirectory doctors={doctors} locale="en" />
+  <FaqSection items={faqItems} locale="en" />
+</Layout>
+
+<script>
+  (() => {
+    const searchInput = document.querySelector<HTMLInputElement>('#doctor-search');
+    const specialtyInputs = [...document.querySelectorAll<HTMLInputElement>('input[name="specialty"]')];
+    const cards = [...document.querySelectorAll<HTMLElement>('[data-doctor-card]')];
+    const grid = document.querySelector<HTMLElement>('#doctors-grid');
+    const emptyState = document.querySelector<HTMLElement>('#empty-results');
+    const status = document.querySelector<HTMLElement>('#results-status');
+    if (!searchInput) return;
+
+    const normalize = (value: string) => value.trim().toLocaleLowerCase('en');
+
+    const applyFilters = () => {
+      const query = normalize(searchInput.value ?? '');
+      const specialty = specialtyInputs.find((input) => input.checked)?.value ?? 'كل الأطباء';
+      let visibleCount = 0;
+
+      cards.forEach((card) => {
+        const matchesSearch = normalize(card.dataset.search ?? '').includes(query);
+        const matchesSpecialty = specialty === 'كل الأطباء' || card.dataset.specialty === specialty;
+        const isVisible = matchesSearch && matchesSpecialty;
+        card.hidden = !isVisible;
+        if (isVisible) visibleCount += 1;
+      });
+
+      grid?.classList.toggle('hidden', visibleCount === 0);
+      emptyState?.classList.toggle('hidden', visibleCount !== 0);
+      if (status) status.textContent = `Results: ${visibleCount}`;
+    };
+
+    const resetFilters = () => {
+      searchInput.value = '';
+      specialtyInputs.forEach((input, index) => {
+        input.checked = index === 0;
+      });
+      applyFilters();
+    };
+
+    searchInput.addEventListener('input', applyFilters);
+    specialtyInputs.forEach((input) => input.addEventListener('change', applyFilters));
+    document.querySelectorAll<HTMLElement>('#reset-filters, [data-reset-filters]').forEach((button) => {
+      button.addEventListener('click', resetFilters);
+    });
+  })();
+</script>

@@ -1,0 +1,218 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import AnalyticsConsent from '../components/analytics/AnalyticsConsent.astro';
+import Gtm from '../components/analytics/Gtm.astro';
+import JsonLd from '../components/seo/JsonLd.astro';
+import SiteFooter from '../components/site/SiteFooter.astro';
+import SiteHeader from '../components/site/SiteHeader.astro';
+import { organization } from '../data/organization';
+import { imageMimeType, socialCard } from '../data/seo';
+import { SEO_INDEXABLE } from 'astro:env/server';
+import { isGtmConfigured } from '../lib/gtm';
+import {
+  getAlternatePaths,
+  htmlLang,
+  localeFromPathname,
+  normalizePathname,
+  ogLocale,
+  type Locale,
+} from '../lib/i18n/localize';
+import { findRoutePair } from '../lib/i18n/routes';
+import { buildGraph } from '../lib/schema';
+import '../styles/global.css';
+
+export interface ArticleMeta {
+  publishedTime: string;
+  modifiedTime?: string;
+  author?: string;
+  section?: string;
+  tags?: readonly string[];
+}
+
+export interface Props {
+  /** Full document title (unique, search-focused; include brand when needed). */
+  title: string;
+  description: string;
+  image?: string;
+  imageWidth?: number;
+  imageHeight?: number;
+  imageAlt?: string;
+  noindex?: boolean;
+  /** Use noindex,follow for soft errors like 404. */
+  robotsFollow?: boolean;
+  ogType?: 'website' | 'article' | 'profile';
+  schemas?: Record<string, unknown>[];
+  locale?: Locale;
+  hideChrome?: boolean;
+  /** Override canonical path (defaults to current pathname). */
+  canonicalPath?: string;
+  /** Skip canonical/hreflang (error pages). */
+  omitAlternates?: boolean;
+  /** Optional Open Graph article metadata. */
+  article?: ArticleMeta;
+  /** Disable GTM on staff/auth surfaces. */
+  disableAnalytics?: boolean;
+  /** Skip public JSON-LD graph (admin/login). */
+  omitStructuredData?: boolean;
+}
+
+const {
+  title,
+  description,
+  image = socialCard.path,
+  imageWidth = socialCard.width,
+  imageHeight = socialCard.height,
+  imageAlt,
+  noindex = false,
+  robotsFollow = true,
+  ogType = 'website',
+  schemas = [],
+  locale: localeProp,
+  hideChrome = false,
+  canonicalPath,
+  omitAlternates = false,
+  article,
+  disableAnalytics = false,
+  omitStructuredData = false,
+} = Astro.props;
+
+const site = Astro.site;
+if (!site) throw new Error('Astro site URL must be configured.');
+
+const pathname = normalizePathname(Astro.url.pathname);
+const locale = localeProp ?? localeFromPathname(pathname);
+const isEnglish = locale === 'en';
+
+const host = Astro.url.hostname.toLowerCase();
+const isPreviewHost =
+  host.endsWith('.workers.dev') ||
+  host.endsWith('.pages.dev') ||
+  host.includes('localhost') ||
+  host === '127.0.0.1';
+
+const routePair = findRoutePair(pathname);
+const effectiveNoindex =
+  noindex ||
+  SEO_INDEXABLE !== true ||
+  isPreviewHost ||
+  routePair?.indexable === false;
+
+const resolvedCanonicalPath = normalizePathname(canonicalPath ?? pathname);
+const canonicalUrl = new URL(resolvedCanonicalPath, site);
+const socialImageUrl = new URL(image, site).href;
+const socialImageSecureUrl = socialImageUrl.replace(/^http:\/\//i, 'https://');
+const socialMime = imageMimeType(image);
+const brandName = isEnglish ? organization.alternateName : organization.name;
+const fullTitle = title;
+const resolvedImageAlt = imageAlt ?? (isEnglish ? socialCard.altEn : socialCard.altAr);
+const structuredData = omitStructuredData ? null : buildGraph(site, schemas, locale);
+const analyticsEnabled = isGtmConfigured && !disableAnalytics;
+
+const alternates =
+  omitAlternates || effectiveNoindex ? null : getAlternatePaths(resolvedCanonicalPath);
+const arabicAlternate = alternates ? new URL(alternates.ar, site).href : null;
+const englishAlternate =
+  alternates?.en !== undefined ? new URL(alternates.en, site).href : null;
+const primaryOgLocale = ogLocale(locale);
+const alternateOgLocale =
+  arabicAlternate && englishAlternate ? ogLocale(isEnglish ? 'ar' : 'en') : null;
+
+const robotsContent = effectiveNoindex
+  ? robotsFollow
+    ? 'noindex, follow'
+    : 'noindex, nofollow'
+  : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
+
+const skipLabel = isEnglish ? 'Skip to main content' : 'تجاوز إلى المحتوى الرئيسي';
+---
+
+<!doctype html>
+<html lang={htmlLang(locale)} dir={isEnglish ? 'ltr' : 'rtl'}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#12a394" />
+    {analyticsEnabled && <Gtm />}
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content={brandName} />
+    <meta name="application-name" content={organization.alternateName} />
+    <meta name="robots" content={robotsContent} />
+
+    <meta property="og:locale" content={primaryOgLocale} />
+    {alternateOgLocale && <meta property="og:locale:alternate" content={alternateOgLocale} />}
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={brandName} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={socialImageSecureUrl} />
+    <meta property="og:image:secure_url" content={socialImageSecureUrl} />
+    <meta property="og:image:alt" content={resolvedImageAlt} />
+    <meta property="og:image:width" content={String(imageWidth)} />
+    <meta property="og:image:height" content={String(imageHeight)} />
+    <meta property="og:image:type" content={socialMime} />
+    <meta property="og:url" content={canonicalUrl} />
+    {article && ogType === 'article' && (
+      <>
+        <meta property="article:published_time" content={article.publishedTime} />
+        {article.modifiedTime && (
+          <meta property="article:modified_time" content={article.modifiedTime} />
+        )}
+        {article.author && <meta property="article:author" content={article.author} />}
+        {article.section && <meta property="article:section" content={article.section} />}
+        {article.tags?.map((tag) => <meta property="article:tag" content={tag} />)}
+      </>
+    )}
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImageSecureUrl} />
+    <meta name="twitter:image:alt" content={resolvedImageAlt} />
+
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    {!effectiveNoindex && <link rel="canonical" href={canonicalUrl} />}
+    {arabicAlternate && englishAlternate && (
+      <>
+        <link rel="alternate" hreflang="ar" href={arabicAlternate} />
+        <link rel="alternate" hreflang="en" href={englishAlternate} />
+        <link rel="alternate" hreflang="x-default" href={arabicAlternate} />
+      </>
+    )}
+    {arabicAlternate && !englishAlternate && !effectiveNoindex && (
+      <>
+        <link rel="alternate" hreflang="ar" href={arabicAlternate} />
+        <link rel="alternate" hreflang="x-default" href={arabicAlternate} />
+      </>
+    )}
+
+    {structuredData && <JsonLd data={structuredData} />}
+    <!-- Soft client navigations (Next.js-like) — avoids full reload / favicon spinner. -->
+    <ClientRouter fallback="swap" />
+  </head>
+  <body class="flex min-h-screen flex-col bg-surface text-ink">
+    <a
+      href="#main-content"
+      class="sr-only fixed start-2 top-2 z-[100] rounded-lg bg-surface px-4 py-2 text-sm font-bold text-primary shadow-[var(--shadow-card)] focus:not-sr-only focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-focus"
+    >
+      {skipLabel}
+    </a>
+    {!hideChrome && <SiteHeader locale={locale} />}
+    <main id="main-content" tabindex="-1" class="flex-1" transition:animate="none">
+      <slot />
+    </main>
+    {!hideChrome && <SiteFooter locale={locale} />}
+    {analyticsEnabled && <AnalyticsConsent locale={locale} />}
+  </body>
+</html>
+
+<style is:global>
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation: none;
+    }
+  }
+</style>

@@ -1,0 +1,138 @@
+---
+import {
+  buildPhoneUrl,
+  buildWhatsAppUrl,
+  clinicLines,
+} from '../../data/contact';
+import { clinicFacts, formatClinicHours } from '../../data/clinic-facts';
+import { clinicMapUrl } from '../../data/seo';
+import type { Locale } from '../../lib/i18n/localize';
+import { isEnglish, localizeContact, ui } from '../../lib/i18n/localize';
+import ContactInquiryForm from '../contact/ContactInquiryForm.astro';
+import AssetIcon from '../ui/AssetIcon.astro';
+import PillLabel from '../ui/PillLabel.astro';
+
+export interface Props {
+  locale?: Locale;
+}
+
+const { locale = 'ar' } = Astro.props;
+const en = isEnglish(locale);
+const copy = ui(locale);
+const contact = localizeContact(locale);
+const phone = clinicLines[0];
+const whatsappMessage = en
+  ? 'Hello, I would like to book a consultation at Fal Clinic.'
+  : 'مرحباً، أود حجز استشارة في مجمع عيادات فال.';
+const shortLocation = en
+  ? `${clinicFacts.cityEn} · ${clinicFacts.districtEn}`
+  : `${clinicFacts.cityAr} · ${clinicFacts.districtAr}`;
+
+const text = en
+  ? {
+      eyebrow: copy!.pages.servicesConsultEyebrow,
+      title: copy!.pages.servicesConsultTitle,
+      intro: copy!.pages.servicesConsultIntro,
+      note: copy!.pages.servicesConsultNote,
+      submit: copy!.pages.servicesConfirmBooking,
+      whatsapp: copy!.common.whatsapp,
+      call: copy!.pages.servicesCallDirect,
+      address: copy!.common.address,
+    }
+  : {
+      eyebrow: 'ابدأ الآن',
+      title: 'احجز استشارتك المجانية',
+      intro: 'املأ النموذج وسيتواصل معك فريقنا خلال ساعات العمل لتأكيد موعدك.',
+      note: 'الخطة والعلاج يبدآن فقط بعد موافقتك.',
+      submit: 'تأكيد الحجز',
+      whatsapp: 'واتساب',
+      call: 'اتصال مباشر',
+      address: 'العنوان',
+    };
+
+const cards = [
+  {
+    id: 'whatsapp',
+    href: buildWhatsAppUrl(whatsappMessage, phone.id),
+    icon: '/assets/whatsapp.svg',
+    label: text.whatsapp,
+    value: phone.phoneDisplay,
+    external: true,
+    ltr: true,
+  },
+  {
+    id: 'call',
+    href: buildPhoneUrl(phone.id),
+    icon: '/assets/phone.svg',
+    label: text.call,
+    value: formatClinicHours(locale),
+    external: false,
+    ltr: false,
+  },
+  {
+    id: 'location',
+    href: clinicMapUrl,
+    icon: '/assets/location.svg',
+    label: text.address,
+    value: shortLocation,
+    external: true,
+    ltr: false,
+  },
+] as const;
+---
+
+<section id="booking" class="scroll-mt-24 bg-surface py-12 sm:py-24" aria-labelledby="services-consult-heading">
+  <div class="page-container">
+    <div class="rounded-[var(--radius-section)] bg-footer px-5 py-10 sm:px-8 sm:py-16 lg:px-12 lg:py-24">
+      <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-10">
+        <div class="flex flex-col items-start gap-4">
+          <div class="flex max-w-2xl flex-col items-start gap-4">
+            <PillLabel text={text.eyebrow} />
+            <h2 id="services-consult-heading" class="text-display font-black text-white">
+              {text.title}
+            </h2>
+          </div>
+          <div class="text-[1.0625rem] leading-[1.8] text-on-dark/70">
+            <p>{text.intro}</p>
+            <p>{text.note}</p>
+          </div>
+          <ul class="mt-2 w-full space-y-4">
+            {cards.map((card) => (
+              <li>
+                <a
+                  href={card.href}
+                  class="flex items-center gap-4 rounded-2xl border border-white/15 px-5 py-4 text-on-dark transition-colors hover:border-icon-accent/40 focus-visible:outline-offset-4"
+                  target={card.external ? '_blank' : undefined}
+                  rel={card.external ? 'noopener noreferrer' : undefined}
+                  aria-label={
+                    card.id === 'location'
+                      ? `${text.address}: ${contact.location}`
+                      : `${card.label} ${card.value}`
+                  }
+                >
+                  <span class="inline-flex size-11 shrink-0 items-center justify-center rounded-xl bg-white/10 text-icon-accent">
+                    <AssetIcon src={card.icon} size="md" />
+                  </span>
+                  <span class="min-w-0">
+                    <span class="block text-[0.9375rem] font-bold text-on-dark">{card.label}</span>
+                    <span
+                      class="mt-0.5 block text-[0.8125rem] leading-[1.6] text-on-dark/60"
+                      dir={card.ltr ? 'ltr' : undefined}
+                    >
+                      {card.value}
+                    </span>
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <ContactInquiryForm
+          locale={locale}
+          submitLabel={text.submit}
+          gtmForm="services_consult"
+        />
+      </div>
+    </div>
+  </div>
+</section>

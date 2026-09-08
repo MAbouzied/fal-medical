@@ -1,0 +1,177 @@
+---
+import {
+  clinicServices,
+  serviceDepartmentFromSlug,
+  serviceDepartments,
+  type ServiceDepartment,
+} from '../../data/services';
+import type { Locale } from '../../lib/i18n/localize';
+import { isEnglish, localizeDepartment, ui } from '../../lib/i18n/localize';
+import ServiceCard from './ServiceCard.astro';
+
+export interface Props {
+  locale?: Locale;
+}
+
+const { locale = 'ar' } = Astro.props;
+const en = isEnglish(locale);
+const copy = ui(locale);
+const title = en ? copy!.pages.servicesCatalogTitle : 'تصفح كل الخدمات';
+const tablistLabel = en ? 'Filter services by department' : 'تصفية الخدمات حسب القسم';
+const statusLabel = en ? 'Service count' : 'عدد الخدمات';
+const selectedDepartment: ServiceDepartment =
+  serviceDepartmentFromSlug(Astro.url.searchParams.get('department')) ??
+  serviceDepartmentFromSlug(Astro.url.hash) ??
+  'كل الخدمات';
+const selectedTabIndex = Math.max(0, serviceDepartments.indexOf(selectedDepartment));
+const visibleCount = clinicServices.filter(
+  (service) => selectedDepartment === 'كل الخدمات' || service.department === selectedDepartment,
+).length;
+---
+
+<section id="all-services" class="scroll-mt-24 bg-surface py-12 sm:py-20" aria-labelledby="services-catalog-heading">
+  <div class="page-container">
+    <h2 id="services-catalog-heading" class="text-display text-center font-black text-ink">
+      {title}
+    </h2>
+
+    <div
+      class="mt-8 flex gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:justify-center sm:overflow-visible"
+      role="tablist"
+      aria-label={tablistLabel}
+    >
+      {serviceDepartments.map((department, index) => (
+        <button
+          id={`catalog-tab-${index}`}
+          type="button"
+          role="tab"
+          aria-selected={index === selectedTabIndex ? 'true' : 'false'}
+          aria-controls="services-panel"
+          tabindex={index === selectedTabIndex ? 0 : -1}
+          data-service-filter={department}
+          class="min-h-11 shrink-0 rounded-full border border-success/50 bg-surface px-4 text-sm font-bold whitespace-nowrap text-gold-text transition-colors hover:bg-surface-accent aria-selected:border-transparent aria-selected:bg-gold aria-selected:text-ink-button"
+        >
+          {localizeDepartment(department, locale)}
+        </button>
+      ))}
+    </div>
+
+    <p id="services-status" class="sr-only" role="status" aria-live="polite">
+      {statusLabel}: {visibleCount}
+    </p>
+    <div
+      id="services-panel"
+      role="tabpanel"
+      aria-labelledby={`catalog-tab-${selectedTabIndex}`}
+      class="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
+    >
+      {clinicServices.map((service) => (
+        <ServiceCard
+          service={service}
+          locale={locale}
+          hidden={selectedDepartment !== 'كل الخدمات' && service.department !== selectedDepartment}
+        />
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  const departmentFromLocation = () => {
+    const query = new URLSearchParams(window.location.search).get('department');
+    const hash = window.location.hash.replace(/^#/, '');
+    const slug = (query ?? hash).toLowerCase();
+    if (slug === 'dentistry' || slug === 'dental') return 'أسنان';
+    if (slug === 'skin' || slug === 'dermatology') return 'جلدية';
+    return 'كل الخدمات';
+  };
+
+  const departmentSlug = (department: string) => {
+    if (department === 'أسنان') return 'dentistry';
+    if (department === 'جلدية') return 'skin';
+    return '';
+  };
+
+  const bindCatalog = () => {
+    const root = document.querySelector<HTMLElement>('#all-services');
+    const tabs = [...document.querySelectorAll<HTMLButtonElement>('#all-services [data-service-filter]')];
+    const serviceCards = [...document.querySelectorAll<HTMLElement>('#all-services [data-service-card]')];
+    const servicesPanel = document.querySelector<HTMLElement>('#services-panel');
+    const servicesStatus = document.querySelector<HTMLElement>('#services-status');
+    const isEnglishPage = document.documentElement.lang.startsWith('en');
+    const isRtl = document.documentElement.dir === 'rtl';
+
+    if (!root || tabs.length === 0) return;
+
+    const selectCategory = (selectedTab: HTMLButtonElement, updateUrl = false) => {
+      const department = selectedTab.dataset.serviceFilter ?? 'كل الخدمات';
+      let visibleCount = 0;
+
+      tabs.forEach((tab) => {
+        const isSelected = tab === selectedTab;
+        tab.setAttribute('aria-selected', String(isSelected));
+        tab.tabIndex = isSelected ? 0 : -1;
+      });
+
+      serviceCards.forEach((card) => {
+        const isVisible = department === 'كل الخدمات' || card.dataset.department === department;
+        card.hidden = !isVisible;
+        if (isVisible) visibleCount += 1;
+      });
+
+      servicesPanel?.setAttribute('aria-labelledby', selectedTab.id);
+      if (servicesStatus) {
+        servicesStatus.textContent = isEnglishPage
+          ? `Service count: ${visibleCount}`
+          : `عدد الخدمات: ${visibleCount}`;
+      }
+
+      if (!updateUrl) return;
+      const url = new URL(window.location.href);
+      const slug = departmentSlug(department);
+      if (slug) url.searchParams.set('department', slug);
+      else url.searchParams.delete('department');
+      url.hash = 'all-services';
+      history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
+    };
+
+    const applyLocation = () => {
+      const department = departmentFromLocation();
+      const selectedTab = tabs.find((tab) => tab.dataset.serviceFilter === department) ?? tabs[0];
+      if (selectedTab) selectCategory(selectedTab);
+    };
+
+    if (root.dataset.catalogBound !== 'true') {
+      root.dataset.catalogBound = 'true';
+      tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => selectCategory(tab, true));
+        tab.addEventListener('keydown', (event) => {
+          if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+          event.preventDefault();
+          const goingNext = isRtl ? event.key === 'ArrowLeft' : event.key === 'ArrowRight';
+          const targetIndex = event.key === 'Home'
+            ? 0
+            : event.key === 'End'
+              ? tabs.length - 1
+              : (index + (goingNext ? 1 : -1) + tabs.length) % tabs.length;
+          const targetTab = tabs[targetIndex];
+          if (targetTab) {
+            selectCategory(targetTab, true);
+            targetTab.focus();
+          }
+        });
+      });
+    }
+
+    applyLocation();
+  };
+
+  if (document.documentElement.dataset.servicesCatalogBound !== 'true') {
+    document.documentElement.dataset.servicesCatalogBound = 'true';
+    window.addEventListener('hashchange', bindCatalog);
+    window.addEventListener('popstate', bindCatalog);
+    document.addEventListener('astro:page-load', bindCatalog);
+  }
+
+  bindCatalog();
+</script>

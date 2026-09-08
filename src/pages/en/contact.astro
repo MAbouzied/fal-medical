@@ -1,0 +1,36 @@
+---
+import ContactPage from '../../components/contact/ContactPage.astro';
+import { ui } from '../../lib/i18n/localize';
+import {
+  buildBreadcrumbSchema,
+  buildWebPageSchema,
+} from '../../lib/schema';
+import Layout from '../../layouts/Layout.astro';
+
+const site = Astro.site!;
+const copy = ui('en')!;
+const title = copy.pages.contactTitle;
+const description = copy.pages.contactDescription;
+---
+
+<Layout
+  title={title}
+  description={description}
+  locale="en"
+  schemas={[
+    buildWebPageSchema({
+      site,
+      path: '/en/contact',
+      name: title,
+      description,
+      type: 'ContactPage',
+      locale: 'en',
+    }),
+    buildBreadcrumbSchema(site, [
+      { name: copy.nav.home, path: '/en' },
+      { name: copy.nav.contact, path: '/en/contact' },
+    ]),
+  ]}
+>
+  <ContactPage locale="en" />
+</Layout>

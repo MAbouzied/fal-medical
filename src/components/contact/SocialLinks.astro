@@ -1,0 +1,57 @@
+---
+import { clinicSocialLinks } from '../../data/contact';
+import type { Locale } from '../../lib/i18n/localize';
+import { isEnglish } from '../../lib/i18n/localize';
+import AssetIcon from '../ui/AssetIcon.astro';
+
+export interface Props {
+  locale?: Locale;
+  class?: string;
+  heading?: string;
+  id?: string;
+  variant?: 'default' | 'on-dark';
+  hideHeading?: boolean;
+}
+
+const {
+  locale = 'ar',
+  class: className = '',
+  heading,
+  id = 'social-links',
+  variant = 'default',
+  hideHeading = false,
+} = Astro.props;
+const en = isEnglish(locale);
+const resolvedHeading = heading ?? (en ? 'Follow us' : 'تابعنا');
+const headingId = `${id}-heading`;
+const onDark = variant === 'on-dark';
+---
+
+<nav class:list={['space-y-3', className]} aria-labelledby={hideHeading ? undefined : headingId} aria-label={hideHeading ? resolvedHeading : undefined}>
+  {!hideHeading && (
+    <h2 id={headingId} class:list={['text-xs font-bold', onDark ? 'text-white' : 'text-ink']}>
+      {resolvedHeading}
+    </h2>
+  )}
+  <ul class="flex flex-wrap items-center gap-2">
+    {clinicSocialLinks.map((link) => (
+      <li>
+        <a
+          href={link.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          class:list={[
+            'inline-flex size-10 items-center justify-center rounded-full border transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus',
+            onDark
+              ? 'border-white/20 bg-white/5 text-white hover:border-primary hover:text-primary'
+              : 'border-border bg-surface text-ink hover:border-primary/40 hover:text-primary',
+          ]}
+          aria-label={en ? link.labelEn : link.labelAr}
+          data-gtm-location="social"
+        >
+          <AssetIcon src={link.icon} size="md" class={onDark ? 'brightness-0 invert' : ''} />
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>

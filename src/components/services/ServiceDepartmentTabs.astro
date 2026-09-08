@@ -1,0 +1,103 @@
+---
+import { clinicServices, homeServiceDepartments } from '../../data/services';
+import type { Locale } from '../../lib/i18n/localize';
+import { isEnglish, localizeDepartment } from '../../lib/i18n/localize';
+import ServiceCard from './ServiceCard.astro';
+
+export interface Props {
+  locale?: Locale;
+  idPrefix?: string;
+}
+
+const { locale = 'ar', idPrefix = 'home-services' } = Astro.props;
+const defaultDepartment = homeServiceDepartments[0];
+const en = isEnglish(locale);
+const tablistLabel = en ? 'Filter services by department' : 'تصفية الخدمات حسب القسم';
+---
+
+<div data-service-tabs={idPrefix}>
+  <div
+    class="mx-auto flex w-full max-w-[480px] gap-1 overflow-x-auto rounded-[var(--radius-card)] border border-border bg-surface-soft p-1 sm:grid sm:grid-cols-2 sm:gap-1.5 sm:overflow-visible sm:p-1.5"
+    role="tablist"
+    aria-label={tablistLabel}
+  >
+    {homeServiceDepartments.map((department, index) => (
+      <button
+        id={`${idPrefix}-tab-${index}`}
+        type="button"
+        role="tab"
+        aria-selected={index === 0 ? 'true' : 'false'}
+        aria-controls={`${idPrefix}-panel`}
+        tabindex={index === 0 ? 0 : -1}
+        data-service-filter={department}
+        class="min-h-11 shrink-0 rounded-full px-4 text-sm font-medium whitespace-nowrap text-muted transition-[color,background-color,box-shadow] hover:bg-surface hover:text-ink aria-selected:bg-primary aria-selected:text-surface aria-selected:shadow-[var(--shadow-control)] aria-selected:hover:bg-primary aria-selected:hover:text-surface sm:min-h-12 sm:w-full sm:px-4 sm:text-base"
+      >
+        {localizeDepartment(department, locale)}
+      </button>
+    ))}
+  </div>
+
+  <div
+    id={`${idPrefix}-panel`}
+    role="tabpanel"
+    aria-labelledby={`${idPrefix}-tab-0`}
+    class="mt-8 grid grid-cols-1 gap-4 sm:mt-10 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3"
+  >
+    {clinicServices.map((service) => (
+      <ServiceCard
+        service={service}
+        locale={locale}
+        hidden={service.department !== defaultDepartment}
+      />
+    ))}
+  </div>
+</div>
+
+<script>
+  (() => {
+    const roots = [...document.querySelectorAll<HTMLElement>('[data-service-tabs]')];
+
+    roots.forEach((root) => {
+      const tabs = [...root.querySelectorAll<HTMLButtonElement>('[data-service-filter]')];
+      const serviceCards = [...root.querySelectorAll<HTMLElement>('[data-service-card]')];
+      const servicesPanel = root.querySelector<HTMLElement>('[role="tabpanel"]');
+      if (tabs.length === 0) return;
+
+      const selectCategory = (selectedTab: HTMLButtonElement) => {
+        const selectedCategory = selectedTab.dataset.serviceFilter ?? '';
+
+        tabs.forEach((tab) => {
+          const isSelected = tab === selectedTab;
+          tab.setAttribute('aria-selected', String(isSelected));
+          tab.tabIndex = isSelected ? 0 : -1;
+        });
+
+        serviceCards.forEach((card) => {
+          card.hidden = card.dataset.department !== selectedCategory;
+        });
+
+        if (servicesPanel) {
+          servicesPanel.setAttribute('aria-labelledby', selectedTab.id);
+        }
+      };
+
+      tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => selectCategory(tab));
+        tab.addEventListener('keydown', (event) => {
+          if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+          event.preventDefault();
+          const targetIndex = event.key === 'Home'
+            ? 0
+            : event.key === 'End'
+              ? tabs.length - 1
+              : (index + (event.key === 'ArrowLeft' ? 1 : -1) + tabs.length) % tabs.length;
+          const targetTab = tabs[targetIndex];
+          if (targetTab) {
+            selectCategory(targetTab);
+            targetTab.focus();
+          }
+        });
+      });
+    });
+  })();
+</script>

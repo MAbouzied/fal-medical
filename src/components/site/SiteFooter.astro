@@ -1,0 +1,187 @@
+---
+import { buildPhoneUrl, clinicLines } from '../../data/contact';
+import SocialLinks from '../contact/SocialLinks.astro';
+import BrandLogo from './BrandLogo.astro';
+import { clinicLicenses } from '../../data/licenses';
+import type { Locale } from '../../lib/i18n/localize';
+import { isEnglish, localizeContact, ui } from '../../lib/i18n/localize';
+
+export interface Props {
+  locale?: Locale;
+}
+
+const { locale = 'ar' } = Astro.props;
+const en = isEnglish(locale);
+const copy = ui(locale);
+const contact = localizeContact(locale);
+const currentYear = new Date().getFullYear();
+const homeHref = en ? '/en' : '/';
+
+const links = en
+  ? [
+      { label: copy!.nav.about, href: '/en#about' },
+      { label: copy!.nav.services, href: '/en/services' },
+      { label: copy!.nav.devices, href: '/en/devices' },
+      { label: copy!.nav.contact, href: '/en/contact' },
+      { label: copy!.nav.quickBook, href: '/en/book' },
+      { label: 'Privacy Policy', href: '/en/privacy' },
+    ]
+  : [
+      { label: 'من نحن', href: '/#about' },
+      { label: 'خدماتنا', href: '/services' },
+      { label: 'الأجهزة', href: '/devices' },
+      { label: 'تواصل معنا', href: '/contact' },
+      { label: 'حجز موعد', href: '/book' },
+      { label: 'سياسة الخصوصية', href: '/privacy' },
+    ];
+
+const featuredServices = [
+  {
+    title: en ? 'Teeth whitening' : 'تبييض الأسنان',
+    href: en ? '/en/services/teeth-whitening' : '/services/teeth-whitening',
+  },
+  {
+    title: en ? 'Filler & Botox' : 'الفيلر والبوتوكس',
+    href: en ? '/en/services/filler-botox' : '/services/filler-botox',
+  },
+  {
+    title: en ? 'Laser' : 'الليزر',
+    href: en ? '/en/services/laser' : '/services/laser',
+  },
+];
+
+const licenseCopy = en
+  ? {
+      title: copy!.common.officialLicenses,
+      commercialRegister: copy!.common.commercialRegister,
+      municipalLicense: copy!.common.municipalLicense,
+      licensedActivity: copy!.common.licensedActivity,
+      viewCr: copy!.common.viewCommercialRegistration,
+      sbcAlt: copy!.common.saudiBusinessCenter,
+      municipality: clinicLicenses.municipalityEn,
+      activity: clinicLicenses.licensedActivityEn,
+    }
+  : {
+      title: 'بيانات الترخيص الرسمية:',
+      commercialRegister: 'السجل التجاري (الرقم الوطني الموحد)',
+      municipalLicense: 'رخصة النشاط البلدية (بلدي)',
+      licensedActivity: 'النشاط المرخّص',
+      viewCr: 'عرض شهادة السجل التجاري',
+      sbcAlt: 'المركز السعودي للأعمال',
+      municipality: clinicLicenses.municipalityAr,
+      activity: clinicLicenses.licensedActivityAr,
+    };
+
+const tagline = en
+  ? copy!.common.footerTagline
+  : 'نصمم ابتسامات وإطلالات طبيعية تمنحك ثقة تدوم، في مساحة تحترم راحتك وخصوصيتك.';
+---
+
+<footer id="footer" class="bg-footer py-16 text-white sm:py-20">
+  <div class="page-container">
+    <div class="grid gap-10 border-b border-white/10 pb-12 sm:grid-cols-2 lg:grid-cols-4">
+      <section>
+        <BrandLogo locale={locale} href={homeHref} class="mb-4" onDark />
+        <p class="max-w-xs text-sm leading-7 text-footer-muted">{tagline}</p>
+      </section>
+      <section>
+        <h2 class="mb-4 text-sm font-bold">{en ? copy!.nav.links : 'روابط'}</h2>
+        <div class="grid gap-2">
+          {links.map((link) => (
+            <a href={link.href} class="text-sm text-footer-muted hover:text-primary">{link.label}</a>
+          ))}
+        </div>
+      </section>
+      <section>
+        <h2 class="mb-4 text-sm font-bold">{en ? copy!.nav.services : 'الخدمات'}</h2>
+        <ul class="space-y-2 text-sm text-footer-muted">
+          {featuredServices.map((service) => (
+            <li>
+              <a href={service.href} class="hover:text-primary">
+                {service.title}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+      <section>
+        <h2 class="mb-4 text-sm font-bold">{en ? copy!.common.footerContact : 'تواصل'}</h2>
+        <ul class="space-y-2 text-sm text-footer-muted">
+          <li>{contact.location}</li>
+          <li>
+            <a href={buildPhoneUrl(clinicLines[0].id)} dir="ltr" class="hover:text-primary">
+              {clinicLines[0].phoneDisplay}
+            </a>
+          </li>
+          <li>{contact.hours}</li>
+          <li data-gtm-location="footer"><a href={`mailto:${contact.email}`} class="hover:text-primary">{contact.email}</a></li>
+        </ul>
+      </section>
+    </div>
+
+    <section
+      class="mt-8 rounded-[var(--radius-section)] border border-white/10 bg-white/5 px-4 py-5 sm:px-6 sm:py-6"
+      aria-labelledby="footer-licenses-heading"
+    >
+      <div class="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
+        <div class="min-w-0 flex-1 space-y-2 text-sm leading-7 text-footer-muted">
+          <h2 id="footer-licenses-heading" class="text-sm font-bold text-white">
+            {licenseCopy.title}
+          </h2>
+          <p>
+            {licenseCopy.commercialRegister}:
+            {' '}
+            <span dir="ltr" class="font-medium tabular-nums text-white">{clinicLicenses.unifiedNationalNumber || '—'}</span>
+          </p>
+          <p>
+            {licenseCopy.municipalLicense}:
+            {' '}
+            <span dir="ltr" class="font-medium tabular-nums text-white">{clinicLicenses.municipalLicenseNumber || '—'}</span>
+            {' – '}
+            {licenseCopy.municipality}
+          </p>
+          <p>
+            {licenseCopy.licensedActivity}:
+            {' '}
+            {licenseCopy.activity}
+          </p>
+        </div>
+
+        <a
+          href={clinicLicenses.commercialRegistrationCertificate}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex shrink-0 flex-col items-center gap-2 self-center rounded-2xl border border-white/15 bg-white p-3 transition hover:shadow-[var(--shadow-card)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus sm:self-start"
+          aria-label={licenseCopy.viewCr}
+        >
+          <img
+            src={clinicLicenses.saudiBusinessCenterLogo}
+            alt={licenseCopy.sbcAlt}
+            width="72"
+            height="70"
+            class="h-16 w-auto sm:h-[4.5rem]"
+            loading="lazy"
+            decoding="async"
+          />
+          <span class="max-w-[8rem] text-center text-[0.6875rem] font-bold leading-4 text-muted">
+            {licenseCopy.sbcAlt}
+          </span>
+        </a>
+      </div>
+    </section>
+
+    <div class="flex flex-col gap-4 pt-8 sm:flex-row sm:items-center sm:justify-between">
+      <p class="text-xs text-footer-muted">
+        © {currentYear} {en ? 'Fal Clinic. All rights reserved.' : 'عيادة فال. جميع الحقوق محفوظة.'}
+      </p>
+      <SocialLinks
+        locale={locale}
+        variant="on-dark"
+        hideHeading
+        class="!space-y-0"
+        id="footer-social"
+        heading={en ? copy!.common.followUs : 'تابعنا'}
+      />
+    </div>
+  </div>
+</footer>

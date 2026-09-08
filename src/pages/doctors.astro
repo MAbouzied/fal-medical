@@ -1,0 +1,109 @@
+---
+import DoctorsDirectory from '../components/doctors/DoctorsDirectory.astro';
+import FaqSection from '../components/sections/FaqSection.astro';
+import SectionHeading from '../components/ui/SectionHeading.astro';
+import { clinicFacts } from '../data/clinic-facts';
+import { doctors } from '../data/doctors';
+import { faqItems } from '../data/faq';
+import {
+  buildBreadcrumbSchema,
+  buildItemListSchema,
+  buildWebPageSchema,
+} from '../lib/schema';
+import Layout from '../layouts/Layout.astro';
+
+const site = Astro.site!;
+const title = `أطباء الأسنان والجلدية في ${clinicFacts.cityAr} | فال`;
+const description =
+  `تعرّف على أطباء الأسنان والجلدية في عيادة فال ب${clinicFacts.cityAr} واختر الطبيب المناسب لخطة علاجك.`;
+---
+
+<Layout
+  title={title}
+  description={description}
+  schemas={[
+    buildWebPageSchema({ site, path: '/doctors', name: title, description }),
+    buildBreadcrumbSchema(site, [
+      { name: 'الرئيسية', path: '/' },
+      { name: 'الأطباء', path: '/doctors' },
+    ]),
+    buildItemListSchema({
+      site,
+      path: '/doctors',
+      name: 'أطباء فال',
+      description,
+      itemType: 'Physician',
+      items: doctors.map((doctor) => ({
+        name: doctor.name,
+        path: `/doctors/${doctor.id}`,
+        description: doctor.summary,
+        image: doctor.image,
+      })),
+    }),
+  ]}
+>
+  <section class="py-14 sm:py-24">
+    <div class="page-container">
+      <SectionHeading
+        eyebrow="الأطباء"
+        title="نخبة من الأطباء المتخصصين"
+        description="اختر طبيبك من فريق طبي موثوق يجمع بين الخبرة، العناية، والاهتمام بأدق التفاصيل."
+        level={1}
+      />
+    </div>
+  </section>
+
+  <DoctorsDirectory doctors={doctors} />
+  <FaqSection items={faqItems} />
+</Layout>
+
+<script>
+  (() => {
+    const searchInput = document.querySelector<HTMLInputElement>('#doctor-search');
+    const specialtyInputs = [...document.querySelectorAll<HTMLInputElement>('input[name="specialty"]')];
+    const cards = [...document.querySelectorAll<HTMLElement>('[data-doctor-card]')];
+    const grid = document.querySelector<HTMLElement>('#doctors-grid');
+    const emptyState = document.querySelector<HTMLElement>('#empty-results');
+    const status = document.querySelector<HTMLElement>('#results-status');
+    const filterDisclosure = document.querySelector<HTMLDetailsElement>('.doctor-filters');
+    const desktopFilters = window.matchMedia('(min-width: 64rem)');
+
+    if (!searchInput) return;
+
+    const normalize = (value: string) => value.trim().toLocaleLowerCase('ar');
+
+    const applyFilters = () => {
+      const query = normalize(searchInput?.value ?? '');
+      const specialty = specialtyInputs.find((input) => input.checked)?.value ?? 'كل الأطباء';
+      let visibleCount = 0;
+
+      cards.forEach((card) => {
+        const matchesSearch = normalize(card.dataset.search ?? '').includes(query);
+        const matchesSpecialty = specialty === 'كل الأطباء' || card.dataset.specialty === specialty;
+        const isVisible = matchesSearch && matchesSpecialty;
+        card.hidden = !isVisible;
+        if (isVisible) visibleCount += 1;
+      });
+
+      grid?.classList.toggle('hidden', visibleCount === 0);
+      emptyState?.classList.toggle('hidden', visibleCount !== 0);
+      if (status) status.textContent = `عدد النتائج: ${visibleCount}`;
+    };
+
+    const resetFilters = () => {
+      if (searchInput) searchInput.value = '';
+      specialtyInputs.forEach((input, index) => {
+        input.checked = index === 0;
+      });
+      applyFilters();
+      if (filterDisclosure && !desktopFilters.matches) filterDisclosure.open = true;
+      searchInput?.focus();
+    };
+
+    searchInput?.addEventListener('input', applyFilters);
+    specialtyInputs.forEach((input) => input.addEventListener('change', applyFilters));
+    document.querySelectorAll<HTMLElement>('#reset-filters, [data-reset-filters]').forEach((button) => {
+      button.addEventListener('click', resetFilters);
+    });
+  })();
+</script>

@@ -1,0 +1,72 @@
+---
+export const prerender = false;
+
+import Layout from '../layouts/Layout.astro';
+import { loginErrorMessage, sanitizeReturnUrl } from '../lib/auth/authorization';
+
+const returnTo = sanitizeReturnUrl(Astro.url.searchParams.get('returnTo'));
+if (Astro.locals.staffAccess) {
+  return Astro.redirect(returnTo);
+}
+
+const title = 'Staff login | Fal Clinic';
+const description = 'Sign in with an approved Google account to access the staff admin area.';
+const errorMessage = loginErrorMessage(Astro.url.searchParams.get('error'));
+---
+
+<Layout
+  title={title}
+  description={description}
+  locale="en"
+  noindex={true}
+  robotsFollow={false}
+  hideChrome={true}
+  omitAlternates={true}
+  disableAnalytics={true}
+  omitStructuredData={true}
+>
+  <section class="flex min-h-screen items-center justify-center bg-surface px-4 py-16">
+    <div class="w-full max-w-md rounded-[var(--radius-section)] border border-border bg-surface-soft p-8 shadow-card">
+      <p class="text-sm font-bold uppercase tracking-[0.08em] text-muted">Fal Clinic</p>
+      <h1 class="mt-3 text-3xl font-black text-ink">Staff login</h1>
+      <p class="mt-3 text-sm leading-7 text-muted">
+        Use an approved Google account. Access is limited to clinic staff in the private staff directory.
+      </p>
+
+      {errorMessage && (
+        <p class="mt-4 rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink" role="alert">
+          {errorMessage}
+        </p>
+      )}
+
+      <button
+        type="button"
+        id="google-sign-in"
+        class="mt-8 inline-flex min-h-12 w-full items-center justify-center rounded-[var(--radius-button)] bg-gold-gradient px-5 py-3 text-sm font-extrabold text-ink-button shadow-[var(--shadow-gold)] transition-transform hover:-translate-y-0.5"
+        data-return-to={returnTo}
+      >
+        Continue with Google
+      </button>
+
+      <p class="mt-6 text-xs leading-6 text-muted">
+        By signing in you agree that Google profile name, email, and profile image may be used to
+        establish a short staff session cookie. See the
+        <a class="font-bold text-primary hover:underline" href="/en/privacy">privacy policy</a>.
+      </p>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  import { authClient } from '../lib/auth/client';
+
+  const button = document.getElementById('google-sign-in');
+  button?.addEventListener('click', async () => {
+    const returnTo = button.getAttribute('data-return-to') || '/admin';
+    await authClient.signIn.social({
+      provider: 'google',
+      callbackURL: returnTo,
+      errorCallbackURL: `/login?returnTo=${encodeURIComponent(returnTo)}`,
+    });
+  });
+</script>

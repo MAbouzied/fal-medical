@@ -1,0 +1,86 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// Static 404.html is shared for all unknown URLs. Locale is applied from the
+// requested pathname via an inline script (Astro.url is /404 at build time).
+const ar = {
+  title: 'الصفحة غير موجودة | فال',
+  description: 'الصفحة التي تبحث عنها غير متوفرة في موقع فال.',
+  heading: 'الصفحة غير موجودة',
+  body: 'تعذّر العثور على الصفحة المطلوبة. يمكنك العودة إلى الرئيسية أو تصفح الخدمات والأطباء.',
+  home: 'العودة للرئيسية',
+  services: 'تصفح الخدمات',
+  homeHref: '/',
+  servicesHref: '/services',
+};
+
+const en = {
+  title: 'Page not found | Fal Clinic',
+  description: 'The page you requested is not available on the Fal Clinic website.',
+  heading: 'Page not found',
+  body: 'We could not find the page you requested. Return home or browse our services and doctors.',
+  home: 'Back to home',
+  services: 'Browse services',
+  homeHref: '/en',
+  servicesHref: '/en/services',
+};
+
+const btnClass =
+  'inline-flex w-full items-center justify-center gap-2 rounded-full border border-transparent bg-gold-gradient px-5 text-xs font-bold whitespace-nowrap text-ink-button shadow-[var(--shadow-gold)] transition-transform hover:-translate-y-0.5 min-h-10 sm:w-auto';
+const btnOutlineClass =
+  'inline-flex w-full items-center justify-center gap-2 rounded-full border border-border bg-surface px-5 text-xs font-bold whitespace-nowrap text-ink transition-transform hover:-translate-y-0.5 hover:border-primary/40 min-h-10 sm:w-auto';
+---
+
+<Layout
+  title={ar.title}
+  description={ar.description}
+  locale="ar"
+  noindex={true}
+  robotsFollow={true}
+  omitAlternates={true}
+  omitStructuredData={true}
+>
+  <section class="py-20 sm:py-28" data-404-page>
+    <div class="page-container flex max-w-2xl flex-col items-center text-center">
+      <p class="text-sm font-bold tracking-[0.08em] text-primary">404</p>
+      <h1 class="text-display mt-3 font-black" data-404-heading>{ar.heading}</h1>
+      <p class="mt-4 text-sm leading-7 text-pretty text-muted sm:text-lg" data-404-body>
+        {ar.body}
+      </p>
+      <div class="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+        <a href={ar.homeHref} class={btnClass} data-404-home>{ar.home}</a>
+        <a href={ar.servicesHref} class={btnOutlineClass} data-404-services>{ar.services}</a>
+      </div>
+    </div>
+  </section>
+
+  <script is:inline define:vars={{ ar, en }}>
+    (() => {
+      const path = window.location.pathname || '/';
+      const isEnglish = path === '/en' || path.startsWith('/en/');
+      const copy = isEnglish ? en : ar;
+      const root = document.documentElement;
+      root.lang = isEnglish ? 'en' : 'ar';
+      root.dir = isEnglish ? 'ltr' : 'rtl';
+
+      document.title = copy.title;
+      const desc = document.querySelector('meta[name="description"]');
+      if (desc) desc.setAttribute('content', copy.description);
+
+      const heading = document.querySelector('[data-404-heading]');
+      const body = document.querySelector('[data-404-body]');
+      const home = document.querySelector('[data-404-home]');
+      const services = document.querySelector('[data-404-services]');
+      if (heading) heading.textContent = copy.heading;
+      if (body) body.textContent = copy.body;
+      if (home instanceof HTMLAnchorElement) {
+        home.href = copy.homeHref;
+        home.textContent = copy.home;
+      }
+      if (services instanceof HTMLAnchorElement) {
+        services.href = copy.servicesHref;
+        services.textContent = copy.services;
+      }
+    })();
+  </script>
+</Layout>

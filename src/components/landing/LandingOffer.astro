@@ -1,0 +1,49 @@
+---
+import { resolveLandingPage } from '../../data/landing';
+import type { Locale } from '../../lib/i18n/localize';
+import ButtonLink from '../ui/ButtonLink.astro';
+import PillLabel from '../ui/PillLabel.astro';
+import SitePicture from '../ui/SitePicture.astro';
+
+export interface Props {
+  locale?: Locale;
+}
+
+const { locale = 'ar' } = Astro.props;
+const page = resolveLandingPage(locale);
+---
+
+<section id="season-offer" class="scroll-mt-24 bg-surface py-12 sm:py-24" aria-labelledby="offer-heading">
+  <div class="page-container">
+    <div class="grid items-center overflow-hidden rounded-[var(--radius-section)] border border-border bg-on-dark shadow-[var(--shadow-card)] lg:grid-cols-2">
+      <div class="order-2 flex flex-col items-start gap-5 p-6 sm:p-10 lg:order-1 lg:p-14">
+        <PillLabel text={page.offer.eyebrow} />
+        <h2 id="offer-heading" class="text-display font-black text-ink">{page.offer.title}</h2>
+        <p class="text-[1.0625rem] leading-[1.8] text-pretty text-muted">{page.offer.text}</p>
+        <ul class="w-full space-y-3">
+          {page.offer.items.map((item) => (
+            <li class="flex items-center gap-3 text-[0.9375rem] text-muted">
+              <span
+                class="grid size-[1.375rem] shrink-0 place-items-center rounded-[0.6875rem] bg-surface-accent text-[0.6875rem] text-gold-text"
+                aria-hidden="true"
+              >
+                ✓
+              </span>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+        <ButtonLink href={page.offer.href} size="lg">{page.offer.cta}</ButtonLink>
+      </div>
+      <div class="order-1 p-6 sm:p-10 lg:order-2">
+        <SitePicture
+          src={page.offer.imageSrc}
+          alt={page.offer.imageAlt}
+          widths={[360, 540, 720]}
+          sizes="(max-width: 1024px) calc(100vw - 2rem), 40vw"
+          class="mx-auto aspect-square w-full max-w-md object-contain"
+        />
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,58 @@
+---
+import type { Locale } from '../../lib/i18n/localize';
+import { isEnglish, localizeDoctor, localizeSpecialty, ui } from '../../lib/i18n/localize';
+import type { Doctor } from '../../data/doctors';
+import ButtonLink from '../ui/ButtonLink.astro';
+import SitePicture from '../ui/SitePicture.astro';
+
+export interface Props {
+  doctor: Doctor;
+  locale?: Locale;
+  headingLevel?: 2 | 3;
+}
+
+const { doctor: rawDoctor, locale = 'ar', headingLevel = 2 } = Astro.props;
+const doctor = localizeDoctor(rawDoctor, locale);
+const en = isEnglish(locale);
+const copy = ui(locale);
+const profileHref = en ? `/en/doctors/${doctor.id}` : `/doctors/${doctor.id}`;
+const viewLabel = en ? copy!.common.viewProfile : 'عرض الملف';
+const bookLabel = en ? copy!.common.bookWithDoctor : 'احجز مع الطبيب';
+const specialtyLabel = doctor.specialtyLabel || localizeSpecialty(doctor.specialty, locale);
+const HeadingTag = headingLevel === 3 ? 'h3' : 'h2';
+---
+
+<article
+  id={`profile-${doctor.id}`}
+  class="overflow-hidden rounded-[var(--radius-card)] border border-border bg-surface shadow-[var(--shadow-card)]"
+  data-doctor-card
+  data-search={`${doctor.name} ${doctor.title} ${specialtyLabel}`}
+  data-specialty={doctor.specialty}
+  data-branch={doctor.branch}
+  data-services={doctor.services.join('|')}
+>
+  <div class="relative aspect-[1.08/1] overflow-hidden bg-surface-accent">
+    <a href={profileHref} aria-label={`${viewLabel} ${doctor.name}`}>
+      <SitePicture
+        src={doctor.image}
+        alt={`${en ? 'Photo of' : 'صورة'} ${doctor.name}`}
+        widths={[320, 480, 640, 800]}
+        sizes="(max-width: 768px) calc(100vw - 2rem), 33vw"
+        class={doctor.id === 'mohamed-tahhan' ? 'size-full object-cover object-left' : 'size-full object-cover object-top'}
+      />
+    </a>
+    <span class="absolute end-3 top-3 max-w-[min(100%-1.5rem,14rem)] truncate rounded-full bg-surface/95 px-3 py-1.5 text-[0.6875rem] font-bold text-primary">
+      {specialtyLabel}
+    </span>
+  </div>
+  <div class="p-5 sm:p-6">
+    <HeadingTag class="text-base font-bold tracking-tight text-balance sm:text-lg">
+      <a href={profileHref} class="hover:text-primary">{doctor.name}</a>
+    </HeadingTag>
+    <p class="mt-1 min-h-10 text-sm leading-5 text-pretty text-muted">{doctor.title}</p>
+    <div class="mt-4 flex flex-col gap-2 border-t border-border pt-4">
+      <ButtonLink href={profileHref} variant="outline" class="w-full text-center">{viewLabel}</ButtonLink>
+      <ButtonLink href={`${profileHref}#booking`} class="w-full text-center">{bookLabel}</ButtonLink>
+    </div>
+  </div>
+</article>

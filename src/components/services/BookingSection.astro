@@ -1,0 +1,302 @@
+---
+import type { Locale } from '../../lib/i18n/localize';
+import {
+  isEnglish,
+  localizeContact,
+  ui,
+} from '../../lib/i18n/localize';
+import ClinicLineButtons from '../contact/ClinicLineButtons.astro';
+import BookingServiceFields from '../contact/BookingServiceFields.astro';
+import AssetIcon from '../ui/AssetIcon.astro';
+import PillLabel from '../ui/PillLabel.astro';
+
+export interface Props {
+  defaultDepartment?: string;
+  locale?: Locale;
+}
+
+const { defaultDepartment = '', locale = 'ar' } = Astro.props;
+const en = isEnglish(locale);
+const copy = ui(locale);
+const contact = localizeContact(locale);
+
+const contactMessage = en
+  ? 'Hello, I would like to book at Fal Clinic.'
+  : 'مرحباً، أود الحجز عبر فال.';
+const fieldClass =
+  'min-h-12 w-full rounded-[1.25rem] border border-border bg-surface px-4 text-sm text-ink shadow-[var(--shadow-control)] placeholder:text-placeholder focus:border-primary aria-[invalid=true]:border-danger';
+
+const labels = en
+  ? {
+      eyebrow: copy!.booking.eyebrow,
+      title: copy!.booking.title,
+      subtitle: copy!.booking.subtitle,
+      whatsapp: copy!.common.whatsapp,
+      call: copy!.common.call,
+      name: copy!.common.fullName,
+      phone: copy!.common.phone,
+      department: copy!.common.specialty,
+      service: copy!.common.service,
+      chooseDepartment: copy!.common.chooseSpecialty,
+      chooseService: copy!.common.chooseService,
+      send: copy!.common.sendWhatsapp,
+      namePh: copy!.common.namePlaceholder,
+      phonePh: copy!.common.phonePlaceholder,
+      errors: copy!.booking.errors,
+      statusInvalid: copy!.booking.statusInvalid,
+      statusOpening: copy!.booking.statusOpening,
+    }
+  : {
+      eyebrow: 'احجز موعدك',
+      title: 'احجز سريعا الآن',
+      subtitle: 'املأ الاسم ورقم الجوال، اختر التخصص ثم الخدمة، ثم أرسل الطلب عبر واتساب.',
+      whatsapp: 'واتساب',
+      call: 'اتصال',
+      name: 'الاسم الكامل',
+      phone: 'رقم الجوال',
+      department: 'التخصص',
+      service: 'الخدمة',
+      chooseDepartment: 'اختر التخصص',
+      chooseService: 'اختر الخدمة',
+      send: 'إرسال عبر واتساب',
+      namePh: 'مثال: عبدالله محمد',
+      phonePh: '05XXXXXXXX',
+      errors: {
+        name: 'يرجى إدخال الاسم الكامل (3 أحرف على الأقل).',
+        phone: 'يرجى إدخال رقم جوال سعودي بصيغة 05XXXXXXXX.',
+        department: 'يرجى اختيار التخصص.',
+        service: 'يرجى اختيار الخدمة.',
+        consent: 'الموافقة مطلوبة للمتابعة.',
+      },
+      statusInvalid: 'يرجى تصحيح الحقول الموضحة قبل المتابعة.',
+      statusOpening: 'جارٍ فتح واتساب لإرسال طلب الحجز...',
+    };
+---
+
+<section id="booking" class="bg-surface-soft/60 py-20 sm:py-24" aria-labelledby="booking-heading">
+  <div class="page-container">
+    <div class="grid items-start gap-6 rounded-[2rem] border border-border bg-surface-soft p-4 shadow-[var(--shadow-card)] sm:gap-10 sm:p-8 lg:grid-cols-[0.84fr_1.16fr] lg:gap-14 lg:p-10">
+      <div>
+        <PillLabel text={labels.eyebrow} />
+        <h2 id="booking-heading" class="text-display mt-4 font-black text-ink">{labels.title}</h2>
+        <p class="mt-4 max-w-lg text-sm leading-7 text-pretty text-muted">{labels.subtitle}</p>
+
+        <div class="mt-6" data-gtm-location="booking_section_sidebar">
+          <ClinicLineButtons
+            locale={locale}
+            mode="both"
+            showPhone
+            whatsappMessage={contactMessage}
+            callLabel={labels.call}
+            whatsappLabel={labels.whatsapp}
+          />
+        </div>
+
+        <address class="mt-5 space-y-2 text-sm not-italic text-muted sm:mt-7 sm:space-y-3" aria-label={en ? 'Contact details' : 'بيانات التواصل'} data-gtm-location="booking_section_sidebar">
+          <p class="flex items-center gap-2 sm:gap-3">
+            <AssetIcon src="/assets/clock.svg" size="sm" class="shrink-0" />
+            <span class="leading-5">{contact.hours}</span>
+          </p>
+          <p class="flex items-center gap-2 sm:gap-3">
+            <AssetIcon src="/assets/location.svg" size="sm" class="shrink-0" />
+            <span class="leading-5">{contact.location}</span>
+          </p>
+        </address>
+      </div>
+
+      <form
+        id="booking-form"
+        class="rounded-[2rem] border border-border bg-surface p-4 shadow-[var(--shadow-card)] sm:p-8"
+        method="post"
+        action="/api/customers"
+        data-astro-reload
+        novalidate
+        data-gtm-form="booking_section"
+        data-locale={locale}
+        data-msg-invalid={labels.statusInvalid}
+        data-msg-opening={labels.statusOpening}
+        data-msg-sheets-failed={en
+          ? 'We could not save the online record. WhatsApp will still open so the clinic receives your request.'
+          : 'تعذر حفظ السجل الإلكتروني. سيتم فتح واتساب حتى يصل طلبك للعيادة.'}
+        data-msg-name={labels.errors.name}
+        data-msg-phone={labels.errors.phone}
+        data-msg-department={labels.errors.department}
+        data-msg-service={labels.errors.service}
+        data-msg-consent={labels.errors.consent}
+      >
+        <label class="sr-only" aria-hidden="true">
+          Website
+          <input name="website" type="text" tabindex="-1" autocomplete="off" />
+        </label>
+        <div class="grid gap-4">
+          <div class="space-y-1.5">
+            <label for="booking-name" class="block text-xs font-bold">{labels.name}</label>
+            <input id="booking-name" name="name" type="text" class={fieldClass} placeholder={labels.namePh} autocomplete="name" minlength="3" maxlength="100" required aria-describedby="booking-name-error" aria-invalid="false" />
+            <p id="booking-name-error" class="hidden text-xs text-danger" data-error-for="booking-name" role="status"></p>
+          </div>
+          <div class="space-y-1.5">
+            <label for="booking-phone" class="block text-xs font-bold">{labels.phone}</label>
+            <input id="booking-phone" name="phone" type="tel" dir="ltr" class={fieldClass} placeholder={labels.phonePh} autocomplete="tel" inputmode="numeric" minlength="10" maxlength="20" pattern="05[0-9]{8}" required aria-describedby="booking-phone-error" aria-invalid="false" />
+            <p id="booking-phone-error" class="hidden text-xs text-danger" data-error-for="booking-phone" role="status"></p>
+          </div>
+          <BookingServiceFields
+            locale={locale}
+            fieldClass={fieldClass}
+            labelClass="block text-xs font-bold"
+            specialtyLabel={labels.department}
+            serviceLabel={labels.service}
+            specialtyPlaceholder={labels.chooseDepartment}
+            servicePlaceholder={labels.chooseService}
+            defaultService={defaultDepartment}
+            specialtyId="booking-department"
+            serviceId="booking-service"
+            specialtyDescribedBy="booking-department-error"
+            serviceDescribedBy="booking-service-error"
+          >
+            <p slot="specialty-error" id="booking-department-error" class="hidden text-xs text-danger" data-error-for="booking-department" role="status"></p>
+            <p slot="service-error" id="booking-service-error" class="hidden text-xs text-danger" data-error-for="booking-service" role="status"></p>
+          </BookingServiceFields>
+        </div>
+
+        <label class="mt-5 flex cursor-pointer items-start gap-3 text-xs leading-5 text-muted">
+          <input id="booking-consent" name="consent" type="checkbox" class="mt-0.5 size-4 accent-primary" required aria-describedby="booking-consent-error" aria-invalid="false" />
+          <span>
+            {en ? (
+              <>
+                I agree to the
+                {' '}
+                <a href="/en/privacy" class="font-bold text-primary underline-offset-2 hover:underline">privacy policy</a>
+                {' '}
+                and to be contacted to confirm the booking.
+              </>
+            ) : (
+              <>
+                أوافق على
+                {' '}
+                <a href="/privacy" class="font-bold text-primary underline-offset-2 hover:underline">سياسة الخصوصية</a>
+                {' '}
+                والتواصل معي لتأكيد الحجز.
+              </>
+            )}
+          </span>
+        </label>
+        <p id="booking-consent-error" class="mt-1 hidden text-xs text-danger" data-error-for="booking-consent" role="status"></p>
+
+        <button type="submit" class="mt-6 inline-flex min-h-[3.25rem] w-full items-center justify-center gap-2 rounded-full bg-gold-gradient px-7 text-sm font-bold whitespace-nowrap text-ink-button shadow-[var(--shadow-gold)] transition-transform hover:-translate-y-0.5 sm:text-base">
+          {labels.send}
+          <AssetIcon src="/assets/whatsapp.svg" size="sm" />
+        </button>
+        <p id="booking-status" class="mt-4 min-h-5 text-center text-sm font-medium" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<script>
+  import {
+    buildBookingWhatsAppMessage,
+    buildWhatsAppUrl,
+    clinicContact,
+    clinicLineFromDepartment,
+  } from '../../data/contact';
+  import { saveCustomerLead } from '../../lib/customer-leads';
+  import { GtmEvents, pushGtmEvent } from '../../lib/gtm';
+
+  const bindBookingSection = () => {
+    const bookingForm = document.querySelector<HTMLFormElement>('#booking-form');
+    if (!bookingForm || bookingForm.dataset.bound === 'true') return;
+    bookingForm.dataset.bound = 'true';
+
+    const bookingStatus = document.querySelector<HTMLElement>('#booking-status');
+    const formId = bookingForm.dataset.gtmForm ?? 'booking_section';
+    const requiredFields = [
+      ...bookingForm.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input[required], select[required]'),
+    ];
+
+    const messages: Readonly<Record<string, string>> = {
+      'booking-name': bookingForm.dataset.msgName ?? '',
+      'booking-phone': bookingForm.dataset.msgPhone ?? '',
+      'booking-department': bookingForm.dataset.msgDepartment ?? '',
+      'booking-service': bookingForm.dataset.msgService ?? '',
+      'booking-consent': bookingForm.dataset.msgConsent ?? '',
+    };
+
+    const showFieldState = (field: HTMLInputElement | HTMLSelectElement) => {
+      const error = document.querySelector<HTMLElement>(`[data-error-for="${field.id}"]`);
+      const isValid = field.checkValidity();
+      field.setAttribute('aria-invalid', String(!isValid));
+      if (error) {
+        error.textContent = isValid ? '' : messages[field.id] ?? '';
+        error.classList.toggle('hidden', isValid);
+      }
+      return isValid;
+    };
+
+    requiredFields.forEach((field) => {
+      field.addEventListener('blur', () => showFieldState(field));
+      field.addEventListener('input', () => {
+        if (field.getAttribute('aria-invalid') === 'true') showFieldState(field);
+      });
+      field.addEventListener('change', () => {
+        if (field.getAttribute('aria-invalid') === 'true') showFieldState(field);
+      });
+    });
+
+    bookingForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const isValid = requiredFields.every(showFieldState);
+
+      if (!isValid) {
+        pushGtmEvent(GtmEvents.formError, { form_id: formId, method: 'whatsapp' });
+        if (bookingStatus) {
+          bookingStatus.textContent = bookingForm.dataset.msgInvalid ?? '';
+          bookingStatus.className = 'mt-4 min-h-5 text-center text-sm font-medium text-danger';
+        }
+        requiredFields.find((field) => !field.checkValidity())?.focus();
+        return;
+      }
+
+      const data = new FormData(bookingForm);
+      const department = String(data.get('department') ?? '').trim();
+      const service = String(data.get('service') ?? '').trim();
+      const message = buildBookingWhatsAppMessage({
+        name: String(data.get('name') ?? '').trim(),
+        phone: String(data.get('phone') ?? '').trim(),
+        department,
+        service,
+        branch: clinicContact.branch,
+      });
+      const whatsappUrl = buildWhatsAppUrl(message, clinicLineFromDepartment(service || department));
+
+      pushGtmEvent(GtmEvents.formSubmit, {
+        form_id: formId,
+        method: 'whatsapp',
+      });
+
+      void (async () => {
+        const result = await saveCustomerLead({
+          name: String(data.get('name') ?? '').trim(),
+          phone: String(data.get('phone') ?? '').trim(),
+          department,
+          service,
+          locale: bookingForm.dataset.locale === 'en' ? 'en' : 'ar',
+          consent: data.has('consent'),
+          website: String(data.get('website') ?? ''),
+        });
+
+        if (bookingStatus) {
+          bookingStatus.textContent = result.ok
+            ? (bookingForm.dataset.msgOpening ?? '')
+            : (bookingForm.dataset.msgSheetsFailed ?? '');
+          bookingStatus.className = result.ok
+            ? 'mt-4 min-h-5 text-center text-sm font-medium text-success'
+            : 'mt-4 min-h-5 text-center text-sm font-medium text-danger';
+        }
+
+        window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+      })();
+    });
+  };
+
+  document.addEventListener('astro:page-load', bindBookingSection);
+</script>

@@ -1,0 +1,32 @@
+---
+import { faqItems } from '../../data/faq';
+import type { Locale } from '../../lib/i18n/localize';
+import { isEnglish, localizeFaq, ui } from '../../lib/i18n/localize';
+import FaqSection from '../sections/FaqSection.astro';
+import ServicesConsultBand from '../services/ServicesConsultBand.astro';
+import LandingAbout from './LandingAbout.astro';
+import LandingFeatured from './LandingFeatured.astro';
+import LandingOffer from './LandingOffer.astro';
+import LandingSpecialties from './LandingSpecialties.astro';
+import LandingSteps from './LandingSteps.astro';
+
+export interface Props {
+  locale?: Locale;
+}
+
+const { locale = 'ar' } = Astro.props;
+const en = isEnglish(locale);
+const copy = ui(locale);
+const faqs = en ? localizeFaq('en') : faqItems;
+const faqTitle = en ? copy!.pages.servicesFaqTitle : 'إجابات على أهم استفساراتك';
+---
+
+<LandingAbout locale={locale} />
+<LandingSpecialties locale={locale} />
+<LandingFeatured locale={locale} />
+<LandingOffer locale={locale} />
+<LandingSteps locale={locale} />
+<div id="contact">
+  <ServicesConsultBand locale={locale} />
+</div>
+<FaqSection items={faqs} locale={locale} eyebrow={en ? copy!.faq.eyebrow : 'الأسئلة الشائعة'} title={faqTitle} variant="list" />

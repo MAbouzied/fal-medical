@@ -1,0 +1,72 @@
+---
+import type { FaqItem } from '../../data/faq';
+import type { Locale } from '../../lib/i18n/localize';
+import { isEnglish, ui } from '../../lib/i18n/localize';
+import AssetIcon from '../ui/AssetIcon.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+
+export interface Props {
+  items: readonly FaqItem[];
+  locale?: Locale;
+  eyebrow?: string;
+  title?: string;
+  variant?: 'cards' | 'list';
+  showEyebrow?: boolean;
+}
+
+const {
+  items,
+  locale = 'ar',
+  eyebrow,
+  title,
+  variant = 'cards',
+  showEyebrow = true,
+} = Astro.props;
+const en = isEnglish(locale);
+const copy = ui(locale);
+const headingEyebrow = eyebrow ?? (en ? copy!.faq.eyebrow : 'الأسئلة الشائعة');
+const headingTitle = title ?? (en ? copy!.faq.title : 'أسئلة يتكرر طرحها');
+const isList = variant === 'list';
+const toggleIcon = isList ? '/assets/chevron-down.svg' : '/assets/plus.svg';
+const toggleIconClass = isList
+  ? 'shrink-0 transition-transform duration-300 group-open:rotate-180'
+  : 'shrink-0 transition-transform duration-300 group-open:rotate-45';
+---
+
+<section class="bg-surface py-12 sm:py-24" aria-labelledby="faq-heading">
+  <div class="page-container">
+    {showEyebrow ? (
+      <div id="faq-heading">
+        <SectionHeading eyebrow={headingEyebrow} title={headingTitle} />
+      </div>
+    ) : (
+      <h2 id="faq-heading" class="text-display text-center font-black text-ink">
+        {headingTitle}
+      </h2>
+    )}
+    <div class:list={[
+      'mx-auto mt-8 sm:mt-10',
+      isList ? 'max-w-4xl space-y-3' : 'max-w-3xl space-y-3',
+    ]}>
+      {items.map((item) => (
+        <details
+          class:list={[
+            'group',
+            isList
+              ? 'overflow-hidden rounded-[1.625rem] border border-border bg-surface px-[1.3125rem]'
+              : 'overflow-hidden rounded-[var(--radius-card)] border border-border bg-surface px-4 py-3 sm:px-5 sm:py-4',
+          ]}
+        >
+          <summary class:list={[
+            'flex cursor-pointer list-none items-center justify-between gap-4 text-start text-sm font-bold text-ink sm:text-base [&::-webkit-details-marker]:hidden',
+            isList && 'py-4',
+          ]}>
+            <span>{item.question}</span>
+            <AssetIcon src={toggleIcon} size="sm" class={toggleIconClass} />
+          </summary>
+          <p class="pt-3 text-sm leading-7 text-muted sm:text-base sm:leading-8">{item.answer}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>

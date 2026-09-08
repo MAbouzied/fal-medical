@@ -1,0 +1,55 @@
+---
+import { resolveLandingPage } from '../../data/landing';
+import type { Locale } from '../../lib/i18n/localize';
+import PillLabel from '../ui/PillLabel.astro';
+import SitePicture from '../ui/SitePicture.astro';
+
+export interface Props {
+  locale?: Locale;
+}
+
+const { locale = 'ar' } = Astro.props;
+const page = resolveLandingPage(locale);
+---
+
+<section id="about" class="scroll-mt-24 bg-on-dark py-12 sm:py-24" aria-labelledby="about-heading">
+  <div class="page-container grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+    <div class="flex flex-col items-start gap-4 lg:col-start-2">
+      <PillLabel text={page.about.eyebrow} />
+      <div class="max-w-xl">
+        <h2 id="about-heading" class="text-display font-black text-ink">{page.about.title}</h2>
+        <p class="mt-3 text-[1.0625rem] leading-[1.8] text-pretty text-muted">{page.about.intro}</p>
+        <p class="mt-3 text-[1.0625rem] leading-[1.8] text-pretty text-muted">{page.about.body}</p>
+      </div>
+      <ul class="mt-4 grid w-full gap-4 sm:grid-cols-2">
+        {page.about.features.map((feature) => (
+          <li class="flex items-start gap-3.5">
+            <span
+              class="grid size-11 shrink-0 place-items-center rounded-xl border border-border bg-surface text-xl font-semibold text-gold-text"
+              aria-hidden="true"
+            >
+              ✦
+            </span>
+            <div>
+              <h3 class="text-[0.9375rem] font-bold text-ink">{feature.title}</h3>
+              <p class="mt-0.5 text-[0.8125rem] leading-[1.6] text-muted-soft">{feature.text}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="relative lg:col-start-1 lg:row-start-1">
+      <SitePicture
+        src={page.about.imageSrc}
+        alt={page.about.imageAlt}
+        widths={[480, 768, 960, 1200]}
+        sizes="(max-width: 1024px) calc(100vw - 2rem), 40vw"
+        class="aspect-[4/5] w-full rounded-[var(--radius-section)] object-cover shadow-[var(--shadow-card)]"
+      />
+      <p class="absolute top-6 start-6 rounded-full bg-surface px-4 py-2 text-xs font-bold tracking-widest text-ink">
+        {page.about.photoBadge}
+      </p>
+    </div>
+  </div>
+</section>

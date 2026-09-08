@@ -1,0 +1,30 @@
+---
+import { getFormServiceGroups } from '../../data/form-landing';
+import type { Locale } from '../../lib/i18n/localize';
+
+export interface Props {
+  locale?: Locale;
+  placeholder: string;
+  selectedValue?: string;
+}
+
+const { locale = 'ar', placeholder, selectedValue = '' } = Astro.props;
+const groups = getFormServiceGroups(locale);
+---
+
+<option value="">{placeholder}</option>
+{
+  groups.map((group) => (
+    <optgroup label={group.label}>
+      {group.services.map((service) => (
+            <option
+              value={service.value}
+              data-specialty={group.department}
+              selected={service.value === selectedValue}
+            >
+              {service.label}
+            </option>
+      ))}
+    </optgroup>
+  ))
+}

@@ -1,0 +1,84 @@
+---
+export const prerender = false;
+
+import { clinicFacts } from '../data/clinic-facts';
+import BlogUnavailable from '../components/blog/BlogUnavailable.astro';
+import Breadcrumbs from '../components/seo/Breadcrumbs.astro';
+import BookingSection from '../components/services/BookingSection.astro';
+import Layout from '../layouts/Layout.astro';
+import {
+  buildBlogCollectionSchemas,
+} from '../lib/schema';
+import BlogListing from '../modules/blog/components/BlogListing.astro';
+import {
+  DEFAULT_BLOG_LISTING_LABELS,
+} from '../modules/blog';
+import {
+  BLOG_CACHE_MAX_AGE_SECONDS,
+  BLOG_CACHE_SWR_SECONDS,
+  blogListingCacheTags,
+} from '../modules/blog/cache';
+import { loadPublicBlogListingPage } from '../modules/blog/lib/load-public-blog';
+
+const result = await loadPublicBlogListingPage(1);
+if (!result.ok) {
+  if (result.kind === 'not_found') {
+    return new Response(null, { status: 404, statusText: 'Not Found' });
+  }
+  Astro.response.status = 503;
+  Astro.response.headers.set('Retry-After', '120');
+  Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+}
+
+if (result.ok && Astro.cache.enabled) {
+  Astro.cache.set({
+    maxAge: BLOG_CACHE_MAX_AGE_SECONDS,
+    swr: BLOG_CACHE_SWR_SECONDS,
+    tags: blogListingCacheTags(),
+  });
+}
+
+const listing = result.ok ? result.data : null;
+const schemaPosts = listing
+  ? [...(listing.featured ? [listing.featured] : []), ...listing.items]
+  : [];
+
+const site = Astro.site!;
+const title = `مدونة فال | مقالات عن الأسنان والجلدية في ${clinicFacts.cityAr}`;
+const description =
+  `مقالات عربية من عيادة فال في ${clinicFacts.cityAr} حول طب الأسنان والجلدية والليزر والعناية الوقائية، مع مسار واضح لحجز موعد.`;
+const labels = DEFAULT_BLOG_LISTING_LABELS;
+---
+
+{result.ok && listing ? (
+  <Layout
+    title={title}
+    description={description}
+    schemas={buildBlogCollectionSchemas({
+      site,
+      path: '/blogs',
+      name: title,
+      description,
+      posts: schemaPosts,
+    })}
+  >
+    <Breadcrumbs
+      items={[
+        { name: 'الرئيسية', href: '/' },
+        { name: 'المدونة' },
+      ]}
+    />
+    <BlogListing
+      featured={listing.featured}
+      recent={listing.items}
+      totalPublished={listing.totalPublished}
+      page={1}
+      totalPages={listing.totalPages}
+      labels={labels}
+    >
+      <BookingSection slot="cta" />
+    </BlogListing>
+  </Layout>
+) : (
+  <BlogUnavailable />
+)}

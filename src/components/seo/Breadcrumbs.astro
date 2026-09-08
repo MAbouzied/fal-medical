@@ -1,0 +1,47 @@
+---
+import type { Locale } from '../../lib/i18n/localize';
+
+export interface Crumb {
+  name: string;
+  href?: string;
+}
+
+export interface Props {
+  items: readonly Crumb[];
+  locale?: Locale;
+}
+
+const { items, locale = 'ar' } = Astro.props;
+const isEnglish = locale === 'en';
+const label = isEnglish ? 'Breadcrumb' : 'مسار التنقل';
+---
+
+{
+  items.length > 0 && (
+    <nav class="border-b border-border/60 bg-surface-soft/60" aria-label={label}>
+      <ol class="page-container flex flex-wrap items-center gap-x-2 gap-y-1 py-3 text-xs text-muted sm:text-sm">
+        {items.map((item, index) => {
+          const isLast = index === items.length - 1;
+          return (
+            <li class="inline-flex min-w-0 items-center gap-2">
+              {index > 0 && (
+                <span class="text-border-control" aria-hidden="true">
+                  /
+                </span>
+              )}
+              {item.href && !isLast ? (
+                <a href={item.href} class="truncate font-medium text-ink hover:text-primary">
+                  {item.name}
+                </a>
+              ) : (
+                <span class="truncate font-bold text-ink" aria-current={isLast ? 'page' : undefined}>
+                  {item.name}
+                </span>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
+  )
+}

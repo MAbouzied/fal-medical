@@ -1,0 +1,45 @@
+---
+import { clinicFacts } from '../data/clinic-facts';
+import DevicesGrid from '../components/devices/DevicesGrid.astro';
+import FaqSection from '../components/sections/FaqSection.astro';
+import { clinicDevices } from '../data/devices';
+import { faqItems } from '../data/faq';
+import {
+  buildBreadcrumbSchema,
+  buildItemListSchema,
+  buildWebPageSchema,
+} from '../lib/schema';
+import Layout from '../layouts/Layout.astro';
+
+const site = Astro.site!;
+const title = `أجهزة مجمع عيادات فال في ${clinicFacts.cityAr}`;
+const description = `تعرّف على أجهزة الليزر والعناية بالبشرة وعلاج الأسنان المستخدمة في مجمع عيادات فال ب${clinicFacts.cityAr}.`;
+---
+
+<Layout
+  title={title}
+  description={description}
+  schemas={[
+    buildWebPageSchema({ site, path: '/devices', name: title, description }),
+    buildBreadcrumbSchema(site, [
+      { name: 'الرئيسية', path: '/' },
+      { name: 'الأجهزة', path: '/devices' },
+    ]),
+    buildItemListSchema({
+      site,
+      path: '/devices',
+      name: 'أجهزة فال',
+      description,
+      itemType: 'MedicalDevice',
+      items: clinicDevices.map((device) => ({
+        name: device.name,
+        path: '/devices',
+        description: device.description,
+        image: device.image,
+      })),
+    }),
+  ]}
+>
+  <DevicesGrid headingLevel={1} />
+  <FaqSection items={faqItems} />
+</Layout>

@@ -1,0 +1,44 @@
+---
+import BlogBlocks from './BlogBlocks.astro';
+import BlogPortableText from './BlogPortableText.astro';
+import {
+  prepareBlogBody,
+  type RenderableBlock,
+} from '../content/content-renderers';
+import type { BlogBody } from '../model/blog-types';
+import { lexicalJsonToHtml, sanitizeBlogHtml } from '../../../lib/admin/blog-content.ts';
+
+export interface Props {
+  body?: BlogBody;
+  blocks?: readonly RenderableBlock[];
+}
+
+const { body, blocks: preparedBlocks } = Astro.props;
+
+if (!preparedBlocks && !body) {
+  throw new Error('BlogBody requires either body or blocks.');
+}
+
+if (body?.format === 'portableText') {
+  // Rendered below.
+}
+---
+
+{
+  body?.format === 'portableText' ? (
+    <BlogPortableText value={body.value} />
+  ) : body?.format === 'html' ? (
+    <div class="blog-body blog-body--html" set:html={sanitizeBlogHtml(body.html)} />
+  ) : body?.format === 'lexical' ? (
+    <div class="blog-body blog-body--lexical" set:html={sanitizeBlogHtml(lexicalJsonToHtml(body.json))} />
+  ) : (
+    <div class="blog-body">
+      <BlogBlocks
+        blocks={
+          preparedBlocks ??
+          prepareBlogBody(body!, { isDev: import.meta.env.DEV }).blocks
+        }
+      />
+    </div>
+  )
+}

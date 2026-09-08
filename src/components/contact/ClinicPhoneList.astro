@@ -1,0 +1,36 @@
+---
+import { buildPhoneUrl, clinicLines } from '../../data/contact';
+import type { Locale } from '../../lib/i18n/localize';
+import { isEnglish } from '../../lib/i18n/localize';
+
+export interface Props {
+  locale?: Locale;
+  class?: string;
+  itemClass?: string;
+  linkClass?: string;
+  /** When true, each row shows the clinic label before the number. */
+  showLabels?: boolean;
+}
+
+const {
+  locale = 'ar',
+  class: className = '',
+  itemClass = '',
+  linkClass = 'hover:text-primary',
+  showLabels = true,
+} = Astro.props;
+const en = isEnglish(locale);
+---
+
+<ul class:list={['space-y-2', className]}>
+  {clinicLines.map((line) => (
+    <li class:list={['flex flex-wrap items-baseline gap-x-2 gap-y-0.5', itemClass]}>
+      {showLabels && (
+        <span class="text-ink">{en ? line.labelEn : line.labelAr}</span>
+      )}
+      <a href={buildPhoneUrl(line.id)} dir="ltr" class:list={[linkClass]}>
+        {line.phoneDisplay}
+      </a>
+    </li>
+  ))}
+</ul>

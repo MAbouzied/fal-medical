@@ -1,0 +1,82 @@
+---
+import DoctorCard from '../../../components/doctors/DoctorCard.astro';
+import DoctorDetailContent from '../../../components/doctors/DoctorDetailContent.astro';
+import BookingSection from '../../../components/services/BookingSection.astro';
+import SectionHeading from '../../../components/ui/SectionHeading.astro';
+import FaqSection from '../../../components/sections/FaqSection.astro';
+import Breadcrumbs from '../../../components/seo/Breadcrumbs.astro';
+import { doctors, getDoctorById } from '../../../data/doctors';
+import { localizeDoctor, localizeFaq, ui } from '../../../lib/i18n/localize';
+import {
+  buildBreadcrumbSchema,
+  buildPhysicianSchema,
+  buildWebPageSchema,
+} from '../../../lib/schema';
+import Layout from '../../../layouts/Layout.astro';
+
+export function getStaticPaths() {
+  return doctors.map((doctor) => ({ params: { id: doctor.id } }));
+}
+
+const doctor = getDoctorById(Astro.params.id!);
+if (!doctor) return Astro.redirect('/en/doctors');
+
+const localized = localizeDoctor(doctor, 'en');
+const relatedDoctors = doctors
+  .filter((item) => item.specialty === doctor.specialty && item.id !== doctor.id)
+  .slice(0, 3);
+const site = Astro.site!;
+const copy = ui('en')!;
+const faqItems = localizeFaq('en');
+const doctorPath = `/en/doctors/${doctor.id}`;
+const mainEntityId = `${new URL(doctorPath, site).href}#physician`;
+const title = `${localized.name} — ${localized.seoRole} | Fal Clinic`;
+---
+
+<Layout
+  title={title}
+  description={localized.summary}
+  locale="en"
+  ogType="profile"
+  schemas={[
+    buildWebPageSchema({
+      site,
+      path: doctorPath,
+      name: title,
+      description: localized.summary,
+      type: 'ProfilePage',
+      locale: 'en',
+      mainEntityId,
+    }),
+    buildBreadcrumbSchema(site, [
+      { name: copy.nav.home, path: '/en' },
+      { name: copy.nav.doctors, path: '/en/doctors' },
+      { name: localized.name, path: doctorPath },
+    ]),
+    buildPhysicianSchema(site, localized, 'en'),
+  ]}
+>
+  <Breadcrumbs
+    locale="en"
+    items={[
+      { name: 'Home', href: '/en' },
+      { name: 'Doctors', href: '/en/doctors' },
+      { name: localized.name },
+    ]}
+  />
+  <DoctorDetailContent doctor={doctor} locale="en" />
+  <BookingSection locale="en" />
+  {relatedDoctors.length > 0 && (
+    <section class="py-14 sm:py-24" aria-labelledby="related-doctors-heading">
+      <div class="page-container">
+        <div id="related-doctors-heading">
+          <SectionHeading eyebrow={copy.nav.doctors} title="More doctors in this specialty" />
+        </div>
+        <div class="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
+          {relatedDoctors.map((relatedDoctor) => <DoctorCard doctor={relatedDoctor} locale="en" />)}
+        </div>
+      </div>
+    </section>
+  )}
+  <FaqSection items={faqItems} locale="en" />
+</Layout>

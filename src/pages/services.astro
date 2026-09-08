@@ -1,0 +1,43 @@
+---
+import { clinicFacts } from '../data/clinic-facts';
+import ServicesPage from '../components/services/ServicesPage.astro';
+import { clinicServices } from '../data/services';
+import {
+  buildBreadcrumbSchema,
+  buildItemListSchema,
+  buildWebPageSchema,
+} from '../lib/schema';
+import Layout from '../layouts/Layout.astro';
+
+const site = Astro.site!;
+const title = `خدمات الأسنان والجلدية في ${clinicFacts.cityAr} | فال`;
+const description =
+  `تصفح خدمات طب الأسنان والجلدية في عيادة فال ب${clinicFacts.cityAr} واحجز موعدك مع فريق متخصص.`;
+---
+
+<Layout
+  title={title}
+  description={description}
+  schemas={[
+    buildWebPageSchema({ site, path: '/services', name: title, description }),
+    buildBreadcrumbSchema(site, [
+      { name: 'الرئيسية', path: '/' },
+      { name: 'الخدمات', path: '/services' },
+    ]),
+    buildItemListSchema({
+      site,
+      path: '/services',
+      name: 'خدمات فال',
+      description,
+      itemType: 'Service',
+      items: clinicServices.map((service) => ({
+        name: service.title,
+        path: `/services/${service.id}`,
+        description: service.description,
+        image: service.heroImage,
+      })),
+    }),
+  ]}
+>
+  <ServicesPage />
+</Layout>

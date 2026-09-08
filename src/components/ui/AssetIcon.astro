@@ -1,0 +1,19 @@
+---
+export interface Props {
+  src: string;
+  alt?: string;
+  size?: 'sm' | 'md' | 'lg';
+  class?: string;
+}
+
+const { src, alt = '', size = 'md', class: className = '' } = Astro.props;
+const sizes = {
+  sm: 'size-4',
+  md: 'size-5',
+  lg: 'size-6',
+} as const;
+---
+
+<span class:list={['inline-flex shrink-0 items-center justify-center overflow-hidden', sizes[size], className]}>
+  <img src={src} alt={alt} class="size-full object-contain" />
+</span>

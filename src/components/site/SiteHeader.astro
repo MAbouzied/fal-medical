@@ -1,0 +1,199 @@
+---
+import AssetIcon from '../ui/AssetIcon.astro';
+import ButtonLink from '../ui/ButtonLink.astro';
+import BrandLogo from './BrandLogo.astro';
+import type { Locale } from '../../lib/i18n/localize';
+import { isEnglish, languageSwitchHref, localizeDepartment, ui } from '../../lib/i18n/localize';
+import { homeServiceDepartments, servicesCatalogPath } from '../../data/services';
+
+export interface Props {
+  locale?: Locale;
+}
+
+const { locale = 'ar' } = Astro.props;
+const en = isEnglish(locale);
+const copy = ui(locale);
+const languageHref = languageSwitchHref(
+  Astro.url.pathname,
+  locale,
+  Astro.url.search,
+  Astro.url.hash,
+);
+
+const allServicesHref = servicesCatalogPath('كل الخدمات', locale);
+const homeHref = en ? '/en' : '/';
+const servicesHref = allServicesHref;
+const contactHref = en ? '/en/contact' : '/contact';
+const bookHref = en ? '/en/book' : '/book';
+const languageLabel = en ? 'العربية' : 'English';
+const bookLabel = en ? copy!.nav.bookConsultation : 'احجز استشارتك الآن';
+const servicesLabel = en ? copy!.nav.services : 'الخدمات';
+const contactLabel = en ? copy!.nav.contact : 'تواصل معنا';
+const path = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const contactActive = path === contactHref || path.endsWith('/contact');
+const servicesActive = path === '/services' || path === '/en/services' || path.includes('/services');
+
+const serviceLinks = homeServiceDepartments.map((department) => ({
+  label: localizeDepartment(department, locale),
+  href: servicesCatalogPath(department, locale),
+}));
+---
+
+<header class="relative z-20 overflow-x-clip border-b border-border/70 bg-surface" data-site-locale={locale}>
+  <div class="page-container flex min-h-20 items-center justify-between gap-3 sm:gap-4">
+    <div class="flex min-w-0 items-center gap-2 sm:gap-4" data-header-brand>
+      <BrandLogo locale={locale} href={homeHref} />
+
+      <nav class="hidden items-center gap-1 md:flex" aria-label={en ? 'Main navigation' : 'التنقل الرئيسي'}>
+        <div class="group relative" data-nav-menu>
+          <a
+            href={servicesHref}
+            class:list={[
+              'flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-bold',
+              servicesActive ? 'text-gold-text' : 'text-ink hover:bg-surface-soft',
+            ]}
+            aria-haspopup="true"
+          >
+            {servicesLabel}
+            <AssetIcon src="/assets/chevron-down.svg" size="sm" class="opacity-70" />
+          </a>
+          <div class="invisible absolute top-full start-0 z-30 min-w-52 pt-1 opacity-0 transition group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+            <div class="rounded-2xl border border-border bg-surface p-2 shadow-[var(--shadow-card)]">
+              <a href={allServicesHref} class="block rounded-lg px-3 py-2 text-sm font-bold hover:bg-surface-soft">
+                {en ? 'All services' : 'كل الخدمات'}
+              </a>
+              {serviceLinks.map((item) => (
+                <a href={item.href} class="block rounded-lg px-3 py-2 text-sm text-muted hover:bg-surface-soft hover:text-ink">
+                  {item.label}
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+        <a
+          href={contactHref}
+          data-nav="contact"
+          aria-current={contactActive ? 'page' : undefined}
+          class:list={[
+            'rounded-lg px-3 py-2 text-sm font-bold',
+            contactActive ? 'text-gold-text' : 'text-ink hover:bg-surface-soft',
+          ]}
+        >
+          {contactLabel}
+        </a>
+      </nav>
+    </div>
+
+    <div class="flex shrink-0 items-center gap-2 sm:gap-3">
+      <a
+        href={languageHref}
+        data-language-switch
+        class="inline-flex size-10 items-center justify-center rounded-full text-ink hover:bg-surface-soft"
+        aria-label={en ? 'Switch to Arabic' : 'Switch to English'}
+        title={languageLabel}
+      >
+        <AssetIcon src="/assets/globe.svg" size="md" />
+      </a>
+      <ButtonLink href={bookHref} size="lg" class="max-sm:hidden">
+        {bookLabel}
+      </ButtonLink>
+      <details class="relative md:hidden" data-mobile-nav>
+        <summary
+          class="flex size-10 cursor-pointer list-none items-center justify-center rounded-xl border border-border text-lg [&::-webkit-details-marker]:hidden"
+          aria-label={en ? 'Open menu' : 'فتح قائمة التنقل'}
+        >
+          ☰
+        </summary>
+        <nav
+          class="absolute top-12 end-0 z-30 flex w-56 max-w-[calc(100vw-2rem)] flex-col rounded-2xl border border-border bg-surface p-2 shadow-[var(--shadow-card)]"
+          aria-label={en ? 'Mobile navigation' : 'التنقل للجوال'}
+        >
+          <a href={servicesHref} class="rounded-lg px-3 py-2.5 text-sm font-bold hover:bg-surface-soft" data-mobile-nav-link>
+            {servicesLabel}
+          </a>
+          {serviceLinks.map((item) => (
+            <a href={item.href} class="rounded-lg px-3 py-2.5 text-sm font-bold hover:bg-surface-soft" data-mobile-nav-link>
+              {item.label}
+            </a>
+          ))}
+          <a
+            href={contactHref}
+            data-nav="contact"
+            class="rounded-lg px-3 py-2.5 text-sm font-bold hover:bg-surface-soft"
+            data-mobile-nav-link
+          >
+            {contactLabel}
+          </a>
+          <a
+            href={languageHref}
+            data-language-switch
+            class="rounded-lg px-3 py-2.5 text-sm font-bold hover:bg-surface-soft"
+            data-mobile-nav-link
+          >
+            {languageLabel}
+          </a>
+          <a href={bookHref} class="mt-1 rounded-[var(--radius-button)] bg-gold-gradient px-3 py-2.5 text-center text-sm font-bold text-ink-button" data-mobile-nav-link>
+            {bookLabel}
+          </a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+<script>
+  const closeMobileNav = () => {
+    document.querySelectorAll<HTMLDetailsElement>('details[data-mobile-nav][open]').forEach((nav) => {
+      nav.open = false;
+    });
+  };
+
+  const alternateLanguagePath = (pathname: string, locale: 'ar' | 'en'): string => {
+    const raw = pathname.split(/[?#]/)[0] || '/';
+    const path = raw.length > 1 ? raw.replace(/\/+$/, '') : raw;
+    if (locale === 'en') {
+      if (path === '/en') return '/';
+      if (path.startsWith('/en/')) return path.slice(3) || '/';
+      return path;
+    }
+    if (path === '/blogs' || path.startsWith('/blogs/')) return '/en';
+    if (path === '/') return '/en';
+    return `/en${path}`;
+  };
+
+  const syncLanguageSwitchHrefs = () => {
+    const header = document.querySelector<HTMLElement>('header[data-site-locale]');
+    const locale = header?.dataset.siteLocale === 'en' ? 'en' : 'ar';
+    const base = alternateLanguagePath(window.location.pathname, locale);
+    const suffix = `${window.location.search}${window.location.hash}`;
+    document.querySelectorAll<HTMLAnchorElement>('a[data-language-switch]').forEach((link) => {
+      link.href = `${base}${suffix}`;
+    });
+  };
+
+  const bindHeaderInteractions = () => {
+    closeMobileNav();
+    syncLanguageSwitchHrefs();
+  };
+
+  if (document.documentElement.dataset.siteHeaderBound !== 'true') {
+    document.documentElement.dataset.siteHeaderBound = 'true';
+    window.addEventListener('hashchange', syncLanguageSwitchHrefs);
+    document.addEventListener('click', (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+
+      if (target.closest('[data-mobile-nav-link]')) {
+        closeMobileNav();
+        return;
+      }
+
+      const openMobile = document.querySelector<HTMLDetailsElement>('details[data-mobile-nav][open]');
+      if (openMobile && !target.closest('details[data-mobile-nav]')) {
+        closeMobileNav();
+      }
+    });
+  }
+
+  document.addEventListener('astro:page-load', bindHeaderInteractions);
+</script>

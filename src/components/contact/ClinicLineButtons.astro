@@ -1,0 +1,138 @@
+---
+import { buildPhoneUrl, buildWhatsAppUrl, clinicLines } from '../../data/contact';
+import type { Locale } from '../../lib/i18n/localize';
+import { isEnglish } from '../../lib/i18n/localize';
+import AssetIcon from '../ui/AssetIcon.astro';
+
+export interface Props {
+  locale?: Locale;
+  /** Which actions to render for each clinic line. */
+  mode?: 'call' | 'whatsapp' | 'both';
+  size?: 'sm' | 'md';
+  class?: string;
+  whatsappMessage?: string;
+  /** Accessible name prefix, e.g. "Call" / "اتصال". */
+  callLabel?: string;
+  whatsappLabel?: string;
+  /**
+   * When true (default for mode="both"), render each clinic as its own group
+   * with a heading and its WhatsApp/call actions underneath.
+   */
+  grouped?: boolean;
+  /** Show the clinic phone number under each group heading. */
+  showPhone?: boolean;
+}
+
+const {
+  locale = 'ar',
+  mode = 'call',
+  size = 'md',
+  class: className = '',
+  whatsappMessage,
+  callLabel,
+  whatsappLabel,
+  grouped = mode === 'both',
+  showPhone = false,
+} = Astro.props;
+
+const en = isEnglish(locale);
+const resolvedCall = callLabel ?? (en ? 'Call' : 'اتصال');
+const resolvedWhatsapp = whatsappLabel ?? (en ? 'WhatsApp' : 'واتساب');
+const heightClass = size === 'sm' ? 'min-h-10 text-xs' : 'min-h-12 text-sm';
+const showCall = mode === 'call' || mode === 'both';
+const showWhatsapp = mode === 'whatsapp' || mode === 'both';
+---
+
+{
+  grouped ? (
+    <div class:list={['flex flex-col gap-4', className]} data-clinic-groups>
+      {clinicLines.map((line) => {
+        const label = en ? line.labelEn : line.labelAr;
+        return (
+          <div class="flex flex-col gap-2" data-clinic-group={line.id}>
+            <div class="space-y-0.5">
+              <p class="text-xs font-bold text-ink">{label}</p>
+              {showPhone && (
+                <a
+                  href={buildPhoneUrl(line.id)}
+                  dir="ltr"
+                  class="inline-block text-sm text-muted tabular-nums hover:text-primary"
+                >
+                  {line.phoneDisplay}
+                </a>
+              )}
+            </div>
+            <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+              {showWhatsapp && (
+                <a
+                  href={buildWhatsAppUrl(whatsappMessage, line.id)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class:list={[
+                    'inline-flex w-full items-center justify-center gap-2 rounded-full border border-success/40 bg-success-soft px-5 font-bold whitespace-nowrap text-success transition-transform hover:-translate-y-0.5 sm:w-auto',
+                    heightClass,
+                  ]}
+                  aria-label={`${resolvedWhatsapp} — ${label}`}
+                >
+                  {resolvedWhatsapp}
+                  <AssetIcon src="/assets/whatsapp.svg" size="sm" />
+                </a>
+              )}
+              {showCall && (
+                <a
+                  href={buildPhoneUrl(line.id)}
+                  class:list={[
+                    'inline-flex w-full items-center justify-center gap-2 rounded-full border border-primary/30 bg-surface-accent px-5 font-bold whitespace-nowrap text-primary transition-transform hover:-translate-y-0.5 sm:w-auto',
+                    heightClass,
+                  ]}
+                  aria-label={`${resolvedCall} — ${label}`}
+                >
+                  {resolvedCall}
+                  <AssetIcon src="/assets/phone.svg" size="sm" />
+                </a>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  ) : (
+    <div class:list={['flex flex-col gap-3 sm:flex-row sm:flex-wrap', className]}>
+      {clinicLines.map((line) => {
+        const label = en ? line.labelEn : line.labelAr;
+        return (
+          <>
+            {showWhatsapp && (
+              <a
+                href={buildWhatsAppUrl(whatsappMessage, line.id)}
+                target="_blank"
+                rel="noopener noreferrer"
+                class:list={[
+                  'inline-flex w-full items-center justify-center gap-2 rounded-full border border-success/40 bg-success-soft px-5 font-bold whitespace-nowrap text-success transition-transform hover:-translate-y-0.5 sm:w-auto',
+                  heightClass,
+                ]}
+                aria-label={`${resolvedWhatsapp} — ${label}`}
+              >
+                {resolvedWhatsapp} · {label}
+                <AssetIcon src="/assets/whatsapp.svg" size="sm" />
+              </a>
+            )}
+            {showCall && (
+              <a
+                href={buildPhoneUrl(line.id)}
+                class:list={[
+                  'inline-flex w-full items-center justify-center gap-2 rounded-full border border-primary/30 bg-surface-accent px-5 font-bold whitespace-nowrap text-primary transition-transform hover:-translate-y-0.5 sm:w-auto',
+                  heightClass,
+                ]}
+                aria-label={`${resolvedCall} — ${label}`}
+              >
+                {resolvedCall} · {label}
+                <AssetIcon src="/assets/phone.svg" size="sm" />
+              </a>
+            )}
+          </>
+        );
+      })}
+    </div>
+  )
+}

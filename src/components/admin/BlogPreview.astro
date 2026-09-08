@@ -1,0 +1,67 @@
+---
+import type { AdminPost } from '../../lib/admin/blog-admin.ts';
+import { sanitizeBlogHtml } from '../../lib/admin/blog-content.ts';
+import '../../modules/blog/styles/blog.css';
+
+interface Props {
+  post: AdminPost;
+}
+
+const { post } = Astro.props;
+const previewHtml = sanitizeBlogHtml(post.contentHtml || '<p>لا يوجد محتوى بعد.</p>');
+---
+
+<section class="preview-view">
+  <div class="preview-bar">
+    <a class="text-button" href={`/admin/${encodeURIComponent(post.id)}/edit`}>← العودة للتحرير</a>
+    <span>معاينة المقال</span>
+    <button type="button" class="button button-primary" id="preview-publish"><span class="action-spinner" aria-hidden="true" hidden></span><span data-label>نشر المقال</span></button>
+  </div>
+  <article class="preview-article blog-root">
+    <p class="admin-kicker">{post.category || 'مدونة فال'}</p>
+    <h1>{post.title || 'بدون عنوان'}</h1>
+    <p>{post.excerpt || 'لا توجد مقدمة مختصرة لهذا المقال بعد.'}</p>
+    {post.coverUrl && <img class="preview-cover" src={post.coverUrl} alt={post.coverAlt || post.title} />}
+    <hr />
+    <div class="blog-body preview-body" set:html={previewHtml}></div>
+  </article>
+</section>
+
+<script>
+  const button = document.querySelector<HTMLButtonElement>('#preview-publish');
+  const status = document.querySelector<HTMLElement>('#admin-status');
+  const id = window.location.pathname.split('/').filter(Boolean).at(-2);
+  button?.addEventListener('click', async () => {
+    if (!id) return;
+    button.disabled = true;
+    button.setAttribute('aria-busy', 'true');
+    const spinner = button.querySelector<HTMLElement>('.action-spinner');
+    const label = button.querySelector<HTMLElement>('[data-label]');
+    if (spinner) spinner.hidden = false;
+    if (label) label.textContent = 'جارٍ النشر…';
+    try {
+      const response = await fetch(`/api/admin/blog/posts/${encodeURIComponent(id)}/publish`, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        if (response.status === 401) {
+          const returnTo = `${window.location.pathname}${window.location.search}`;
+          window.location.assign(`/login?returnTo=${encodeURIComponent(returnTo)}`);
+        }
+        const error = result && typeof result === 'object' ? (result as { error?: unknown }).error : undefined;
+        const message = typeof error === 'string'
+          ? error
+          : error && typeof error === 'object' && typeof (error as { message?: unknown }).message === 'string'
+            ? (error as { message: string }).message
+            : 'تعذر نشر المقال';
+        throw new Error(message);
+      }
+      window.location.assign('/admin');
+    } catch (error) {
+      button.disabled = false;
+      button.removeAttribute('aria-busy');
+      if (spinner) spinner.hidden = true;
+      if (label) label.textContent = 'نشر المقال';
+      if (status) { status.textContent = error instanceof Error ? error.message : 'تعذر نشر المقال'; status.hidden = false; status.classList.add('error'); }
+    }
+  });
+</script>

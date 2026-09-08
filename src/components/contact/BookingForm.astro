@@ -1,0 +1,161 @@
+---
+import { clinicContact } from '../../data/contact';
+import AssetIcon from '../ui/AssetIcon.astro';
+import PillLabel from '../ui/PillLabel.astro';
+import ClinicLineButtons from './ClinicLineButtons.astro';
+import BookingServiceFields from './BookingServiceFields.astro';
+
+const contactMessage = 'مرحباً، أود الحجز عبر فال.';
+---
+
+<section id="booking" class="bg-surface py-16 sm:py-24" aria-labelledby="booking-heading">
+  <div class="page-container grid gap-6 rounded-[var(--radius-card)] border border-border bg-surface-soft p-4 shadow-[var(--shadow-card)] sm:gap-8 sm:p-8 lg:grid-cols-[0.85fr_1.15fr] lg:p-10">
+    <div class="self-start lg:sticky lg:top-8">
+      <PillLabel text="احجز موعدك" />
+      <h2 id="booking-heading" class="text-display mt-3 font-black sm:mt-4">نموذج حجز سريع</h2>
+      <p class="mt-4 max-w-lg text-sm leading-7 text-pretty text-muted">
+        املأ الاسم ورقم الجوال، اختر التخصص ثم الخدمة، ثم أرسل الطلب عبر واتساب.
+      </p>
+      <div class="mt-6" data-gtm-location="booking_contact_sidebar">
+        <ClinicLineButtons
+          mode="both"
+          size="sm"
+          showPhone
+          whatsappMessage={contactMessage}
+        />
+      </div>
+      <ul class="mt-5 space-y-2 text-sm text-muted sm:mt-7 sm:space-y-3" data-gtm-location="booking_contact_sidebar">
+        <li class="flex items-center gap-2 sm:gap-3"><AssetIcon src="/assets/clock.svg" size="sm" class="shrink-0" /><span>{clinicContact.hours}</span></li>
+        <li class="flex items-center gap-2 sm:gap-3"><AssetIcon src="/assets/location.svg" size="sm" class="shrink-0" />{clinicContact.location}</li>
+      </ul>
+    </div>
+
+    <form
+      class="rounded-[var(--radius-card)] border border-border bg-surface p-4 shadow-[var(--shadow-card)] sm:p-8"
+      method="post"
+      action="/api/customers"
+      data-astro-reload
+      aria-describedby="contact-booking-notice"
+      data-booking-form
+      data-gtm-form="booking_contact"
+      novalidate
+    >
+      <p id="contact-booking-notice" class="mb-5 rounded-2xl bg-surface-soft px-4 py-3 text-sm leading-6 text-muted" role="note">
+        سيتم حفظ بيانات الحجز لدى العيادة للمتابعة، ثم فتح واتساب لإرسال الطلب.
+      </p>
+      <label class="sr-only" aria-hidden="true">
+        Website
+        <input name="website" type="text" tabindex="-1" autocomplete="off" />
+      </label>
+      <div class="grid gap-4">
+        <label class="grid gap-2 text-xs font-bold">
+          الاسم الكامل
+          <input name="name" autocomplete="name" required minlength="3" maxlength="100" placeholder="مثال: عبدالله محمد" class="min-h-12 rounded-2xl border border-border px-4 text-sm font-normal shadow-[var(--shadow-control)]" />
+        </label>
+        <label class="grid gap-2 text-xs font-bold">
+          رقم الجوال
+          <input name="phone" type="tel" dir="ltr" inputmode="numeric" autocomplete="tel" required minlength="10" maxlength="20" pattern="05[0-9]{8}" placeholder="05XXXXXXXX" class="min-h-12 rounded-2xl border border-border px-4 text-sm font-normal shadow-[var(--shadow-control)]" />
+        </label>
+        <BookingServiceFields
+          fieldClass="min-h-12 rounded-2xl border border-border bg-surface px-4 text-sm font-normal shadow-[var(--shadow-control)]"
+          labelClass="grid gap-2 text-xs font-bold"
+          specialtyLabel="التخصص"
+          serviceLabel="الخدمة"
+          specialtyPlaceholder="اختر التخصص"
+          servicePlaceholder="اختر الخدمة"
+        />
+      </div>
+      <label class="mt-5 flex items-start gap-3 text-xs leading-6 text-muted">
+        <input name="consent" type="checkbox" required class="mt-1 size-4 shrink-0 accent-primary" />
+        <span>
+          أوافق على
+          {' '}
+          <a href="/privacy" class="font-bold text-primary underline-offset-2 hover:underline">سياسة الخصوصية</a>
+          {' '}
+          والتواصل معي لتأكيد الحجز.
+        </span>
+      </label>
+      <button type="submit" class="mt-6 inline-flex min-h-[3.25rem] w-full items-center justify-center gap-2 rounded-full bg-gold-gradient px-7 text-sm font-bold whitespace-nowrap text-ink-button shadow-[var(--shadow-gold)] transition-transform hover:-translate-y-0.5 sm:text-base">
+        إرسال عبر واتساب
+        <AssetIcon src="/assets/whatsapp.svg" size="sm" />
+      </button>
+      <p class="mt-3 min-h-5 text-center text-sm font-medium" role="status" aria-live="polite" data-booking-status></p>
+    </form>
+  </div>
+</section>
+
+<script>
+  import {
+    buildBookingWhatsAppMessage,
+    buildWhatsAppUrl,
+    clinicContact,
+    clinicLineFromDepartment,
+  } from '../../data/contact';
+  import { saveCustomerLead } from '../../lib/customer-leads';
+  import { GtmEvents, pushGtmEvent } from '../../lib/gtm';
+
+  const bindBookingForms = () => {
+    document.querySelectorAll<HTMLFormElement>('[data-booking-form]').forEach((form) => {
+      if (form.dataset.bound === 'true') return;
+      form.dataset.bound = 'true';
+
+      const status = form.querySelector<HTMLElement>('[data-booking-status]');
+      const formId = form.dataset.gtmForm ?? 'booking_contact';
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        if (!form.reportValidity()) {
+          pushGtmEvent(GtmEvents.formError, { form_id: formId, method: 'whatsapp' });
+          if (status) {
+            status.textContent = 'يرجى تعبئة الحقول المطلوبة قبل الإرسال.';
+            status.className = 'mt-3 min-h-5 text-center text-sm font-medium text-danger';
+          }
+          return;
+        }
+
+        const data = new FormData(form);
+        const department = String(data.get('department') ?? '').trim();
+        const service = String(data.get('service') ?? '').trim();
+        const message = buildBookingWhatsAppMessage({
+          name: String(data.get('name') ?? '').trim(),
+          phone: String(data.get('phone') ?? '').trim(),
+          department,
+          service,
+          branch: clinicContact.branch,
+        });
+        const whatsappUrl = buildWhatsAppUrl(message, clinicLineFromDepartment(service || department));
+
+        pushGtmEvent(GtmEvents.formSubmit, {
+          form_id: formId,
+          method: 'whatsapp',
+        });
+
+        void (async () => {
+          const result = await saveCustomerLead({
+            name: String(data.get('name') ?? '').trim(),
+            phone: String(data.get('phone') ?? '').trim(),
+            department,
+            service,
+            locale: 'ar',
+            consent: data.has('consent'),
+            website: String(data.get('website') ?? ''),
+          });
+
+          if (status) {
+            status.textContent = result.ok
+              ? 'جارٍ فتح واتساب لإرسال طلب الحجز...'
+              : 'تعذر حفظ السجل الإلكتروني. سيتم فتح واتساب لإرسال الطلب للعيادة.';
+            status.className = result.ok
+              ? 'mt-3 min-h-5 text-center text-sm font-medium text-success'
+              : 'mt-3 min-h-5 text-center text-sm font-medium text-danger';
+          }
+
+          window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+        })();
+      });
+    });
+  };
+
+  document.addEventListener('astro:page-load', bindBookingForms);
+</script>

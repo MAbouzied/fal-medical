@@ -1,0 +1,105 @@
+---
+import AssetIcon from '../ui/AssetIcon.astro';
+import PillLabel from '../ui/PillLabel.astro';
+import ContactInquiryForm from './ContactInquiryForm.astro';
+import { clinicFacts } from '../../data/clinic-facts';
+import { buildPhoneUrl, clinicLines } from '../../data/contact';
+import { clinicMapEmbedUrl, clinicMapUrl } from '../../data/seo';
+import type { Locale } from '../../lib/i18n/localize';
+import { isEnglish, localizeContact, ui } from '../../lib/i18n/localize';
+
+export interface Props {
+  locale?: Locale;
+}
+
+const { locale = 'ar' } = Astro.props;
+const en = isEnglish(locale);
+const copy = ui(locale);
+const contact = localizeContact(locale);
+const phone = clinicLines[0];
+
+const text = en
+  ? {
+      badge: copy!.pages.contactBadge,
+      heading: copy!.pages.contactHeading,
+      intro: copy!.pages.contactIntro,
+      locationTitle: copy!.pages.locationTitle,
+      branchName: copy!.pages.branchName,
+      hours: copy!.common.hours,
+      openMap: copy!.pages.openMap,
+    }
+  : {
+      badge: 'تواصل معنا',
+      heading: 'نحن هنا لمساعدتك',
+      intro:
+        'لديك استفسار أو ترغب في حجز موعد؟ تواصل معنا، وسيكون فريقنا سعيدًا بالإجابة عن استفساراتك ومساعدتك في الحصول على الرعاية التي تحتاجها.',
+      locationTitle: `موقعنا في ${clinicFacts.cityAr}`,
+      branchName: `فرع ${clinicFacts.cityAr}`,
+      hours: 'مواعيد العمل',
+      openMap: 'افتح في خرائط Google',
+    };
+---
+
+<section class="bg-surface py-12 sm:py-16">
+  <div class="page-container text-center">
+    <PillLabel text={text.badge} />
+    <h1 class="text-display mt-4 font-black text-ink">{text.heading}</h1>
+    <p class="mx-auto mt-4 max-w-2xl text-sm leading-7 text-pretty text-muted sm:text-base sm:leading-8">
+      {text.intro}
+    </p>
+  </div>
+</section>
+
+<section class="bg-surface pb-16 sm:pb-24">
+  <div class="page-container rounded-[var(--radius-card)] bg-surface-soft p-4 sm:p-8 lg:p-10">
+    <div class="grid gap-6 lg:grid-cols-2 lg:gap-8">
+      <div class="space-y-4">
+        <a
+          href={buildPhoneUrl(phone.id)}
+          class="inline-flex items-center gap-3 text-sm font-bold text-ink hover:text-gold-text"
+          dir="ltr"
+        >
+          <span class="inline-flex size-10 items-center justify-center rounded-full bg-surface text-gold-text">
+            <AssetIcon src="/assets/phone.svg" size="md" class="text-gold-text" />
+          </span>
+          <span dir="ltr">{phone.phoneDisplay}</span>
+        </a>
+
+        <article class="rounded-[var(--radius-card)] bg-surface p-5 shadow-[var(--shadow-card)] sm:p-6">
+          <h2 class="text-lg font-black text-ink">{text.locationTitle}</h2>
+          <div class="mt-4 overflow-hidden rounded-[var(--radius-control)] bg-[#eeeeee]">
+            <iframe
+              title={text.locationTitle}
+              src={clinicMapEmbedUrl}
+              class="aspect-[4/3] w-full border-0"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+            ></iframe>
+          </div>
+          <p class="mt-4 font-bold text-ink">{text.branchName}</p>
+          <p class="mt-1 text-sm leading-7 text-muted">{contact.location}</p>
+          <h3 class="mt-5 text-sm font-bold text-ink">{text.hours}</h3>
+          <ul class="mt-2 space-y-1 text-sm leading-7 text-muted">
+            {contact.hoursRows.map(([day, hours]) => (
+              <li class="flex justify-between gap-4">
+                <span>{day}</span>
+                <span>{hours}</span>
+              </li>
+            ))}
+          </ul>
+          <a
+            href={clinicMapUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="mt-3 inline-flex items-center gap-2 text-sm font-bold text-gold-text hover:underline"
+          >
+            <AssetIcon src="/assets/location.svg" size="sm" class="text-gold-text" />
+            {text.openMap}
+          </a>
+        </article>
+      </div>
+
+      <ContactInquiryForm locale={locale} />
+    </div>
+  </div>
+</section>

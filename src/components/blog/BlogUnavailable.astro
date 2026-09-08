@@ -1,0 +1,48 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  heading?: string;
+  body?: string;
+}
+
+const {
+  title = 'المدونة غير متاحة مؤقتاً | فال',
+  description = 'تعذر تحميل مقالات المدونة حالياً. يرجى المحاولة بعد قليل.',
+  heading = 'المدونة غير متاحة مؤقتاً',
+  body = 'نعمل على استعادة المحتوى. يمكنك العودة لاحقاً أو تصفح الخدمات وحجز موعد.',
+} = Astro.props;
+---
+
+<Layout
+  title={title}
+  description={description}
+  noindex={true}
+  robotsFollow={false}
+  omitAlternates={true}
+  omitStructuredData={true}
+>
+  <section class="py-20 sm:py-28">
+    <div class="page-container flex max-w-2xl flex-col items-center text-center">
+      <p class="text-sm font-bold tracking-[0.08em] text-primary">503</p>
+      <h1 class="text-display mt-3 font-black">{heading}</h1>
+      <p class="mt-4 text-sm leading-7 text-pretty text-muted sm:text-lg">{body}</p>
+      <div class="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+        <a
+          href="/"
+          class="inline-flex min-h-10 w-full items-center justify-center rounded-full bg-gold-gradient px-5 text-xs font-bold text-ink-button shadow-[var(--shadow-gold)] sm:w-auto"
+        >
+          العودة للرئيسية
+        </a>
+        <a
+          href="/services"
+          class="inline-flex min-h-10 w-full items-center justify-center rounded-full border border-border bg-surface px-5 text-xs font-bold text-ink sm:w-auto"
+        >
+          تصفح الخدمات
+        </a>
+      </div>
+    </div>
+  </section>
+</Layout>

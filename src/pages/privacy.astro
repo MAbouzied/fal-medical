@@ -1,0 +1,90 @@
+---
+import { clinicFacts } from '../data/clinic-facts';
+import {
+  buildBreadcrumbSchema,
+  buildWebPageSchema,
+} from '../lib/schema';
+import Layout from '../layouts/Layout.astro';
+
+const site = Astro.site!;
+const title = 'سياسة الخصوصية | فال';
+const description =
+  `تعرّف على كيفية جمع واستخدام وحماية بياناتك عند التواصل أو الحجز عبر موقع عيادة فال في ${clinicFacts.cityAr}.`;
+---
+
+<Layout
+  title={title}
+  description={description}
+  schemas={[
+    buildWebPageSchema({
+      site,
+      path: '/privacy',
+      name: title,
+      description,
+      locale: 'ar',
+    }),
+    buildBreadcrumbSchema(site, [
+      { name: 'الرئيسية', path: '/' },
+      { name: 'سياسة الخصوصية', path: '/privacy' },
+    ]),
+  ]}
+>
+  <section class="py-14 sm:py-24">
+    <div class="page-container prose-clinic mx-auto max-w-3xl">
+      <h1 class="text-display font-black text-ink">سياسة الخصوصية</h1>
+      <p class="mt-4 text-sm leading-7 text-muted sm:text-base">
+        توضّح هذه السياسة كيفية تعامل عيادة فال مع المعلومات التي تقدّمها عبر الموقع عند طلب الحجز أو التواصل.
+      </p>
+
+      <h2 class="mt-10 text-xl font-extrabold text-ink">البيانات التي نجمعها</h2>
+      <p class="mt-3 text-sm leading-7 text-muted sm:text-base">
+        قد نجمع الاسم ورقم الجوال والقسم والخدمة المطلوبة وأي ملاحظات ترسلها عبر نماذج الحجز أو واتساب، بالإضافة إلى بيانات تقنية أساسية لازمة لتشغيل الموقع بأمان.
+      </p>
+
+      <h2 class="mt-10 text-xl font-extrabold text-ink">كيف نستخدم البيانات</h2>
+      <ul class="mt-3 list-disc space-y-2 ps-5 text-sm leading-7 text-muted sm:text-base">
+        <li>التواصل لتأكيد الموعد أو الرد على الاستفسارات.</li>
+        <li>تنظيم طلبات الحجز داخل العيادة.</li>
+        <li>تحسين تجربة الموقع وجودة الخدمة.</li>
+      </ul>
+
+      <h2 class="mt-10 text-xl font-extrabold text-ink">مشاركة البيانات</h2>
+      <p class="mt-3 text-sm leading-7 text-muted sm:text-base">
+        لا نبيع بياناتك. قد تُشارك مع أدوات تشغيل ضرورية مثل واتساب أو أنظمة المتابعة الداخلية للعيادة، وبالقدر اللازم لتقديم الخدمة فقط.
+      </p>
+
+      <h2 class="mt-10 text-xl font-extrabold text-ink">التحليلات وملفات الارتباط</h2>
+      <p class="mt-3 text-sm leading-7 text-muted sm:text-base">
+        نستخدم Google Tag Manager / Google Analytics فقط بعد موافقتك الصريحة عبر بانر الموقع. لا تُرسل بيانات الاسم أو الجوال أو القسم أو الخدمة إلى أدوات التحليل. يمكنك رفض التحليلات والبقاء دون تتبع.
+      </p>
+
+      <h2 class="mt-10 text-xl font-extrabold text-ink">حفظ طلبات الحجز</h2>
+      <p class="mt-3 text-sm leading-7 text-muted sm:text-base">
+        تُحفظ طلبات الحجز في جداول Google Sheets الخاصة بالعيادة للمتابعة الداخلية، ثم تُنقل عبر واتساب لتأكيد الموعد. للاطلاع أو التصحيح أو الحذف تواصل عبر البريد أدناه. نحتفظ بسجلات الحجز للمدة اللازمة لتشغيل العيادة والمتطلبات النظامية، ثم نحذفها أو نُعمّيها عند انتهاء الحاجة.
+      </p>
+
+      <h2 class="mt-10 text-xl font-extrabold text-ink">تسجيل دخول فريق العمل عبر Google</h2>
+      <p class="mt-3 text-sm leading-7 text-muted sm:text-base">
+        عند استخدام صفحة تسجيل الدخول الخاصة بفريق العمل، نعالج اسم ملفك الشخصي وبريدك الإلكتروني وصورة الملف عبر Google فقط للتحقق من الهوية. لا نطلب صلاحيات تعديل بريدك أو الوصول غير المتصل، وتُحفظ جلسة العمل في ملف تعريف ارتباط مشفّر لمدة محدودة تقريباً ثماني ساعات. يقتصر الدخول على عناوين البريد المعتمدة مسبقاً، ويمكن إنهاء الجلسة عبر تسجيل الخروج.
+      </p>
+
+      <h2 class="mt-10 text-xl font-extrabold text-ink">حقوقك</h2>
+      <p class="mt-3 text-sm leading-7 text-muted sm:text-base">
+        يمكنك طلب تصحيح بياناتك أو الاستفسار عن استخدامها عبر البريد
+        {' '}
+        <a class="font-bold text-primary hover:underline" href="mailto:info@falclinic.com">info@falclinic.com</a>
+        {' '}
+        أو عبر واتساب العيادة.
+      </p>
+
+      <h2 class="mt-10 text-xl font-extrabold text-ink">التواصل</h2>
+      <p class="mt-3 text-sm leading-7 text-muted sm:text-base">
+        للاستفسارات المتعلقة بالخصوصية، تواصل معنا من
+        {' '}
+        <a class="font-bold text-primary hover:underline" href="/contact">صفحة التواصل</a>
+        {' '}
+        أو عبر رقم العيادة المعروض في الموقع.
+      </p>
+    </div>
+  </section>
+</Layout>

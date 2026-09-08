@@ -1,0 +1,89 @@
+---
+import type { Doctor } from '../../data/doctors';
+import { clinicServices, serviceSectionPath } from '../../data/services';
+import type { Locale } from '../../lib/i18n/localize';
+import { isEnglish, localizeDoctor, localizeService, ui } from '../../lib/i18n/localize';
+import ButtonLink from '../ui/ButtonLink.astro';
+import PillLabel from '../ui/PillLabel.astro';
+import SitePicture from '../ui/SitePicture.astro';
+
+export interface Props {
+  doctor: Doctor;
+  locale?: Locale;
+}
+
+const { doctor: rawDoctor, locale = 'ar' } = Astro.props;
+const doctor = localizeDoctor(rawDoctor, locale);
+const en = isEnglish(locale);
+const copy = ui(locale);
+const relatedServiceRaw = clinicServices.find((service) => service.doctorSpecialty === rawDoctor.specialty);
+const relatedService = relatedServiceRaw ? localizeService(relatedServiceRaw, locale) : undefined;
+const relatedHref = relatedService ? serviceSectionPath(relatedService.id, locale) : undefined;
+---
+
+<section class="pb-10 pt-14 sm:pb-14 sm:pt-24" aria-labelledby="doctor-detail-heading">
+  <div class="page-container">
+    <div class="mx-auto flex max-w-3xl flex-col items-center gap-3 text-center">
+      <PillLabel text={doctor.specialtyLabel} />
+      <h1 id="doctor-detail-heading" class="text-display font-black text-ink">
+        {doctor.name}
+      </h1>
+      <p class="max-w-2xl text-sm leading-6 text-pretty text-muted sm:text-lg lg:text-xl lg:leading-8">{doctor.title}</p>
+    </div>
+
+    <div class="mt-10 grid items-start gap-8 lg:mt-16 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-12">
+      <div class="order-1 overflow-hidden rounded-[var(--radius-card)] border border-border bg-surface shadow-[var(--shadow-card)] lg:sticky lg:top-8">
+        <div class="relative aspect-[1.08/1] overflow-hidden bg-surface-accent">
+          <SitePicture
+            src={doctor.image}
+            alt={en ? `Photo of ${doctor.name}` : `صورة ${doctor.name}`}
+            widths={[480, 640, 800, 960]}
+            sizes="(max-width: 1024px) calc(100vw - 2rem), 40vw"
+            class={rawDoctor.id === 'mohamed-tahhan' ? 'size-full object-cover object-left' : 'size-full object-cover object-top'}
+            loading="eager"
+          />
+          <span class="absolute end-3 top-3 max-w-[min(100%-1.5rem,14rem)] truncate rounded-full bg-surface/95 px-3 py-1.5 text-[0.6875rem] font-bold text-primary">
+            {doctor.specialtyLabel}
+          </span>
+        </div>
+        <div class="space-y-4 p-5 sm:p-6">
+          <dl class="grid gap-3 text-sm">
+            <div class="flex items-start justify-between gap-4">
+              <dt class="text-muted">{en ? copy!.common.branch : 'الفرع'}</dt>
+              <dd class="font-bold text-ink">{doctor.branchLabel}</dd>
+            </div>
+          </dl>
+          <div class="flex flex-col gap-2 pt-2">
+            <ButtonLink href="#booking" class="w-full text-center">
+              {en ? copy!.common.bookWithDoctor : 'احجز مع الطبيب'}
+            </ButtonLink>
+            {relatedService && relatedHref && (
+              <ButtonLink href={relatedHref} variant="outline" class="w-full text-center">
+                {en ? copy!.common.relatedSpecialty : 'عرض التخصص'}
+              </ButtonLink>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div class="order-2 flex flex-col gap-6 lg:gap-8">
+        <p class="text-sm leading-7 text-pretty text-muted sm:text-lg sm:leading-8">{doctor.summary}</p>
+        {doctor.sections.map((section) => (
+          <section class="flex flex-col gap-3 sm:gap-4">
+            <h2 class="text-lg font-extrabold tracking-tight text-balance text-ink sm:text-[1.875rem] sm:leading-[2.375rem]">
+              {section.title}
+            </h2>
+            {section.paragraphs?.map((paragraph) => (
+              <p class="text-sm leading-7 text-pretty text-muted sm:text-lg sm:leading-8">{paragraph}</p>
+            ))}
+            {section.listItems && section.listItems.length > 0 && (
+              <ul class="list-disc space-y-2 ps-6 text-sm leading-7 text-pretty text-muted marker:text-primary sm:text-lg sm:leading-8">
+                {section.listItems.map((item) => <li>{item}</li>)}
+              </ul>
+            )}
+          </section>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>

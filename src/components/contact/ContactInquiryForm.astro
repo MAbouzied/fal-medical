@@ -1,0 +1,256 @@
+---
+import ServiceDepartmentOptions from './ServiceDepartmentOptions.astro';
+import type { Locale } from '../../lib/i18n/localize';
+import { isEnglish, ui } from '../../lib/i18n/localize';
+
+export interface Props {
+  locale?: Locale;
+  submitLabel?: string;
+  gtmForm?: string;
+}
+
+const { locale = 'ar', submitLabel, gtmForm = 'contact_inquiry' } = Astro.props;
+const en = isEnglish(locale);
+const copy = ui(locale);
+
+const fieldClass =
+  'min-h-12 w-full rounded-[var(--radius-control)] border border-border bg-surface px-4 text-sm font-normal text-ink placeholder:text-placeholder';
+const labelClass = 'grid gap-1.5 text-xs font-bold text-ink';
+
+const labels = en
+  ? {
+      name: copy!.common.fullName,
+      phone: copy!.common.phone,
+      service: copy!.common.service,
+      namePlaceholder: copy!.common.namePlaceholder,
+      phonePlaceholder: copy!.common.phonePlaceholder,
+      servicePlaceholder: copy!.pages.servicePlaceholder,
+      message: copy!.pages.extraMessage,
+      messagePlaceholder: copy!.pages.extraMessagePlaceholder,
+      consent: copy!.common.consent,
+      privacy: 'privacy policy',
+      send: copy!.pages.sendMessage,
+      notice: copy!.pages.contactNotice,
+      privacyHref: '/en/privacy',
+    }
+  : {
+      name: 'الاسم',
+      phone: 'رقم الجوال',
+      service: 'الخدمة',
+      namePlaceholder: 'مثال: عبدالله محمد',
+      phonePlaceholder: '05XXXXXXXX',
+      servicePlaceholder: 'مثال: تنظيف الأسنان',
+      message: 'رسالة إضافية (اختياري)',
+      messagePlaceholder: 'أي ملاحظات تود إخبارنا بها',
+      consent: 'أوافق على سياسة الخصوصية والتواصل معي لتأكيد الحجز.',
+      privacy: 'سياسة الخصوصية',
+      send: 'أرسل رسالة',
+      notice: 'سيتم حفظ بياناتك لدى العيادة للمتابعة، ثم فتح واتساب لإرسال الرسالة.',
+      privacyHref: '/privacy',
+    };
+---
+
+<form
+  class="rounded-[var(--radius-card)] border border-border bg-surface p-6 shadow-[var(--shadow-card)] sm:p-10"
+  method="post"
+  action="/api/customers"
+  data-astro-reload
+  aria-describedby="contact-inquiry-notice"
+  data-contact-inquiry-form
+  data-gtm-form={gtmForm}
+  data-locale={locale}
+  novalidate
+>
+  <p id="contact-inquiry-notice" class="sr-only" role="note">{labels.notice}</p>
+  <label class="sr-only" aria-hidden="true">
+    Website
+    <input name="website" type="text" tabindex="-1" autocomplete="off" />
+  </label>
+  <input type="hidden" name="locale" value={locale} />
+  <input type="hidden" name="department" value="" data-inquiry-department />
+
+  <div class="grid gap-4 sm:grid-cols-2">
+    <label class={labelClass}>
+      {labels.name}
+      <input
+        name="name"
+        autocomplete="name"
+        required
+        minlength="3"
+        maxlength="100"
+        placeholder={labels.namePlaceholder}
+        class={fieldClass}
+      />
+    </label>
+    <label class={labelClass}>
+      {labels.phone}
+      <input
+        name="phone"
+        type="tel"
+        dir="ltr"
+        inputmode="numeric"
+        autocomplete="tel"
+        required
+        minlength="10"
+        maxlength="20"
+        pattern="05[0-9]{8}"
+        placeholder={labels.phonePlaceholder}
+        class={fieldClass}
+      />
+    </label>
+  </div>
+
+  <label class:list={[labelClass, 'mt-4']}>
+    {labels.service}
+    <select class={fieldClass} name="service" required data-inquiry-service>
+      <ServiceDepartmentOptions locale={locale} placeholder={labels.servicePlaceholder} />
+    </select>
+  </label>
+
+  <label class:list={[labelClass, 'mt-4']}>
+    {labels.message}
+    <textarea
+      name="notes"
+      rows="4"
+      maxlength="500"
+      placeholder={labels.messagePlaceholder}
+      class="min-h-28 w-full resize-y rounded-[var(--radius-control)] border border-border bg-surface px-4 py-3 text-sm font-normal text-ink placeholder:text-placeholder"
+    ></textarea>
+  </label>
+
+  <label class="mt-5 flex items-start gap-3 text-xs leading-6 text-muted">
+    <input name="consent" type="checkbox" required class="mt-1 size-4 shrink-0 accent-primary" />
+    <span>
+      {en ? (
+        <>
+          I agree to the
+          {' '}
+          <a href={labels.privacyHref} class="font-bold text-gold-text underline-offset-2 hover:underline">{labels.privacy}</a>
+          {' '}
+          and to be contacted to confirm the booking.
+        </>
+      ) : (
+        <>
+          أوافق على
+          {' '}
+          <a href={labels.privacyHref} class="font-bold text-gold-text underline-offset-2 hover:underline">{labels.privacy}</a>
+          {' '}
+          والتواصل معي لتأكيد الحجز.
+        </>
+      )}
+    </span>
+  </label>
+
+  <button
+    type="submit"
+    class="mt-6 inline-flex min-h-12 w-full items-center justify-center rounded-[var(--radius-button)] bg-gold-gradient px-6 text-[0.9375rem] font-bold text-ink-button shadow-[var(--shadow-gold)]"
+  >
+    {submitLabel ?? labels.send}
+  </button>
+  <p class="mt-3 min-h-5 text-center text-sm font-medium" role="status" aria-live="polite" data-inquiry-status></p>
+</form>
+
+<script>
+  import {
+    buildBookingWhatsAppMessage,
+    buildWhatsAppUrl,
+    clinicContact,
+    clinicLineFromDepartment,
+  } from '../../data/contact';
+  import { saveCustomerLead } from '../../lib/customer-leads';
+  import { GtmEvents, pushGtmEvent } from '../../lib/gtm';
+
+  const copy = {
+    ar: {
+      invalid: 'يرجى تعبئة الحقول المطلوبة قبل الإرسال.',
+      opening: 'جارٍ فتح واتساب لإرسال رسالتك...',
+      fallback: 'تعذر حفظ السجل الإلكتروني. سيتم فتح واتساب لإرسال الرسالة للعيادة.',
+    },
+    en: {
+      invalid: 'Please fill in the required fields before sending.',
+      opening: 'Opening WhatsApp to send your message...',
+      fallback: 'We could not save the online record. WhatsApp will still open so the clinic receives your message.',
+    },
+  } as const;
+
+  const syncDepartment = (form: HTMLFormElement) => {
+    const service = form.querySelector<HTMLSelectElement>('[data-inquiry-service]');
+    const department = form.querySelector<HTMLInputElement>('[data-inquiry-department]');
+    if (!service || !department) return;
+    const selected = service.selectedOptions[0];
+    department.value = selected?.dataset.specialty ?? '';
+  };
+
+  const bindInquiryForms = () => {
+    document.querySelectorAll<HTMLFormElement>('[data-contact-inquiry-form]').forEach((form) => {
+      if (form.dataset.bound === 'true') return;
+      form.dataset.bound = 'true';
+
+      const status = form.querySelector<HTMLElement>('[data-inquiry-status]');
+      const formId = form.dataset.gtmForm ?? 'contact_inquiry';
+      const locale = form.dataset.locale === 'en' ? 'en' : 'ar';
+      const messages = copy[locale];
+
+      const service = form.querySelector<HTMLSelectElement>('[data-inquiry-service]');
+      service?.addEventListener('change', () => syncDepartment(form));
+      syncDepartment(form);
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        syncDepartment(form);
+
+        if (!form.reportValidity()) {
+          pushGtmEvent(GtmEvents.formError, { form_id: formId, method: 'whatsapp' });
+          if (status) {
+            status.textContent = messages.invalid;
+            status.className = 'mt-3 min-h-5 text-center text-sm font-medium text-danger';
+          }
+          return;
+        }
+
+        const data = new FormData(form);
+        const department = String(data.get('department') ?? '').trim();
+        const serviceValue = String(data.get('service') ?? '').trim();
+        const notes = String(data.get('notes') ?? '').trim();
+        const message = buildBookingWhatsAppMessage({
+          name: String(data.get('name') ?? '').trim(),
+          phone: String(data.get('phone') ?? '').trim(),
+          department,
+          service: serviceValue,
+          branch: clinicContact.branch,
+          message: notes,
+        });
+        const whatsappUrl = buildWhatsAppUrl(message, clinicLineFromDepartment(serviceValue || department));
+
+        pushGtmEvent(GtmEvents.formSubmit, {
+          form_id: formId,
+          method: 'whatsapp',
+        });
+
+        void (async () => {
+          const result = await saveCustomerLead({
+            name: String(data.get('name') ?? '').trim(),
+            phone: String(data.get('phone') ?? '').trim(),
+            department,
+            service: serviceValue,
+            locale,
+            consent: data.has('consent'),
+            website: String(data.get('website') ?? ''),
+          });
+
+          if (status) {
+            status.textContent = result.ok ? messages.opening : messages.fallback;
+            status.className = result.ok
+              ? 'mt-3 min-h-5 text-center text-sm font-medium text-success'
+              : 'mt-3 min-h-5 text-center text-sm font-medium text-danger';
+          }
+
+          window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+        })();
+      });
+    });
+  };
+
+  bindInquiryForms();
+  document.addEventListener('astro:page-load', bindInquiryForms);
+</script>

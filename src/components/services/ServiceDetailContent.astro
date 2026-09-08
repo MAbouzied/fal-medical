@@ -1,0 +1,60 @@
+---
+import type { ClinicService } from '../../data/services';
+import type { Locale } from '../../lib/i18n/localize';
+import { localizeDepartment, localizeService } from '../../lib/i18n/localize';
+import PillLabel from '../ui/PillLabel.astro';
+import SitePicture from '../ui/SitePicture.astro';
+
+export interface Props {
+  service: ClinicService;
+  locale?: Locale;
+}
+
+const { service: rawService, locale = 'ar' } = Astro.props;
+const service = localizeService(rawService, locale);
+---
+
+<section class="pb-10 pt-14 sm:pb-14 sm:pt-24" aria-labelledby="service-detail-heading">
+  <div class="page-container">
+    <div class="mx-auto flex max-w-3xl flex-col items-center gap-3 text-center">
+      <PillLabel text={localizeDepartment(service.department, locale)} />
+      <h1 id="service-detail-heading" class="text-display font-black text-ink">
+        {service.title}
+      </h1>
+    </div>
+
+    <div class="mt-10 grid items-start gap-8 lg:mt-16 lg:grid-cols-2 lg:gap-12">
+      <div class="order-2 flex flex-col gap-6 lg:order-1 lg:gap-8">
+        {service.sections.map((section) => (
+          <section class="flex flex-col gap-3 sm:gap-4">
+            <h2 class="text-lg font-extrabold tracking-tight text-balance text-ink sm:text-[1.875rem] sm:leading-[2.375rem]">
+              {section.title}
+            </h2>
+            {section.paragraphs?.map((paragraph) => (
+              <p class="text-sm leading-7 text-pretty text-muted sm:text-lg sm:leading-8">{paragraph}</p>
+            ))}
+            {section.listIntro && (
+              <p class="text-sm leading-7 text-pretty text-muted sm:text-lg sm:leading-8">{section.listIntro}</p>
+            )}
+            {section.listItems && section.listItems.length > 0 && (
+              <ol class="list-decimal space-y-2 ps-6 text-sm leading-7 text-pretty text-muted marker:font-bold sm:text-lg sm:leading-8">
+                {section.listItems.map((item) => <li>{item}</li>)}
+              </ol>
+            )}
+          </section>
+        ))}
+      </div>
+
+      <div class="order-1 overflow-hidden rounded-[var(--radius-section)] lg:order-2">
+        <SitePicture
+          src={service.heroImage}
+          alt={service.heroImageAlt}
+          widths={[480, 630, 800, 960]}
+          sizes="(max-width: 1024px) calc(100vw - 2rem), 50vw"
+          class="aspect-[630/417] w-full object-cover"
+          loading="eager"
+        />
+      </div>
+    </div>
+  </div>
+</section>

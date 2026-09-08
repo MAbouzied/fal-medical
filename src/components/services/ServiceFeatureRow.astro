@@ -1,0 +1,53 @@
+---
+import type { ResolvedServiceFeature } from '../../data/service-features';
+import type { Locale } from '../../lib/i18n/localize';
+import PillLabel from '../ui/PillLabel.astro';
+import SitePicture from '../ui/SitePicture.astro';
+
+export interface Props {
+  block: ResolvedServiceFeature;
+  locale?: Locale;
+  eager?: boolean;
+}
+
+const { block, eager = false } = Astro.props;
+---
+
+<article
+  id={block.id}
+  class="grid items-center gap-10 scroll-mt-24 py-12 sm:gap-12 sm:py-16 lg:grid-cols-2 lg:gap-16 lg:py-24"
+>
+  <div
+    class:list={[
+      'mx-auto w-full max-w-[30.0625rem] overflow-hidden rounded-[var(--radius-section)] shadow-[var(--shadow-card)]',
+      !block.imageStart && 'max-lg:order-first lg:order-2',
+    ]}
+  >
+    <SitePicture
+      src={block.imageSrc}
+      alt={block.imageAlt}
+      widths={[480, 768, 960, 1280]}
+      sizes="(max-width: 1024px) calc(100vw - 2rem), 30rem"
+      class="h-[16rem] w-full object-cover sm:h-[27.1875rem]"
+      loading={eager ? 'eager' : 'lazy'}
+      fetchpriority={eager ? 'high' : 'auto'}
+    />
+  </div>
+  <div class:list={['flex flex-col items-start gap-4', !block.imageStart && 'lg:order-1']}>
+    <PillLabel text={block.badge} />
+    <div class="w-full max-w-xl">
+      <h2 class="text-display font-black text-ink">{block.title}</h2>
+      <p class="mt-3 text-[1.0625rem] leading-[1.8] text-pretty text-muted">
+        {block.text}
+      </p>
+    </div>
+    <ul class="space-y-2.5">
+      {block.bullets.map((bullet) => (
+        <li class="flex items-center gap-1.5 text-base text-muted-soft">
+          <span class="text-xl leading-8 font-semibold text-gold-text" aria-hidden="true">✦</span>
+          <span>{bullet}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</article>

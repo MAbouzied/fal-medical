@@ -1,0 +1,33 @@
+---
+import { clinicFacts, formatClinicLocation } from '../data/clinic-facts';
+import ContactPage from '../components/contact/ContactPage.astro';
+import {
+  buildBreadcrumbSchema,
+  buildWebPageSchema,
+} from '../lib/schema';
+import Layout from '../layouts/Layout.astro';
+
+const site = Astro.site!;
+const title = `تواصل معنا وموقع العيادة في ${clinicFacts.cityAr} | فال`;
+const description = `تواصل مع فال في ${clinicFacts.cityAr}، ${formatClinicLocation('ar')}. احجز موعدك أو راسلنا عبر واتساب والهاتف.`;
+---
+
+<Layout
+  title={title}
+  description={description}
+  schemas={[
+    buildWebPageSchema({
+      site,
+      path: '/contact',
+      name: title,
+      description,
+      type: 'ContactPage',
+    }),
+    buildBreadcrumbSchema(site, [
+      { name: 'الرئيسية', path: '/' },
+      { name: 'تواصل معنا', path: '/contact' },
+    ]),
+  ]}
+>
+  <ContactPage />
+</Layout>

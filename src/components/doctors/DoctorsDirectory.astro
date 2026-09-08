@@ -1,0 +1,45 @@
+---
+import type { Doctor } from '../../data/doctors';
+import type { Locale } from '../../lib/i18n/localize';
+import { isEnglish } from '../../lib/i18n/localize';
+import AssetIcon from '../ui/AssetIcon.astro';
+import DoctorCard from './DoctorCard.astro';
+import DoctorFilters from './DoctorFilters.astro';
+
+export interface Props {
+  doctors: readonly Doctor[];
+  locale?: Locale;
+}
+
+const { doctors, locale = 'ar' } = Astro.props;
+const en = isEnglish(locale);
+---
+
+<section id="doctors-directory" class="py-12 sm:py-20">
+  <div class="page-container flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-16">
+    <DoctorFilters locale={locale} />
+    <div class="min-w-0 flex-1">
+      <p id="results-status" class="sr-only" aria-live="polite"></p>
+      <div id="doctors-grid" class="grid gap-6 md:grid-cols-2">
+        {doctors.map((doctor) => <DoctorCard doctor={doctor} locale={locale} />)}
+      </div>
+      <div id="empty-results" class="hidden rounded-3xl border border-border bg-surface-soft px-6 py-16 text-center">
+        <h2 class="text-xl font-bold">{en ? 'No matching results' : 'لا توجد نتائج مطابقة'}</h2>
+        <p class="mt-2 text-sm text-muted">
+          {en ? 'Try changing your search or reset the filters.' : 'جرّب تغيير خيارات البحث أو إعادة ضبط التصفية.'}
+        </p>
+        <button type="button" data-reset-filters class="mt-5 min-h-11 rounded-full bg-gold-gradient px-6 text-sm font-bold shadow-[var(--shadow-gold)]">
+          {en ? 'Show all doctors' : 'عرض كل الأطباء'}
+        </button>
+      </div>
+      <nav class="mt-6 flex justify-center gap-6 sm:mt-8 sm:gap-8" aria-label={en ? 'Doctors pagination' : 'صفحات الأطباء'}>
+        <button type="button" disabled class="flex size-12 items-center justify-center rounded-full border border-border disabled:cursor-not-allowed disabled:opacity-40 sm:size-14" aria-label={en ? 'Previous page' : 'الصفحة السابقة'}>
+          <AssetIcon src={en ? '/assets/arrow-left.svg' : '/assets/arrow-right.svg'} size="md" />
+        </button>
+        <button type="button" disabled class="flex size-12 items-center justify-center rounded-full border border-border disabled:cursor-not-allowed disabled:opacity-40 sm:size-14" aria-label={en ? 'Next page' : 'الصفحة التالية'}>
+          <AssetIcon src={en ? '/assets/arrow-right.svg' : '/assets/arrow-left.svg'} size="md" />
+        </button>
+      </nav>
+    </div>
+  </div>
+</section>

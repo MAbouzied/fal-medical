@@ -1,0 +1,198 @@
+---
+import ClinicLineButtons from '../../components/contact/ClinicLineButtons.astro';
+import ClinicPhoneList from '../../components/contact/ClinicPhoneList.astro';
+import AssetIcon from '../../components/ui/AssetIcon.astro';
+import BookingServiceFields from '../../components/contact/BookingServiceFields.astro';
+import { organization } from '../../data/organization';
+import { localizeContact, ui } from '../../lib/i18n/localize';
+import {
+  buildBreadcrumbSchema,
+  buildWebPageSchema,
+} from '../../lib/schema';
+import Layout from '../../layouts/Layout.astro';
+
+const copy = ui('en')!;
+const contact = localizeContact('en');
+const contactMessage = 'Hello, I would like to ask about Fal Clinic services.';
+const site = Astro.site!;
+const title = copy.pages.bookTitle;
+const description = copy.pages.bookDescription;
+const fieldClass =
+  'min-h-12 w-full rounded-2xl border border-border bg-surface px-4 text-sm text-ink shadow-[var(--shadow-control)] placeholder:text-placeholder focus:border-primary';
+---
+
+<Layout
+  title={title}
+  description={description}
+  locale="en"
+  schemas={[
+    buildWebPageSchema({
+      site,
+      path: '/en/book',
+      name: title,
+      description,
+      locale: 'en',
+    }),
+    buildBreadcrumbSchema(site, [
+      { name: copy.nav.home, path: '/en' },
+      { name: copy.nav.quickBook, path: '/en/book' },
+    ]),
+  ]}
+>
+  <section class="relative overflow-hidden border-b border-border bg-gradient-to-br from-surface-accent via-surface to-surface-soft py-10 sm:py-16">
+    <div class="page-container mx-auto max-w-xl">
+      <div class="mb-8 text-center">
+        <img src="/assets/logo.png" alt="" width="56" height="56" class="mx-auto size-14 object-contain" />
+        <p class="mt-4 text-sm font-bold text-primary">{organization.alternateName}</p>
+        <h1 class="text-display mt-3 font-black text-ink">{copy.lead.title}</h1>
+        <p class="mt-3 text-sm leading-7 text-muted">{copy.lead.subtitle}</p>
+      </div>
+
+      <form
+        class="rounded-[2rem] border border-border bg-surface p-5 shadow-[var(--shadow-card)] sm:p-8"
+        method="post"
+        action="/api/customers"
+        data-astro-reload
+        data-lead-form
+        data-gtm-form="lead_quick"
+        data-msg-invalid={copy.lead.statusInvalid}
+        data-msg-opening={copy.lead.statusOpening}
+        data-msg-sheets-failed="We could not save the online record. WhatsApp will still open so the clinic receives your request."
+        novalidate
+      >
+        <label class="sr-only" aria-hidden="true">
+          Website
+          <input name="website" type="text" tabindex="-1" autocomplete="off" />
+        </label>
+        <div class="grid gap-4">
+          <label class="grid gap-2 text-xs font-bold">
+            {copy.common.fullName}
+            <input name="name" type="text" required minlength="3" maxlength="100" autocomplete="name" placeholder={copy.common.namePlaceholder} class={fieldClass} />
+          </label>
+          <label class="grid gap-2 text-xs font-bold">
+            {copy.common.phone}
+            <input name="phone" type="tel" dir="ltr" required minlength="10" maxlength="20" pattern="05[0-9]{8}" inputmode="numeric" autocomplete="tel" placeholder={copy.common.phonePlaceholder} class={fieldClass} />
+          </label>
+          <BookingServiceFields
+            locale="en"
+            fieldClass={fieldClass}
+            labelClass="grid gap-2 text-xs font-bold"
+            specialtyLabel={copy.common.specialty}
+            serviceLabel={copy.common.service}
+            specialtyPlaceholder={copy.common.chooseSpecialty}
+            servicePlaceholder={copy.common.chooseService}
+          />
+        </div>
+
+        <label class="mt-5 flex items-start gap-3 text-xs leading-6 text-muted">
+          <input name="consent" type="checkbox" required class="mt-1 size-4 shrink-0 accent-primary" />
+          <span>
+            I agree to the
+            {' '}
+            <a href="/en/privacy" class="font-bold text-primary underline-offset-2 hover:underline">privacy policy</a>
+            {' '}
+            and that my booking details may be saved and used to confirm my appointment.
+          </span>
+        </label>
+
+        <button
+          type="submit"
+          class="mt-6 inline-flex min-h-[3.25rem] w-full items-center justify-center gap-2 rounded-full bg-gold-gradient px-7 text-sm font-bold text-ink-button shadow-[var(--shadow-gold)] transition-transform hover:-translate-y-0.5"
+        >
+          {copy.common.sendWhatsapp}
+          <AssetIcon src="/assets/whatsapp.svg" size="sm" />
+        </button>
+        <p class="mt-3 min-h-5 text-center text-sm font-medium" role="status" aria-live="polite" data-lead-status></p>
+      </form>
+
+      <div class="mt-6" data-gtm-location="lead_quick">
+        <ClinicLineButtons
+          locale="en"
+          mode="both"
+          whatsappMessage={contactMessage}
+          callLabel={copy.common.callDirect}
+          whatsappLabel={copy.common.contactWhatsapp}
+        />
+      </div>
+
+      <p class="mt-6 text-center text-xs text-muted">{contact.location}</p>
+      <div class="mt-2 text-center text-xs text-muted">
+        <ClinicPhoneList locale="en" class="inline-flex flex-col items-center space-y-1" />
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  import {
+    buildBookingWhatsAppMessage,
+    buildWhatsAppUrl,
+    clinicContact,
+    clinicLineFromDepartment,
+  } from '../../data/contact';
+  import { saveCustomerLead } from '../../lib/customer-leads';
+  import { GtmEvents, pushGtmEvent } from '../../lib/gtm';
+
+  const bindLeadForm = () => {
+    const form = document.querySelector<HTMLFormElement>('[data-lead-form]');
+    if (!form || form.dataset.bound === 'true') return;
+    form.dataset.bound = 'true';
+
+    const status = form.querySelector<HTMLElement>('[data-lead-status]');
+    const formId = form.dataset.gtmForm ?? 'lead_quick';
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (!form.reportValidity()) {
+        pushGtmEvent(GtmEvents.formError, { form_id: formId, method: 'whatsapp' });
+        if (status) {
+          status.textContent = form.dataset.msgInvalid ?? '';
+          status.className = 'mt-3 min-h-5 text-center text-sm font-medium text-danger';
+        }
+        return;
+      }
+
+      const data = new FormData(form);
+      const department = String(data.get('department') ?? '').trim();
+      const service = String(data.get('service') ?? '').trim();
+      const message = buildBookingWhatsAppMessage({
+        name: String(data.get('name') ?? '').trim(),
+        phone: String(data.get('phone') ?? '').trim(),
+        department,
+        service,
+        branch: clinicContact.branch,
+      });
+      const whatsappUrl = buildWhatsAppUrl(message, clinicLineFromDepartment(service || department));
+
+      pushGtmEvent(GtmEvents.formSubmit, {
+        form_id: formId,
+        method: 'whatsapp',
+      });
+
+      void (async () => {
+        const result = await saveCustomerLead({
+          name: String(data.get('name') ?? '').trim(),
+          phone: String(data.get('phone') ?? '').trim(),
+          department,
+          service,
+          locale: 'en',
+          consent: data.has('consent'),
+          website: String(data.get('website') ?? ''),
+        });
+
+        if (status) {
+          status.textContent = result.ok
+            ? (form.dataset.msgOpening ?? '')
+            : (form.dataset.msgSheetsFailed ?? '');
+          status.className = result.ok
+            ? 'mt-3 min-h-5 text-center text-sm font-medium text-success'
+            : 'mt-3 min-h-5 text-center text-sm font-medium text-danger';
+        }
+
+        window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+      })();
+    });
+  };
+
+  document.addEventListener('astro:page-load', bindLeadForm);
+</script>

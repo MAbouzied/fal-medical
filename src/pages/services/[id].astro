@@ -1,0 +1,86 @@
+---
+import { clinicFacts } from '../../data/clinic-facts';
+import DoctorCard from '../../components/doctors/DoctorCard.astro';
+import FaqSection from '../../components/sections/FaqSection.astro';
+import Breadcrumbs from '../../components/seo/Breadcrumbs.astro';
+import BookingSection from '../../components/services/BookingSection.astro';
+import ServiceDetailContent from '../../components/services/ServiceDetailContent.astro';
+import SectionHeading from '../../components/ui/SectionHeading.astro';
+import { doctors } from '../../data/doctors';
+import { faqItems } from '../../data/faq';
+import { clinicServices, getServiceById } from '../../data/services';
+import {
+  buildBreadcrumbSchema,
+  buildServiceSchema,
+  buildWebPageSchema,
+} from '../../lib/schema';
+import Layout from '../../layouts/Layout.astro';
+
+export function getStaticPaths() {
+  return clinicServices.map((service) => ({
+    params: { id: service.id },
+  }));
+}
+
+const { id } = Astro.params;
+const service = getServiceById(id ?? '');
+
+if (!service) {
+  return Astro.redirect('/services');
+}
+
+const site = Astro.site!;
+const servicePath = `/services/${service.id}`;
+const mainEntityId = `${new URL(servicePath, site).href}#service`;
+const title = `${service.title} في ${clinicFacts.cityAr} | فال`;
+const description =
+  service.description.length < 140
+    ? `${service.description} احجز في عيادة فال ب${clinicFacts.cityAr}.`
+    : service.description;
+const relatedDoctors = doctors.filter((doctor) => doctor.specialty === service.doctorSpecialty).slice(0, 3);
+const doctorsToShow = relatedDoctors.length > 0 ? relatedDoctors : doctors.slice(0, 3);
+---
+
+<Layout
+  title={title}
+  description={description}
+  schemas={[
+    buildWebPageSchema({
+      site,
+      path: servicePath,
+      name: title,
+      description,
+      mainEntityId,
+    }),
+    buildBreadcrumbSchema(site, [
+      { name: 'الرئيسية', path: '/' },
+      { name: 'الخدمات', path: '/services' },
+      { name: service.title, path: servicePath },
+    ]),
+    buildServiceSchema(site, service),
+  ]}
+>
+  <Breadcrumbs
+    items={[
+      { name: 'الرئيسية', href: '/' },
+      { name: 'الخدمات', href: '/services' },
+      { name: service.title },
+    ]}
+  />
+  <ServiceDetailContent service={service} />
+
+  <BookingSection />
+
+  <section class="py-14 sm:py-24" aria-labelledby="service-team-heading">
+    <div class="page-container">
+      <div id="service-team-heading">
+        <SectionHeading eyebrow="فريقنا الطبي" title="أطباء متخصصون بخبرة موثوقة" />
+      </div>
+      <div class="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
+        {doctorsToShow.map((doctor) => <DoctorCard doctor={doctor} />)}
+      </div>
+    </div>
+  </section>
+
+  <FaqSection items={faqItems} />
+</Layout>

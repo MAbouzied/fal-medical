@@ -1,0 +1,87 @@
+---
+export const prerender = false;
+
+import { clinicFacts } from '../../../data/clinic-facts';
+import BlogUnavailable from '../../../components/blog/BlogUnavailable.astro';
+import Breadcrumbs from '../../../components/seo/Breadcrumbs.astro';
+import BookingSection from '../../../components/services/BookingSection.astro';
+import Layout from '../../../layouts/Layout.astro';
+import { buildBlogCollectionSchemas } from '../../../lib/schema';
+import BlogListing from '../../../modules/blog/components/BlogListing.astro';
+import {
+  DEFAULT_BLOG_LISTING_LABELS,
+  listingPathForPage,
+} from '../../../modules/blog';
+import {
+  BLOG_CACHE_MAX_AGE_SECONDS,
+  BLOG_CACHE_SWR_SECONDS,
+  blogListingCacheTags,
+} from '../../../modules/blog/cache';
+import { loadPublicBlogListingPage } from '../../../modules/blog/lib/load-public-blog';
+
+const pageNumber = Number.parseInt(Astro.params.page ?? '', 10);
+if (!Number.isInteger(pageNumber) || pageNumber < 2) {
+  return new Response(null, { status: 404, statusText: 'Not Found' });
+}
+
+const result = await loadPublicBlogListingPage(pageNumber);
+if (!result.ok) {
+  if (result.kind === 'not_found') {
+    return new Response(null, { status: 404, statusText: 'Not Found' });
+  }
+  Astro.response.status = 503;
+  Astro.response.headers.set('Retry-After', '120');
+  Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+}
+
+if (result.ok && Astro.cache.enabled) {
+  Astro.cache.set({
+    maxAge: BLOG_CACHE_MAX_AGE_SECONDS,
+    swr: BLOG_CACHE_SWR_SECONDS,
+    tags: blogListingCacheTags(),
+  });
+}
+
+const listing = result.ok ? result.data : null;
+
+const site = Astro.site!;
+const path = listingPathForPage(pageNumber);
+const title = `مدونة فال — صفحة ${pageNumber} | مقالات الأسنان والجلدية`;
+const description =
+  `مقالات عربية إضافية من عيادة فال في ${clinicFacts.cityAr} حول صحة الأسنان والبشرة والعناية الوقائية.`;
+---
+
+{result.ok && listing ? (
+  <Layout
+    title={title}
+    description={description}
+    canonicalPath={path}
+    schemas={buildBlogCollectionSchemas({
+      site,
+      path,
+      name: title,
+      description,
+      posts: listing.items,
+    })}
+  >
+    <Breadcrumbs
+      items={[
+        { name: 'الرئيسية', href: '/' },
+        { name: 'المدونة', href: '/blogs' },
+        { name: `صفحة ${pageNumber}` },
+      ]}
+    />
+    <BlogListing
+      featured={null}
+      recent={listing.items}
+      totalPublished={listing.totalPublished}
+      page={pageNumber}
+      totalPages={listing.totalPages}
+      labels={DEFAULT_BLOG_LISTING_LABELS}
+    >
+      <BookingSection slot="cta" />
+    </BlogListing>
+  </Layout>
+) : (
+  <BlogUnavailable />
+)}

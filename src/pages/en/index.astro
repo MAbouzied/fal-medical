@@ -1,0 +1,38 @@
+---
+import LandingHero from '../../components/landing/LandingHero.astro';
+import LandingSections from '../../components/landing/LandingSections.astro';
+import { clinicFacts, formatClinicDescription } from '../../data/clinic-facts';
+import { localizeFaq, ui } from '../../lib/i18n/localize';
+import {
+  buildBreadcrumbSchema,
+  buildFaqSchema,
+  buildWebPageSchema,
+} from '../../lib/schema';
+import Layout from '../../layouts/Layout.astro';
+
+const site = Astro.site!;
+const copy = ui('en')!;
+const title = `Fal Clinic in ${clinicFacts.cityEn} | Multi-specialty medical complex`;
+const description = `${formatClinicDescription('en')} Book via the site or WhatsApp.`;
+const faqItems = localizeFaq('en');
+---
+
+<Layout
+  title={title}
+  description={description}
+  locale="en"
+  schemas={[
+    buildWebPageSchema({
+      site,
+      path: '/en',
+      name: title,
+      description,
+      locale: 'en',
+    }),
+    buildBreadcrumbSchema(site, [{ name: copy.nav.home, path: '/en' }]),
+    buildFaqSchema(faqItems),
+  ]}
+>
+  <LandingHero locale="en" />
+  <LandingSections locale="en" />
+</Layout>

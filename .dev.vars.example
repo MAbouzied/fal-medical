@@ -1,0 +1,30 @@
+# Copy to .dev.vars for local development. Never commit the real values.
+GOOGLE_SERVICE_ACCOUNT_EMAIL=fal-sheets@example-project.iam.gserviceaccount.com
+GOOGLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nYOUR_PRIVATE_KEY\n-----END PRIVATE KEY-----\n"
+GOOGLE_SHEET_ID=YOUR_SPREADSHEET_ID
+GOOGLE_BOOKINGS_SHEET_NAME=Bookings
+GOOGLE_CUSTOMERS_SHEET_NAME=Customers
+
+# Blog provider. Mock mode starts empty for local editor testing; use Sanity for database content.
+BLOG_PROVIDER=mock
+# SANITY_PROJECT_ID=
+# SANITY_DATASET=production
+# SANITY_API_VERSION=2026-08-03
+# SANITY_API_TOKEN=
+# SANITY_WRITE_TOKEN=
+
+# Private staff authorization dataset. Keep this token local and server-only.
+# SANITY_AUTH_DATASET=staff-auth
+# SANITY_AUTH_TOKEN=
+
+# Local-only dashboard testing; use false or omit in production.
+ADMIN_AUTH_DISABLED=true
+
+# Hosted Sanity Studio URL for /admin
+# PUBLIC_SANITY_STUDIO_URL=https://your-studio.sanity.studio
+
+# Staff authentication (Better Auth + Google)
+# BETTER_AUTH_SECRET=
+# BETTER_AUTH_URL=http://localhost:4321
+# GOOGLE_CLIENT_ID=
+# GOOGLE_CLIENT_SECRET=

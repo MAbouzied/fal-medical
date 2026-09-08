@@ -1,0 +1,12 @@
+---
+import { serializeJsonLd } from '../../lib/schema';
+
+export interface Props {
+  data: Record<string, unknown>;
+}
+
+const { data } = Astro.props;
+const json = serializeJsonLd(data);
+---
+
+<script is:inline type="application/ld+json" set:html={json} />

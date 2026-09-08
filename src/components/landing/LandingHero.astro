@@ -1,0 +1,60 @@
+---
+import { resolveLandingPage } from '../../data/landing';
+import type { Locale } from '../../lib/i18n/localize';
+import { isEnglish } from '../../lib/i18n/localize';
+import AssetIcon from '../ui/AssetIcon.astro';
+import ButtonLink from '../ui/ButtonLink.astro';
+import PillLabel from '../ui/PillLabel.astro';
+import SitePicture from '../ui/SitePicture.astro';
+
+export interface Props {
+  locale?: Locale;
+}
+
+const { locale = 'ar' } = Astro.props;
+const en = isEnglish(locale);
+const page = resolveLandingPage(locale);
+const bookHref = en ? '/en/book' : '/book';
+---
+
+<section class="overflow-hidden border-b border-border bg-gradient-to-bl from-surface-accent via-surface to-surface py-10 sm:py-16 lg:py-24">
+  <div class="page-container grid items-center gap-8 lg:grid-cols-[1fr_0.95fr] lg:gap-16">
+    <div class="order-2 flex flex-col items-start gap-8 lg:order-1">
+      <div class="flex flex-col items-start gap-8">
+        <a href="#season-offer" class="inline-flex rounded-full">
+          <PillLabel text={page.hero.badge} showDot />
+        </a>
+        <div class="max-w-2xl">
+          <h1 class="text-display-hero font-black text-ink">
+            {page.hero.titleBefore}
+            <span class="text-gold">{page.hero.titleAccent}</span>
+          </h1>
+          <p class="mt-2 text-base leading-[1.8] text-pretty text-muted sm:text-xl sm:leading-[1.5]">
+            {page.hero.text}
+          </p>
+        </div>
+      </div>
+      <ButtonLink href={bookHref} size="lg" class="w-full sm:w-auto">
+        {page.hero.cta}
+      </ButtonLink>
+    </div>
+
+    <div class="relative order-1 mx-auto w-full max-w-xl lg:order-2">
+      <SitePicture
+        src={page.hero.imageSrc}
+        alt={page.hero.imageAlt}
+        widths={[480, 768, 960, 1280]}
+        sizes="(max-width: 1024px) calc(100vw - 2rem), 40vw"
+        class="aspect-[8/7] w-full rounded-[var(--radius-card)] object-cover shadow-[var(--shadow-card)]"
+        loading="eager"
+        fetchpriority="high"
+      />
+      <aside class="mx-auto -mt-6 flex w-[calc(100%-1.5rem)] max-w-md items-center gap-3 rounded-2xl border border-border/70 bg-surface/95 p-4 shadow-[var(--shadow-card)] backdrop-blur-sm sm:absolute sm:start-8 sm:bottom-6 sm:mt-0 sm:w-[min(100%-2rem,22.875rem)]">
+        <span class="grid size-10 shrink-0 place-items-center rounded-full bg-gold/10" aria-hidden="true">
+          <AssetIcon src={page.hero.quoteIconSrc} size="md" />
+        </span>
+        <p class="min-w-0 text-sm leading-5 font-bold text-ink">{page.hero.quote}</p>
+      </aside>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,28 @@
+---
+import FormLandingPage from '../components/contact/FormLandingPage.astro';
+import Layout from '../layouts/Layout.astro';
+import { getFormLandingCopy } from '../data/form-landing';
+import { buildWebPageSchema } from '../lib/schema';
+
+const copy = getFormLandingCopy('ar');
+const site = Astro.site!;
+---
+
+<Layout
+  title={copy.pageTitle}
+  description={copy.pageDescription}
+  locale="ar"
+  hideChrome
+  noindex
+  schemas={[
+    buildWebPageSchema({
+      site,
+      path: '/form',
+      name: copy.pageTitle,
+      description: copy.pageDescription,
+      type: 'ContactPage',
+    }),
+  ]}
+>
+  <FormLandingPage locale="ar" />
+</Layout>

@@ -1,0 +1,31 @@
+---
+import type { Locale } from '../../lib/i18n/localize';
+import { isEnglish } from '../../lib/i18n/localize';
+
+export interface Props {
+  locale?: Locale;
+  href: string;
+  class?: string;
+  onDark?: boolean;
+}
+
+const { locale = 'ar', href, class: className = '', onDark = false } = Astro.props;
+const en = isEnglish(locale);
+const label = en ? 'Fal Clinic - Home' : 'عيادة فال - الرئيسية';
+const wordmark = en ? 'Fal' : 'فال';
+const markPx = onDark ? 58 : 42;
+---
+
+<a href={href} class:list={['inline-flex min-w-0 shrink-0 items-center gap-1', className]} aria-label={label}>
+  <img
+    src="/assets/logo.png"
+    alt=""
+    width={markPx}
+    height={markPx}
+    class:list={['object-contain', onDark ? 'size-[58px]' : 'size-10 sm:size-[42px]']}
+    decoding="async"
+  />
+  <span class:list={['text-lg font-bold tracking-tight sm:text-[1.125rem]', onDark ? 'text-white' : 'text-primary']}>
+    {wordmark}
+  </span>
+</a>
