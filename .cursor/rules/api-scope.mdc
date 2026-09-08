@@ -1,0 +1,23 @@
+---
+description: When working on API routes, auth, or middleware, delegate to fal-api-developer
+globs: src/pages/api/**/*,src/lib/auth/**/*,src/lib/staff-access/**/*,src/middleware.ts,src/lib/security/**/*,src/lib/customer-*.ts,src/lib/google-sheets.ts
+alwaysApply: false
+---
+
+# API Scope
+
+When the user is working on API routes, authentication, staff access, middleware, or server integrations:
+
+- Delegate to the **fal-api-developer** subagent
+- Invoke with: `/fal-api-developer` or "Use the fal-api-developer to..."
+
+The API developer works in:
+
+- `src/pages/api/`
+- `src/lib/auth/`
+- `src/lib/staff-access/`
+- `src/middleware.ts`
+- `src/lib/security/`
+- `src/lib/customer-api.ts`, `src/lib/customer-leads.ts`, `src/lib/google-sheets.ts`
+
+Handles: Better Auth, admin API, customer leads, Google Sheets, CSP/security headers, and staff authorization.
