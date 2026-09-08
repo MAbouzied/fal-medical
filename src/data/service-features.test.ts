@@ -158,9 +158,11 @@ describe('services page Figma layout', () => {
     assert.match(header, /servicesCatalogPath/);
     assert.match(header, /department/);
 
-    assert.match(footer, /teeth-whitening/);
-    assert.match(footer, /filler-botox/);
-    assert.match(footer, /\/services\/laser/);
+    assert.match(footer, /clinicServices/);
+    assert.match(footer, /serviceSectionPath/);
+    assert.match(footer, /homeServiceDepartments/);
+    assert.match(footer, /footerServiceGroups/);
+    assert.match(footer, /localizeService/);
 
     assert.match(logo, /\/assets\/logo\.png/);
     assert.doesNotMatch(logo, /logo\.svg/);

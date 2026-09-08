@@ -3,8 +3,9 @@ import { buildPhoneUrl, clinicLines } from '../../data/contact';
 import SocialLinks from '../contact/SocialLinks.astro';
 import BrandLogo from './BrandLogo.astro';
 import { clinicLicenses } from '../../data/licenses';
+import { clinicServices, homeServiceDepartments, serviceSectionPath } from '../../data/services';
 import type { Locale } from '../../lib/i18n/localize';
-import { isEnglish, localizeContact, ui } from '../../lib/i18n/localize';
+import { isEnglish, localizeContact, localizeDepartment, localizeService, ui } from '../../lib/i18n/localize';
 
 export interface Props {
   locale?: Locale;
@@ -35,20 +36,19 @@ const links = en
       { label: 'سياسة الخصوصية', href: '/privacy' },
     ];
 
-const featuredServices = [
-  {
-    title: en ? 'Teeth whitening' : 'تبييض الأسنان',
-    href: en ? '/en/services/teeth-whitening' : '/services/teeth-whitening',
-  },
-  {
-    title: en ? 'Filler & Botox' : 'الفيلر والبوتوكس',
-    href: en ? '/en/services/filler-botox' : '/services/filler-botox',
-  },
-  {
-    title: en ? 'Laser' : 'الليزر',
-    href: en ? '/en/services/laser' : '/services/laser',
-  },
-];
+const footerServiceGroups = homeServiceDepartments.map((department) => ({
+  department,
+  label: localizeDepartment(department, locale),
+  services: clinicServices
+    .filter((service) => service.department === department)
+    .map((service) => {
+      const localized = localizeService(service, locale);
+      return {
+        title: localized.title,
+        href: serviceSectionPath(service.id, locale),
+      };
+    }),
+}));
 
 const licenseCopy = en
   ? {
@@ -94,15 +94,22 @@ const tagline = en
       </section>
       <section>
         <h2 class="mb-4 text-sm font-bold">{en ? copy!.nav.services : 'الخدمات'}</h2>
-        <ul class="space-y-2 text-sm text-footer-muted">
-          {featuredServices.map((service) => (
-            <li>
-              <a href={service.href} class="hover:text-primary">
-                {service.title}
-              </a>
-            </li>
+        <div class="space-y-5">
+          {footerServiceGroups.map((group) => (
+            <div>
+              <h3 class="mb-2 text-xs font-bold text-white/80">{group.label}</h3>
+              <ul class="space-y-2 text-sm text-footer-muted">
+                {group.services.map((service) => (
+                  <li>
+                    <a href={service.href} class="hover:text-primary">
+                      {service.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
           ))}
-        </ul>
+        </div>
       </section>
       <section>
         <h2 class="mb-4 text-sm font-bold">{en ? copy!.common.footerContact : 'تواصل'}</h2>
