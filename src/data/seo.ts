@@ -22,8 +22,12 @@ const clinicMapQuery = encodeURIComponent(
 
 export const clinicMapUrl = `https://www.google.com/maps/search/?api=1&query=${clinicMapQuery}`;
 
-export const clinicMapEmbedUrl =
-  `https://maps.google.com/maps?q=${clinicMapQuery}&hl=ar&z=16&output=embed`;
+/** CSP-safe embed host (www.google.com). Do not use maps.google.com — blocked by frame-src. */
+export function clinicMapEmbedUrl(locale: 'ar' | 'en' = 'ar'): string {
+  const hl = locale === 'en' ? 'en' : 'ar';
+  const { latitude, longitude } = clinicGeo;
+  return `https://www.google.com/maps?q=${latitude},${longitude}&hl=${hl}&z=16&output=embed`;
+}
 
 export function imageMimeType(path: string): string {
   const lower = path.toLowerCase();

@@ -35,7 +35,7 @@ export default defineConfig({
         "font-src 'self' data:",
         "img-src 'self' data: blob: https://cdn.sanity.io https://lh3.googleusercontent.com https://*.googleusercontent.com https://www.googletagmanager.com https://*.google-analytics.com",
         "connect-src 'self' https://*.sanity.io https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com",
-        "frame-src https://www.google.com https://youtube.com https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com",
+        "frame-src https://www.google.com https://maps.google.com https://youtube.com https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com",
         "media-src 'self' https://cdn.sanity.io",
         "worker-src 'self' blob:",
         'upgrade-insecure-requests',

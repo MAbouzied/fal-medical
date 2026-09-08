@@ -70,10 +70,11 @@ const text = en
           <div class="mt-4 overflow-hidden rounded-[var(--radius-control)] bg-[#eeeeee]">
             <iframe
               title={text.locationTitle}
-              src={clinicMapEmbedUrl}
+              src={clinicMapEmbedUrl(locale)}
               class="aspect-[4/3] w-full border-0"
               loading="lazy"
               referrerpolicy="no-referrer-when-downgrade"
+              allowfullscreen
             ></iframe>
           </div>
           <p class="mt-4 font-bold text-ink">{text.branchName}</p>
