@@ -1,0 +1,18 @@
+---
+description: Agent-to-folder mapping for Fal Medical project
+alwaysApply: true
+---
+
+# Fal Medical Agent Delegation
+
+When working on this project, delegate to the appropriate subagent based on scope:
+
+| Task / Folder | Subagent | Invoke |
+|---------------|----------|--------|
+| `src/pages/`, `src/components/`, `src/data/`, `src/layouts/`, `src/styles/` — pages, UI, content data | **fal-site-developer** | `/fal-site-developer` |
+| `src/pages/api/`, `src/lib/auth/`, `src/lib/staff-access/`, `src/middleware.ts` — API, auth, staff | **fal-api-developer** | `/fal-api-developer` |
+| `src/modules/blog/` — blog, Sanity, admin editor | **fal-blog-developer** | `/fal-blog-developer` |
+| Testing, verification, E2E, QA | **fal-qa-engineer** | `/fal-qa-engineer` |
+| Strategy, architecture, no code | **fal-architect-orchestrator** | `/fal-architect-orchestrator` |
+
+Each developer agent works ONLY in their folder scope. QA works across the full repo.

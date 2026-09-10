@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { describe, it } from 'node:test';
 import { clinicFacts } from './clinic-facts.ts';
-import { clinicGeo, clinicMapUrl } from './seo.ts';
+import { clinicGeo, clinicMapEmbedUrl, clinicMapUrl } from './seo.ts';
 
 describe('clinic map facts', () => {
   it('points to a Hafar Al Batin search listing until the official Maps pin is set', () => {
@@ -11,6 +11,15 @@ describe('clinic map facts', () => {
     assert.equal(clinicGeo.latitude, 28.4089);
     assert.equal(clinicGeo.longitude, 45.9658);
     assert.equal(clinicFacts.cityEn, 'Hafar Al Batin');
+  });
+
+  it('embeds Google Maps from www.google.com with clinic coordinates (CSP-safe)', () => {
+    assert.match(clinicMapEmbedUrl('ar'), /^https:\/\/www\.google\.com\/maps\?/);
+    assert.match(clinicMapEmbedUrl('ar'), /28\.4089,45\.9658/);
+    assert.match(clinicMapEmbedUrl('ar'), /output=embed/);
+    assert.match(clinicMapEmbedUrl('ar'), /hl=ar/);
+    assert.match(clinicMapEmbedUrl('en'), /hl=en/);
+    assert.doesNotMatch(clinicMapEmbedUrl('ar'), /maps\.google\.com/);
   });
 
   it('uses a location button on the home booking band instead of an embed', async () => {

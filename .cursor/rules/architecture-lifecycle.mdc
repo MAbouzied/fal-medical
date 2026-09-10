@@ -1,0 +1,36 @@
+---
+description: Read and update architecture docs at session start and end
+alwaysApply: true
+---
+
+# Architecture Lifecycle
+
+Every agent session MUST follow this protocol for architecture files.
+
+## At session start (before coding)
+
+1. Read `PROJECT-STRUCTURE.md` — folder ownership and responsibilities.
+2. Read `docs/ARCHITECTURE.md` — current system design, integrations, and recent changes.
+3. Read `PRODUCT.md` when the task touches product scope, brand, or launch constraints.
+4. Skim `docs/` for any surface-specific doc relevant to the task (e.g. `docs/seo-route-matrix.md`, `docs/surfaces/blog.md`).
+
+## During work
+
+- Stay within your agent scope (see `agent-delegation.mdc`).
+- If you discover a structural change (new route, new module, new integration, moved folder), note it for the session-end update.
+
+## At session end (before finishing)
+
+Update `docs/ARCHITECTURE.md` when your work changed any of:
+
+- Routes or locale pairs (`src/lib/i18n/routes.ts`)
+- API endpoints or auth flows
+- Blog provider, Sanity wiring, or admin surfaces
+- Deployment / env vars / third-party integrations
+- Module boundaries or folder ownership
+
+Add a dated entry under **Recent changes** with: what changed, which paths were touched, and any follow-up needed.
+
+If folder ownership or agent scopes changed, update `PROJECT-STRUCTURE.md` as well.
+
+Do not leave architecture docs stale after meaningful code changes.

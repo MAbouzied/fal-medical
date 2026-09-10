@@ -1,0 +1,21 @@
+---
+description: When working on the blog module, delegate to fal-blog-developer
+globs: src/modules/blog/**/*,src/components/admin/**/*,src/pages/admin/**/*,src/pages/blogs/**/*,src/pages/api/admin/blog/**/*,src/pages/api/blog/**/*
+alwaysApply: false
+---
+
+# Blog Scope
+
+When the user is working on the blog module, Sanity integration, or admin blog editor:
+
+- Delegate to the **fal-blog-developer** subagent
+- Invoke with: `/fal-blog-developer` or "Use the fal-blog-developer to..."
+
+The blog developer works in:
+
+- `src/modules/blog/`
+- `src/components/admin/` (blog editor UI)
+- `src/pages/admin/`, `src/pages/blogs/`
+- `src/pages/api/admin/blog/`, `src/pages/api/blog/`
+
+Handles: mock/Sanity blog providers, Portable Text, Lexical editor, revalidation, and Arabic-only blog routes.

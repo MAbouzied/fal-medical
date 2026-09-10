@@ -52,7 +52,7 @@ const text = en
 
 <section class="bg-surface pb-16 sm:pb-24">
   <div class="page-container rounded-[var(--radius-card)] bg-surface-soft p-4 sm:p-8 lg:p-10">
-    <div class="grid gap-6 lg:grid-cols-2 lg:gap-8">
+    <div class="grid gap-6 lg:grid-cols-2 lg:items-start lg:gap-8">
       <div class="space-y-4">
         <a
           href={buildPhoneUrl(phone.id)}
@@ -70,10 +70,11 @@ const text = en
           <div class="mt-4 overflow-hidden rounded-[var(--radius-control)] bg-[#eeeeee]">
             <iframe
               title={text.locationTitle}
-              src={clinicMapEmbedUrl}
+              src={clinicMapEmbedUrl(locale)}
               class="aspect-[4/3] w-full border-0"
               loading="lazy"
               referrerpolicy="no-referrer-when-downgrade"
+              allowfullscreen
             ></iframe>
           </div>
           <p class="mt-4 font-bold text-ink">{text.branchName}</p>

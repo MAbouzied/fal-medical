@@ -1,0 +1,20 @@
+---
+description: When testing or verifying, delegate to fal-qa-engineer subagent
+globs: "**/*.test.*,**/*.spec.*,tests/**/*,playwright.config.ts,lighthouserc.json"
+alwaysApply: false
+---
+
+# QA Scope
+
+When the user asks to test, verify, validate, or check implementations:
+
+- Delegate to the **fal-qa-engineer** subagent
+- Invoke with: `/fal-qa-engineer` or "Use the fal-qa-engineer to..."
+
+The QA engineer works across the full project and handles:
+
+- Unit tests (`npm run test`)
+- Playwright E2E (`npm run test:e2e`, `npm run seo:test:e2e`)
+- Accessibility (`npm run test:a11y`)
+- SEO verification (`npm run seo:verify`)
+- Full verify pipeline (`npm run verify`)

@@ -57,6 +57,7 @@ describe('landing Figma content', () => {
     const en = resolveLandingPage('en');
 
     assert.equal(ar.hero.badge, 'عروض الصيف');
+    assert.equal(ar.hero.headline, `أفضل عيادة للأسنان والجلدية في ${clinicFacts.cityAr}`);
     assert.equal(ar.hero.titleAccent, 'فال');
     assert.match(ar.hero.titleBefore, /خلّ نهاية سنتك جمال/);
     assert.match(ar.hero.text, /خدمات الأسنان والجلدية والليزر/);
@@ -97,6 +98,10 @@ describe('landing Figma content', () => {
     );
 
     assert.equal(en.hero.titleAccent, 'Fal');
+    assert.equal(
+      en.hero.headline,
+      `The best dentistry and dermatology clinic in ${clinicFacts.cityEn}`,
+    );
     assert.equal(en.specialties.more, 'Learn more');
     assert.equal(en.about.photoBadge.includes(clinicFacts.districtEn), true);
   });
@@ -130,7 +135,8 @@ describe('landing Figma layout', () => {
     assert.match(hero, /quoteIconSrc/);
     assert.match(hero, /PillLabel/);
     assert.match(hero, /ButtonLink/);
-    assert.match(hero, /text-gold/);
+    assert.match(hero, /page\.hero\.headline/);
+    assert.match(hero, /page\.hero\.titleBefore/);
     assert.match(hero, /rounded-\[var\(--radius-card\)\]/);
     assert.match(hero, /from-surface-accent/);
 

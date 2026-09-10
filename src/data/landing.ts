@@ -18,6 +18,9 @@ export function resolveLandingPage(locale: Locale = 'ar') {
   return {
     hero: {
       badge: en ? 'Summer offers' : 'عروض الصيف',
+      headline: en
+        ? `The best dentistry and dermatology clinic in ${clinicFacts.cityEn}`
+        : `أفضل عيادة للأسنان والجلدية في ${clinicFacts.cityAr}`,
       titleBefore: en
         ? 'End this year with beauty, and start the next with confidence with '
         : 'خلّ نهاية سنتك جمال، وبداية سنتك ثقة مع ',

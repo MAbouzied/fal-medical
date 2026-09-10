@@ -1,0 +1,24 @@
+---
+description: When working on site pages, components, or data, delegate to fal-site-developer
+globs: src/pages/**/*.astro,src/components/**/*,src/data/**/*,src/layouts/**/*,src/styles/**/*,src/lib/i18n/**/*,src/lib/seo/**/*,src/lib/schema*.ts,public/**/*
+alwaysApply: false
+---
+
+# Site Scope
+
+When the user is working on public site pages, components, static data, layouts, SEO, or i18n:
+
+- Delegate to the **fal-site-developer** subagent
+- Invoke with: `/fal-site-developer` or "Use the fal-site-developer to..."
+
+The site developer works in:
+
+- `src/pages/` (`.astro` pages only — not `src/pages/api/`)
+- `src/components/`
+- `src/data/`
+- `src/layouts/`
+- `src/styles/`
+- `src/lib/i18n/`, `src/lib/seo/`, `src/lib/schema.ts`
+- `public/` static assets
+
+Handles: marketing pages, booking/contact UI, doctors/services listings, bilingual routes, JSON-LD, and Tailwind styling.
