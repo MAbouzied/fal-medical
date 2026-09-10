@@ -1,5 +1,5 @@
 ---
-import ServiceDepartmentOptions from './ServiceDepartmentOptions.astro';
+import BookingServiceFields from './BookingServiceFields.astro';
 import type { Locale } from '../../lib/i18n/localize';
 import { isEnglish, ui } from '../../lib/i18n/localize';
 
@@ -14,17 +14,19 @@ const en = isEnglish(locale);
 const copy = ui(locale);
 
 const fieldClass =
-  'min-h-12 w-full rounded-[var(--radius-control)] border border-border bg-surface px-4 text-sm font-normal text-ink placeholder:text-placeholder';
-const labelClass = 'grid gap-1.5 text-xs font-bold text-ink';
+  'min-h-12 w-full min-w-0 max-w-full rounded-2xl border border-border bg-surface px-4 text-sm text-ink shadow-[var(--shadow-control)] placeholder:text-placeholder focus:border-primary';
+const labelClass = 'grid gap-2 text-sm text-muted';
 
 const labels = en
   ? {
       name: copy!.common.fullName,
       phone: copy!.common.phone,
-      service: copy!.common.service,
+      specialty: copy!.common.specialty,
+      service: 'Requested service',
       namePlaceholder: copy!.common.namePlaceholder,
       phonePlaceholder: copy!.common.phonePlaceholder,
-      servicePlaceholder: copy!.pages.servicePlaceholder,
+      specialtyPlaceholder: copy!.common.chooseSpecialty,
+      servicePlaceholder: copy!.common.chooseService,
       message: copy!.pages.extraMessage,
       messagePlaceholder: copy!.pages.extraMessagePlaceholder,
       consent: copy!.common.consent,
@@ -36,10 +38,12 @@ const labels = en
   : {
       name: 'الاسم',
       phone: 'رقم الجوال',
-      service: 'الخدمة',
+      specialty: 'التخصص',
+      service: 'الخدمة المطلوبة',
       namePlaceholder: 'مثال: عبدالله محمد',
       phonePlaceholder: '05XXXXXXXX',
-      servicePlaceholder: 'مثال: تنظيف الأسنان',
+      specialtyPlaceholder: 'اختر التخصص',
+      servicePlaceholder: 'اختر الخدمة',
       message: 'رسالة إضافية (اختياري)',
       messagePlaceholder: 'أي ملاحظات تود إخبارنا بها',
       consent: 'أوافق على سياسة الخصوصية والتواصل معي لتأكيد الحجز.',
@@ -67,7 +71,6 @@ const labels = en
     <input name="website" type="text" tabindex="-1" autocomplete="off" />
   </label>
   <input type="hidden" name="locale" value={locale} />
-  <input type="hidden" name="department" value="" data-inquiry-department />
 
   <div class="grid gap-4 sm:grid-cols-2">
     <label class={labelClass}>
@@ -100,12 +103,15 @@ const labels = en
     </label>
   </div>
 
-  <label class:list={[labelClass, 'mt-4']}>
-    {labels.service}
-    <select class={fieldClass} name="service" required data-inquiry-service>
-      <ServiceDepartmentOptions locale={locale} placeholder={labels.servicePlaceholder} />
-    </select>
-  </label>
+  <BookingServiceFields
+    locale={locale}
+    fieldClass={fieldClass}
+    labelClass={labelClass}
+    specialtyLabel={labels.specialty}
+    serviceLabel={labels.service}
+    specialtyPlaceholder={labels.specialtyPlaceholder}
+    servicePlaceholder={labels.servicePlaceholder}
+  />
 
   <label class:list={[labelClass, 'mt-4']}>
     {labels.message}
@@ -173,14 +179,6 @@ const labels = en
     },
   } as const;
 
-  const syncDepartment = (form: HTMLFormElement) => {
-    const service = form.querySelector<HTMLSelectElement>('[data-inquiry-service]');
-    const department = form.querySelector<HTMLInputElement>('[data-inquiry-department]');
-    if (!service || !department) return;
-    const selected = service.selectedOptions[0];
-    department.value = selected?.dataset.specialty ?? '';
-  };
-
   const bindInquiryForms = () => {
     document.querySelectorAll<HTMLFormElement>('[data-contact-inquiry-form]').forEach((form) => {
       if (form.dataset.bound === 'true') return;
@@ -191,13 +189,8 @@ const labels = en
       const locale = form.dataset.locale === 'en' ? 'en' : 'ar';
       const messages = copy[locale];
 
-      const service = form.querySelector<HTMLSelectElement>('[data-inquiry-service]');
-      service?.addEventListener('change', () => syncDepartment(form));
-      syncDepartment(form);
-
       form.addEventListener('submit', (event) => {
         event.preventDefault();
-        syncDepartment(form);
 
         if (!form.reportValidity()) {
           pushGtmEvent(GtmEvents.formError, { form_id: formId, method: 'whatsapp' });

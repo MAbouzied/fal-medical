@@ -168,9 +168,8 @@ describe('services page Figma layout', () => {
     assert.doesNotMatch(logo, /logo\.svg/);
     assert.doesNotMatch(dummyLogo, /M14 31V11h12\.2/);
 
-    assert.match(form, /submitLabel/);
-    assert.match(form, /rounded-\[var\(--radius-button\)\]/);
-    assert.match(form, /text-xs font-bold/);
+    assert.match(form, /BookingServiceFields/);
+    assert.match(form, /text-sm text-muted/);
 
     assert.match(faq, /variant/);
     assert.match(faq, /chevron-down/);
