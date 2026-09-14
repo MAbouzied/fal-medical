@@ -40,6 +40,8 @@ describe('form landing copy', () => {
     const en = getFormLandingCopy('en');
 
     assert.deepEqual(arGroups.map((group) => group.department), ['أسنان', 'جلدية']);
+    assert.equal(arGroups.length, 2);
+    assert.equal(arGroups.some((group) => /تغذية|نساء|علاج طبيعي/.test(group.department)), false);
     assert.equal(arGroups[0]?.label, 'أسنان');
     assert.equal(enGroups[0]?.label, 'Dentistry');
     assert.equal(enGroups[1]?.label, 'Dermatology');

@@ -6,7 +6,7 @@ web
 
 ## Users
 
-Primary users are Arabic-speaking residents of Riyadh (Al Yarmouk and nearby districts) looking for dental, dermatology, aesthetic, nutrition, obstetrics & gynecology, or physiotherapy care.
+Primary users are Arabic-speaking residents of Hafar Al Batin looking for dental or dermatology care.
 
 Secondary users include English-speaking visitors who need clinic basics (services, doctors, contact, booking). Blog stays Arabic-only at launch.
 

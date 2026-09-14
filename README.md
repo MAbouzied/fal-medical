@@ -1,6 +1,6 @@
 # Fal Clinic
 
-Astro website for مجمع عيادات فال الطبية — a Hafar Al Batin medical complex (dentistry, dermatology, aesthetics, nutrition, obstetrics & gynecology, physiotherapy) with bilingual SEO, WhatsApp booking, and Cloudflare deploy.
+Astro website for مجمع عيادات فال الطبية — a Hafar Al Batin medical complex (dentistry and dermatology) with bilingual SEO, WhatsApp booking, and Cloudflare deploy.
 
 This repo copies the **structure and SEO system** from Beauty Corner. Visual design, brand, location, and clinic records are Fal’s.
 
@@ -32,9 +32,8 @@ This repo copies the **structure and SEO system** from Beauty Corner. Visual des
 ## Fill in before launch
 
 - Official Google Maps pin (`src/data/seo.ts`)
-- Commercial registration / Balady numbers (`src/data/licenses.ts`)
 - Real doctor names, photos, and hours (`src/data/doctors.ts`, `clinic-facts.ts`)
-- Social URLs (`src/data/contact.ts`)
+- Remaining social URLs if Instagram or Snapchat are confirmed (`src/data/contact.ts`)
 - Photos and `logo.png` / `social-card.png`
 - GTM, Sheets, Sanity, and auth secrets in `.dev.vars`
 

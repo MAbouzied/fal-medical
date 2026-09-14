@@ -2,10 +2,6 @@
 export const bookingDepartments = [
   'قسم الأسنان',
   'قسم الجلدية',
-  'قسم الليزر',
-  'قسم التغذية',
-  'قسم النساء والولادة',
-  'قسم العلاج الطبيعي',
 ] as const;
 
 export type BookingDepartment = (typeof bookingDepartments)[number];

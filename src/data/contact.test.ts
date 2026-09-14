@@ -15,6 +15,10 @@ describe('clinic social links', () => {
       clinicSocialLinks.map((link) => link.id),
       ['instagram', 'tiktok', 'snapchat'],
     );
+    assert.equal(
+      clinicSocialLinks.find((link) => link.id === 'tiktok')?.href,
+      'https://www.tiktok.com/@falclinichfr',
+    );
   });
 
   it('uses https profile URLs with accessible bilingual labels', () => {

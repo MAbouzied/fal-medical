@@ -114,7 +114,7 @@ export interface ClinicSocialLink {
   icon: string;
 }
 
-/** Replace these with the official Fal social URLs before launch. */
+/** Official Fal social profiles. Replace Instagram and Snapchat when confirmed. */
 export const clinicSocialLinks: readonly ClinicSocialLink[] = [
   {
     id: 'instagram',
@@ -125,7 +125,7 @@ export const clinicSocialLinks: readonly ClinicSocialLink[] = [
   },
   {
     id: 'tiktok',
-    href: 'https://www.tiktok.com/@falclinic',
+    href: 'https://www.tiktok.com/@falclinichfr',
     labelAr: 'تيك توك مجمع عيادات فال',
     labelEn: 'Fal Clinic on TikTok',
     icon: '/assets/tiktok.svg',

@@ -54,6 +54,7 @@ const licenseCopy = en
   ? {
       title: copy!.common.officialLicenses,
       commercialRegister: copy!.common.commercialRegister,
+      unifiedNationalNumber: copy!.common.unifiedNationalNumber,
       municipalLicense: copy!.common.municipalLicense,
       licensedActivity: copy!.common.licensedActivity,
       viewCr: copy!.common.viewCommercialRegistration,
@@ -63,7 +64,8 @@ const licenseCopy = en
     }
   : {
       title: 'بيانات الترخيص الرسمية:',
-      commercialRegister: 'السجل التجاري (الرقم الوطني الموحد)',
+      commercialRegister: 'السجل التجاري',
+      unifiedNationalNumber: 'الرقم الوطني الموحد',
       municipalLicense: 'رخصة النشاط البلدية (بلدي)',
       licensedActivity: 'النشاط المرخّص',
       viewCr: 'عرض شهادة السجل التجاري',
@@ -138,12 +140,17 @@ const tagline = en
           <p>
             {licenseCopy.commercialRegister}:
             {' '}
+            <span dir="ltr" class="font-medium tabular-nums text-white">{clinicLicenses.commercialRegistrationNumber || '—'}</span>
+          </p>
+          <p>
+            {licenseCopy.unifiedNationalNumber}:
+            {' '}
             <span dir="ltr" class="font-medium tabular-nums text-white">{clinicLicenses.unifiedNationalNumber || '—'}</span>
           </p>
           <p>
             {licenseCopy.municipalLicense}:
             {' '}
-            <span dir="ltr" class="font-medium tabular-nums text-white">{clinicLicenses.municipalLicenseNumber || '—'}</span>
+            <span dir="ltr" class="font-medium tabular-nums text-white">{clinicLicenses.municipalLicenseNumber || (en ? 'Not issued' : 'لا يوجد')}</span>
             {' – '}
             {licenseCopy.municipality}
           </p>
@@ -158,6 +165,7 @@ const tagline = en
           href={clinicLicenses.commercialRegistrationCertificate}
           target="_blank"
           rel="noopener noreferrer"
+          type="application/pdf"
           class="inline-flex shrink-0 flex-col items-center gap-2 self-center rounded-2xl border border-white/15 bg-white p-3 transition hover:shadow-[var(--shadow-card)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus sm:self-start"
           aria-label={licenseCopy.viewCr}
         >

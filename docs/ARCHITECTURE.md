@@ -146,6 +146,7 @@ Browser
 
 | Date | Change | Paths | Agent |
 |------|--------|-------|-------|
+| 2026-09-14 | Booking specialties limited to dentistry and dermatology; official TikTok `@falclinichfr`; Fal commercial registration PDF and numbers replace Beauty Corner certificate | `src/data/booking-departments.ts`, `src/data/licenses.ts`, `src/data/contact.ts`, `public/assets/licenses/commercial-registration.pdf`, `src/components/site/SiteFooter.astro` | site |
 | 2026-09-08 | Initial architecture doc and agent rules copied from ON-DM fullstack pattern | `.cursor/`, `PROJECT-STRUCTURE.md`, `docs/ARCHITECTURE.md`, `AGENTS.md` | setup |
 
 _Add new rows at the top when sessions change architecture._
