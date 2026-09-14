@@ -5,9 +5,6 @@ export const specialties = [
   'طب وتجميل الأسنان',
   'الأمراض الجلدية والتجميل',
   'خدمات الليزر',
-  'التغذية',
-  'النساء والولادة',
-  'العلاج الطبيعي',
 ] as const;
 
 export const branches = [clinicFacts.cityAr] as const;

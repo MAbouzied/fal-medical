@@ -60,9 +60,9 @@ export function formatClinicLocation(locale: ClinicLocale = 'ar'): string {
 
 export function formatClinicDescription(locale: ClinicLocale = 'ar'): string {
   if (locale === 'en') {
-    return `Multi-specialty medical complex in ${clinicFacts.cityEn} — ${clinicFacts.districtEn}, ${clinicFacts.streetEn}. Dentistry, dermatology, aesthetics, nutrition, obstetrics & gynecology, and physiotherapy.`;
+    return `Multi-specialty medical complex in ${clinicFacts.cityEn} — ${clinicFacts.districtEn}, ${clinicFacts.streetEn}. Dentistry and dermatology.`;
   }
-  return `عيادة متعددة التخصصات في ${clinicFacts.cityAr} — ${clinicFacts.districtAr}، ${clinicFacts.streetAr}. أسنان، جلدية، تجميل، تغذية، نساء وولادة، وعلاج طبيعي.`;
+  return `عيادة متعددة التخصصات في ${clinicFacts.cityAr} — ${clinicFacts.districtAr}، ${clinicFacts.streetAr}. أسنان وجلدية.`;
 }
 
 export function formatClinicHours(locale: ClinicLocale = 'ar'): string {

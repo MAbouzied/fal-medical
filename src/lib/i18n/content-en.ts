@@ -46,7 +46,8 @@ export const uiEn = {
     namePlaceholder: 'Example: Abdullah Mohammed',
     phonePlaceholder: '05XXXXXXXX',
     officialLicenses: 'Official licensing data:',
-    commercialRegister: 'Commercial Register (Unified National Number)',
+    commercialRegister: 'Commercial Registration Number',
+    unifiedNationalNumber: 'Unified National Number',
     municipalLicense: 'Municipal activity license (Balady)',
     licensedActivity: 'Licensed activity',
     viewCommercialRegistration: 'View commercial registration certificate',
@@ -82,7 +83,7 @@ export const uiEn = {
     eyebrow: `Fal Clinic · ${clinicFacts.cityEn}`,
     heroTitle: 'Specialist care in one medical complex',
     heroText:
-      `Dentistry, dermatology, aesthetics, nutrition, obstetrics & gynecology, and physiotherapy in ${clinicFacts.districtEn} — with easy WhatsApp booking.`,
+      `Dentistry and dermatology in ${clinicFacts.districtEn} — with easy WhatsApp booking.`,
     servicesTitle: 'Clinic services',
     servicesText: 'Choose the care you need and book through WhatsApp in minutes.',
     dentalServicesTitle: 'Dental services',
@@ -719,7 +720,7 @@ export const faqEn = [
   {
     question: 'Which services are available at the clinic?',
     answer:
-      'The clinic offers dentistry, dermatology, and laser care, plus nutrition, obstetrics & gynecology, and physiotherapy, with WhatsApp booking.',
+      'The clinic offers dentistry, dermatology, and laser care, with WhatsApp booking.',
   },
   {
     question: `Where is the ${clinicFacts.cityEn} branch?`,

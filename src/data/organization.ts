@@ -5,12 +5,13 @@ import {
   formatClinicStreetAddress,
 } from './clinic-facts.ts';
 import { clinicContact, clinicLines } from './contact.ts';
+import { clinicLicenses } from './licenses.ts';
 import { clinicServices } from './services.ts';
 
 export const organization = {
   name: clinicFacts.nameAr,
   alternateName: clinicFacts.nameEn,
-  legalName: clinicFacts.nameAr,
+  legalName: clinicLicenses.companyNameAr,
   description: formatClinicDescription('ar'),
   email: clinicContact.email,
   /** Both clinic lines for Schema.org `telephone` (Text or array of Text). */
@@ -34,9 +35,6 @@ export const organization = {
   medicalSpecialties: [
     'Dentistry',
     'Dermatology',
-    'CosmeticSurgery',
-    'DietNutrition',
-    'Obstetric',
   ] as const,
   serviceCatalog: clinicServices.map((service) => ({
     id: service.id,

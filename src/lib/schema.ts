@@ -87,11 +87,15 @@ export function buildOrganizationSchema(site: URL, locale: Locale = 'ar'): JsonL
         name: 'Commercial Registration Number',
         value: clinicLicenses.commercialRegistrationNumber,
       },
-      {
-        '@type': 'PropertyValue',
-        name: 'Municipal License Number',
-        value: clinicLicenses.municipalLicenseNumber,
-      },
+      ...(clinicLicenses.municipalLicenseNumber
+        ? [
+            {
+              '@type': 'PropertyValue',
+              name: 'Municipal License Number',
+              value: clinicLicenses.municipalLicenseNumber,
+            },
+          ]
+        : []),
     ],
     openingHoursSpecification: organization.openingHours.map((spec) => ({
       '@type': 'OpeningHoursSpecification',

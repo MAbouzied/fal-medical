@@ -1,23 +1,22 @@
 export const clinicLicenses = {
-  companyNameAr: 'شركة فال الطبية',
-  companyNameEn: 'Fal Medical Company',
+  companyNameAr: 'مجمع فال الخليج الطبي',
+  companyNameEn: 'Fal Al Khaleej Medical Complex',
   facilityNameAr: 'مجمع عيادات فال الطبية',
   facilityNameEn: 'Fal Medical Complex',
-  /** Fill from the official Commercial Registration before indexing. */
-  unifiedNationalNumber: '',
-  commercialRegistrationNumber: '',
+  /** Unified national number from the Ministry of Commerce certificate. */
+  unifiedNationalNumber: '70423834890',
+  commercialRegistrationNumber: '2511147226',
+  /** Balady listing on the certificate is "لا يوجد". */
   municipalLicenseNumber: '',
   municipalityAr: 'أمانة حفر الباطن',
   municipalityEn: 'Hafar Al Batin Municipality',
-  licensedActivityAr:
-    'مجمع طبي متخصص (الأسنان، الجلدية، التجميل، التغذية، النساء والولادة، العلاج الطبيعي)',
-  licensedActivityEn:
-    'Specialized medical complex (dentistry, dermatology, aesthetics, nutrition, obstetrics & gynecology, physiotherapy)',
+  licensedActivityAr: 'مجمع طبي متخصص (الأسنان والجلدية)',
+  licensedActivityEn: 'Specialized medical complex (dentistry and dermatology)',
   registrationStatusAr: 'يُحدَّث',
   registrationStatusEn: 'To be confirmed',
-  entityTypeAr: 'شركة ذات مسؤولية محدودة',
-  entityTypeEn: 'Limited Liability Company',
-  crIssueDate: '',
+  entityTypeAr: 'مؤسسة فردية',
+  entityTypeEn: 'Individual Establishment',
+  crIssueDate: '1446/06/04',
   saudiBusinessCenterLogo: '/assets/licenses/saudi-business-center.svg',
-  commercialRegistrationCertificate: '/assets/licenses/commercial-registration.png',
+  commercialRegistrationCertificate: '/assets/licenses/commercial-registration.pdf',
 } as const;
