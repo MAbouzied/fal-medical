@@ -1,3 +1,4 @@
+import { siteOrigin } from '../../data/site.ts';
 import { normalizeStaffEmail } from '../staff-access/validation.ts';
 
 export const normalizeEmail = normalizeStaffEmail;
@@ -28,8 +29,8 @@ export function sanitizeReturnUrl(
   if (trimmed.includes('\\') || trimmed.includes('\0')) return fallback;
 
   try {
-    const url = new URL(trimmed, 'https://falclinic.com');
-    if (url.origin !== 'https://falclinic.com') return fallback;
+    const url = new URL(trimmed, siteOrigin);
+    if (url.origin !== siteOrigin) return fallback;
     const path = `${url.pathname}${url.search}${url.hash}` || '/';
     if (
       path === '/login' ||

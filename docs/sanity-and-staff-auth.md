@@ -67,12 +67,12 @@ Deploy with `npm run deploy`. Studio membership remains separate from Better Aut
 Configure these Google OAuth redirect URIs:
 
 - `http://localhost:4321/api/auth/callback/google`
-- `https://falclinic.com/api/auth/callback/google`
+- `https://fal-ksa.com/api/auth/callback/google`
 
 Configure these authorized origins:
 
 - `http://localhost:4321`
-- `https://falclinic.com`
+- `https://fal-ksa.com`
 
 Google sign-in requests only `openid`, `email`, and `profile`. A session is established only when Google reports a verified email and the normalized email has a published `staffAccess` record. Sessions use stateless encrypted cookies for roughly eight hours, while protected requests always revalidate the private directory. Auth and admin responses are private, uncacheable, and excluded from indexing.
 

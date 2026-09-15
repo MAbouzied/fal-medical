@@ -1,6 +1,6 @@
 # SEO Route Matrix — Phase 1 Deliverable
 
-**Site:** https://falclinic.com  
+**Site:** https://fal-ksa.com  
 **Locales:** Arabic (default, `/`) · English (`/en`)  
 **Total indexable URLs:** 44 (22 bilingual route pairs)  
 **Manifest source:** `src/lib/i18n/routes.ts`
@@ -43,10 +43,10 @@
 
 | | Arabic | English |
 |---|--------|---------|
-| **URL** | https://falclinic.com/ | https://falclinic.com/en |
+| **URL** | https://fal-ksa.com/ | https://fal-ksa.com/en |
 | **Title (planned)** | عيادة أسنان وجلدية في الرياض \| فال | Dental & Dermatology Clinic in Riyadh \| Fal Clinic |
 | **Description (planned)** | عيادة فال لطب الأسنان والجلدية في الرياض — حي اليرموك، شارع الإمام عبد الله بن سعود. احجز موعدك عبر واتساب. | Fal Clinic dentistry and dermatology clinic in Riyadh, Al Yarmouk, Imam Abdullah bin Saud Street. Book via WhatsApp. |
-| **Canonical** | https://falclinic.com/ | https://falclinic.com/en |
+| **Canonical** | https://fal-ksa.com/ | https://fal-ksa.com/en |
 | **Hreflang** | ar→`/`, en→`/en`, x-default→`/` | Same |
 | **Robots** | index,follow | index,follow |
 | **H1** | رعاية متكاملة لابتسامتك وبشرتك | Complete care for your smile and skin |
@@ -59,10 +59,10 @@
 
 | | Arabic | English |
 |---|--------|---------|
-| **URL** | https://falclinic.com/services | https://falclinic.com/en/services |
+| **URL** | https://fal-ksa.com/services | https://fal-ksa.com/en/services |
 | **Title (planned)** | خدمات الأسنان والجلدية في الرياض \| فال | Dentistry & Dermatology Services in Riyadh \| Fal Clinic |
 | **Description (planned)** | تصفح جميع خدمات الأسنان والجلدية في عيادة فال بالرياض — زراعة، تبييض، علاج الجلدية والمزيد. | Browse all dentistry and dermatology services at Fal Clinic in Riyadh — implants, whitening, skin care, and more. |
-| **Canonical** | https://falclinic.com/services | https://falclinic.com/en/services |
+| **Canonical** | https://fal-ksa.com/services | https://fal-ksa.com/en/services |
 | **Hreflang** | ar→`/services`, en→`/en/services`, x-default→`/services` | Same |
 | **Robots** | index,follow | index,follow |
 | **H1** | خدمات الأسنان والجلدية | Dentistry and dermatology services |
@@ -75,10 +75,10 @@
 
 | | Arabic | English |
 |---|--------|---------|
-| **URL** | https://falclinic.com/doctors | https://falclinic.com/en/doctors |
+| **URL** | https://fal-ksa.com/doctors | https://fal-ksa.com/en/doctors |
 | **Title (planned)** | أطباء الأسنان في الرياض \| فال | Dentists in Riyadh \| Fal Clinic |
 | **Description (planned)** | تعرف على فريق أطباء الأسنان في عيادة فال بالرياض — خبرة موثوقة ورعاية شخصية. | Meet the Fal Clinic dental team in Riyadh — trusted experience and personalized care. |
-| **Canonical** | https://falclinic.com/doctors | https://falclinic.com/en/doctors |
+| **Canonical** | https://fal-ksa.com/doctors | https://fal-ksa.com/en/doctors |
 | **Hreflang** | ar→`/doctors`, en→`/en/doctors`, x-default→`/doctors` | Same |
 | **Robots** | index,follow | index,follow |
 | **H1** | أطباء متخصصون بخبرة موثوقة | Specialist doctors you can trust |
@@ -91,10 +91,10 @@
 
 | | Arabic | English |
 |---|--------|---------|
-| **URL** | https://falclinic.com/contact | https://falclinic.com/en/contact |
+| **URL** | https://fal-ksa.com/contact | https://fal-ksa.com/en/contact |
 | **Title (planned)** | تواصل معنا وموقع العيادة في الرياض \| فال | Contact & Clinic Location in Riyadh \| Fal Clinic |
 | **Description (planned)** | عنوان عيادة فال في الرياض، أوقات العمل، واتساب، والهاتف — حي اليرموك، شارع الإمام عبد الله بن سعود. | Fal Clinic address in Riyadh, hours, WhatsApp, and phone — Al Yarmouk, Imam Abdullah bin Saud Street. |
-| **Canonical** | https://falclinic.com/contact | https://falclinic.com/en/contact |
+| **Canonical** | https://fal-ksa.com/contact | https://fal-ksa.com/en/contact |
 | **Hreflang** | ar→`/contact`, en→`/en/contact`, x-default→`/contact` | Same |
 | **Robots** | index,follow | index,follow |
 | **H1** | زورونا | Visit us |
@@ -107,10 +107,10 @@
 
 | | Arabic | English |
 |---|--------|---------|
-| **URL** | https://falclinic.com/book | https://falclinic.com/en/book |
+| **URL** | https://fal-ksa.com/book | https://fal-ksa.com/en/book |
 | **Title (planned)** | احجز موعدك في عيادة فال بالرياض | Book Your Appointment at Fal Clinic, Riyadh |
 | **Description (planned)** | احجز موعدك بسرعة في عيادة فال — أدخل اسمك ورقم جوالك واختر الخدمة، ثم أرسل عبر واتساب. | Book quickly at Fal Clinic — enter your name, phone, and service, then send via WhatsApp. |
-| **Canonical** | https://falclinic.com/book | https://falclinic.com/en/book |
+| **Canonical** | https://fal-ksa.com/book | https://fal-ksa.com/en/book |
 | **Hreflang** | ar→`/book`, en→`/en/book`, x-default→`/book` | Same |
 | **Robots** | index,follow | index,follow |
 | **H1** | احجز موعدك الآن | Book your visit |
@@ -123,10 +123,10 @@
 
 | | Arabic | English |
 |---|--------|---------|
-| **URL** | https://falclinic.com/privacy | https://falclinic.com/en/privacy |
+| **URL** | https://fal-ksa.com/privacy | https://fal-ksa.com/en/privacy |
 | **Title (planned)** | سياسة الخصوصية \| فال | Privacy Policy \| Fal Clinic |
 | **Description (planned)** | سياسة الخصوصية لعيادة فال — كيف نجمع ونستخدم بياناتك عند الحجز والتواصل. | Fal Clinic privacy policy — how we collect and use your data when booking and contacting us. |
-| **Canonical** | https://falclinic.com/privacy | https://falclinic.com/en/privacy |
+| **Canonical** | https://fal-ksa.com/privacy | https://fal-ksa.com/en/privacy |
 | **Hreflang** | ar→`/privacy`, en→`/en/privacy`, x-default→`/privacy` | Same |
 | **Robots** | index,follow | index,follow |
 | **H1** | سياسة الخصوصية | Privacy Policy |

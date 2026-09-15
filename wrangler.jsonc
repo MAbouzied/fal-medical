@@ -5,7 +5,7 @@
   // Keep this at or below the workerd version bundled with the local Wrangler CLI.
   "compatibility_date": "2026-08-08",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
-  // Temporarily enabled so the Worker is reachable while falclinic.com
+  // Temporarily enabled so the Worker is reachable while fal-ksa.com
   // stays on a different Cloudflare account/zone that this login cannot bind.
   "workers_dev": true,
   "preview_urls": true,

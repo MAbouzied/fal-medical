@@ -127,7 +127,7 @@ function main() {
 
     const isNoindex = /noindex/i.test(robots);
     if (!isNoindex && !canonical) errors.push(`${route}: missing canonical`);
-    if (canonical && !canonical.startsWith('https://falclinic.com')) {
+    if (canonical && !canonical.startsWith('https://fal-ksa.com')) {
       errors.push(`${route}: canonical not on production host: ${canonical}`);
     }
     if (canonical) {

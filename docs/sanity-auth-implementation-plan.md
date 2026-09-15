@@ -35,7 +35,7 @@ BETTER_AUTH_URL=http://localhost:4321
 Production value:
 
 ```env
-BETTER_AUTH_URL=https://falclinic.com
+BETTER_AUTH_URL=https://fal-ksa.com
 ```
 
 ## Implementation Plan
@@ -186,14 +186,14 @@ Configure these exact redirect URIs:
 
 ```text
 http://localhost:4321/api/auth/callback/google
-https://falclinic.com/api/auth/callback/google
+https://fal-ksa.com/api/auth/callback/google
 ```
 
 Configure these origins:
 
 ```text
 http://localhost:4321
-https://falclinic.com
+https://fal-ksa.com
 ```
 
 The Google consent screen needs an app name, support email, and the approved staff accounts as test users while the OAuth app remains in testing mode.

@@ -36,16 +36,16 @@ test.describe('SEO route contracts', () => {
   test('robots.txt allows production only when indexable', () => {
     const allowed = buildRobotsTxt({
       indexable: true,
-      host: 'falclinic.com',
-      sitemapUrl: 'https://falclinic.com/sitemap.xml',
+      host: 'fal-ksa.com',
+      sitemapUrl: 'https://fal-ksa.com/sitemap.xml',
     });
     expect(allowed).toContain('Allow: /');
     expect(allowed).toContain('Sitemap:');
 
     const blocked = buildRobotsTxt({
       indexable: false,
-      host: 'falclinic.com',
-      sitemapUrl: 'https://falclinic.com/sitemap.xml',
+      host: 'fal-ksa.com',
+      sitemapUrl: 'https://fal-ksa.com/sitemap.xml',
     });
     expect(blocked).toContain('Disallow: /');
     expect(blocked).not.toContain('Sitemap:');
@@ -59,7 +59,7 @@ test.describe('SEO route contracts', () => {
   });
 
   test('sitemap XML excludes private paths by construction', () => {
-    const xml = buildSitemapXml(new URL('https://falclinic.com'), [
+    const xml = buildSitemapXml(new URL('https://fal-ksa.com'), [
       {
         id: 'home',
         ar: '/',
@@ -69,7 +69,7 @@ test.describe('SEO route contracts', () => {
         priority: 1,
       },
     ]);
-    expect(xml).toContain('https://falclinic.com/');
+    expect(xml).toContain('https://fal-ksa.com/');
     expect(xml).not.toContain('/admin');
     expect(xml).not.toContain('/login');
   });

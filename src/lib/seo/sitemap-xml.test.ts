@@ -14,7 +14,7 @@ describe('sitemap XML helpers', () => {
   });
 
   it('builds bilingual entries with hreflang alternates', () => {
-    const xml = buildSitemapXml(new URL('https://falclinic.com'), [
+    const xml = buildSitemapXml(new URL('https://fal-ksa.com'), [
       {
         id: 'home',
         ar: '/',
@@ -25,7 +25,7 @@ describe('sitemap XML helpers', () => {
         priority: 1,
       },
     ]);
-    assert.match(xml, /<loc>https:\/\/falclinic\.com\/<\/loc>/);
+    assert.match(xml, /<loc>https:\/\/fal-ksa\.com\/<\/loc>/);
     assert.match(xml, /hreflang="en"/);
     assert.match(xml, /hreflang="x-default"/);
   });
@@ -39,15 +39,15 @@ describe('sitemap XML helpers', () => {
 
   it('hides the sitemap on non-indexable hosts', () => {
     assert.equal(
-      isSitemapHostIndexable({ indexable: true, host: 'falclinic.com' }),
+      isSitemapHostIndexable({ indexable: true, host: 'fal-ksa.com' }),
       true,
     );
     assert.equal(
-      isSitemapHostIndexable({ indexable: true, host: 'www.falclinic.com' }),
+      isSitemapHostIndexable({ indexable: true, host: 'www.fal-ksa.com' }),
       true,
     );
     assert.equal(
-      isSitemapHostIndexable({ indexable: false, host: 'falclinic.com' }),
+      isSitemapHostIndexable({ indexable: false, host: 'fal-ksa.com' }),
       false,
     );
     assert.equal(

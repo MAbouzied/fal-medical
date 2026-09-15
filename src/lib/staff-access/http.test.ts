@@ -4,13 +4,13 @@ import { adminApiError, hasSameOrigin } from './http.ts';
 
 describe('staff access HTTP helpers', () => {
   it('requires an exact Origin on mutations', () => {
-    assert.equal(hasSameOrigin(new Request('https://falclinic.com/api/admin/users', {
-      method: 'POST', headers: { Origin: 'https://falclinic.com' },
+    assert.equal(hasSameOrigin(new Request('https://fal-ksa.com/api/admin/users', {
+      method: 'POST', headers: { Origin: 'https://fal-ksa.com' },
     })), true);
-    assert.equal(hasSameOrigin(new Request('https://falclinic.com/api/admin/users', {
+    assert.equal(hasSameOrigin(new Request('https://fal-ksa.com/api/admin/users', {
       method: 'POST', headers: { Origin: 'https://evil.example' },
     })), false);
-    assert.equal(hasSameOrigin(new Request('https://falclinic.com/api/admin/users', { method: 'POST' })), false);
+    assert.equal(hasSameOrigin(new Request('https://fal-ksa.com/api/admin/users', { method: 'POST' })), false);
   });
 
   it('returns structured, private error responses', async () => {

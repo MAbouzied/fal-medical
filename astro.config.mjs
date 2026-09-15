@@ -8,7 +8,7 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://falclinic.com',
+  site: 'https://fal-ksa.com',
   // Emit real HTML files (not trailing-slash refresh stubs). Legacy WordPress
   // trailing-slash URLs are handled by public/_redirects + middleware.
   trailingSlash: 'never',

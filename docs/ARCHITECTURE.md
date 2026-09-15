@@ -129,7 +129,7 @@ Browser
 - Build: `npm run build` → `./dist`
 - Deploy: `npm run deploy` (Wrangler)
 - Config: `wrangler.jsonc`, `astro.config.mjs`
-- Production host: `https://falclinic.com`
+- Production host: `https://fal-ksa.com`
 
 ---
 
@@ -146,6 +146,7 @@ Browser
 
 | Date | Change | Paths | Agent |
 |------|--------|-------|-------|
+| 2026-09-15 | Production host moved to `https://fal-ksa.com` (canonical, sitemap, robots, Better Auth origin). Contact email stays `info@falclinic.com`. | `src/data/site.ts`, `astro.config.mjs`, `src/lib/auth/authorization.ts`, `docs/sanity-and-staff-auth.md` | site |
 | 2026-09-14 | Booking specialties limited to dentistry and dermatology; official TikTok `@falclinichfr`; Fal commercial registration PDF and numbers replace Beauty Corner certificate | `src/data/booking-departments.ts`, `src/data/licenses.ts`, `src/data/contact.ts`, `public/assets/licenses/commercial-registration.pdf`, `src/components/site/SiteFooter.astro` | site |
 | 2026-09-08 | Initial architecture doc and agent rules copied from ON-DM fullstack pattern | `.cursor/`, `PROJECT-STRUCTURE.md`, `docs/ARCHITECTURE.md`, `AGENTS.md` | setup |
 

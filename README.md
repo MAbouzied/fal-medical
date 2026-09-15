@@ -24,7 +24,7 @@ This repo copies the **structure and SEO system** from Beauty Corner. Visual des
 - Arabic default `/`, English `/en`, `trailingSlash: "never"`
 - Layout SEO API: canonical, hreflang, robots, Open Graph, JSON-LD
 - Route pairs in `src/lib/i18n/routes.ts` driving sitemap + alternates
-- `/sitemap.xml` and `/robots.txt` gated by `SEO_INDEXABLE` + `falclinic.com`
+- `/sitemap.xml` and `/robots.txt` gated by `SEO_INDEXABLE` + `fal-ksa.com`
 - Booking/contact forms → WhatsApp + optional Google Sheets
 - Arabic-only blog module (`/blogs`) with mock provider
 - Staff `/admin` + Better Auth (optional; needs Fal credentials)
@@ -37,7 +37,7 @@ This repo copies the **structure and SEO system** from Beauty Corner. Visual des
 - Photos and `logo.png` / `social-card.png`
 - GTM, Sheets, Sanity, and auth secrets in `.dev.vars`
 
-Production host: **https://falclinic.com** (also allows `www.falclinic.com`).
+Production host: **https://fal-ksa.com** (also allows `www.fal-ksa.com`).
 
 Default phone: `055 703 4280` (`PUBLIC_CLINIC_PHONE`). Override department lines with `PUBLIC_DENTAL_PHONE` / `PUBLIC_DERMATOLOGY_PHONE`.
 
