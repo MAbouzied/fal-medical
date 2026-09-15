@@ -22,7 +22,7 @@
     "verify:release": "npm run verify && npm run security:audit && npm run test:perf",
     "preview": "astro preview",
     "preview:cf": "npm run build && wrangler dev",
-    "deploy": "npm run build && wrangler deploy",
+    "deploy": "npm run build && wrangler deploy --keep-vars",
     "cf:types": "wrangler types --include-runtime false",
     "astro": "astro"
   },
