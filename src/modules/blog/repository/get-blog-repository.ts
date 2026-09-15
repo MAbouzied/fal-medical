@@ -1,5 +1,4 @@
 import {
-  SANITY_API_TOKEN,
   SANITY_API_VERSION,
   SANITY_DATASET,
   SANITY_PROJECT_ID,
@@ -16,9 +15,9 @@ export function getBlogRepository(): BlogRepository {
       projectId: SANITY_PROJECT_ID || 'ilyfhm76',
       dataset: SANITY_DATASET || 'production',
       apiVersion: SANITY_API_VERSION || '2026-08-03',
-      // Optional Viewer token for a private dataset. A leftover token from
-      // another Sanity project is ignored at fetch time (401 → anonymous read).
-      token: SANITY_API_TOKEN,
+      // Public production is readable without a token. Do not attach
+      // SANITY_API_TOKEN here: admin uses SANITY_WRITE_TOKEN / SANITY_AUTH_TOKEN
+      // instead, and a Viewer token without production access 403s /blogs.
     });
   }
   return cachedRepository;

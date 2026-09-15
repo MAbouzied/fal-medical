@@ -10,7 +10,7 @@ Operational guide for the Fal Clinic blog Content Lake and `/admin` staff area.
 | Dataset | `production` |
 | API version | `2026-08-03` |
 
-Published blog reads always use the Sanity dataset. There is no mock provider. Public reads use the dataset without `SANITY_API_TOKEN` unless it is private. If a Worker secret from another Sanity project is still set, published reads retry anonymously after a 401 so `/blogs` stays up. If the dataset becomes private, create a Viewer-only token for **this** project (`ilyfhm76`) and keep it server-only. Never reuse the staff authorization token for public blog content.
+Published blog reads always use the Sanity dataset. There is no mock provider. Public `/blogs` does **not** use `SANITY_API_TOKEN`. Admin login uses `SANITY_AUTH_TOKEN` on `staff-auth`; the editor uses `SANITY_WRITE_TOKEN` on `production`. Those tokens can be valid while public listing still 503s if a read token is sent that cannot query public `production` (or is used with the API CDN). If the dataset becomes private, create a Viewer-only token for **this** project (`ilyfhm76`) and pass it only then. Never reuse the staff authorization token for public blog content.
 
 ## Private staff access directory
 

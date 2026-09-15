@@ -26,9 +26,9 @@ export function isUnauthorizedSanityError(error: unknown): boolean {
   if (!error || typeof error !== 'object') return false;
   const statusCode =
     'statusCode' in error ? Number((error as { statusCode?: unknown }).statusCode) : Number.NaN;
-  if (statusCode === 401) return true;
+  if (statusCode === 401 || statusCode === 403) return true;
   const message = error instanceof Error ? error.message : String(error);
-  return /unauthorized|session not found/i.test(message);
+  return /unauthorized|forbidden|session not found/i.test(message);
 }
 
 export function withAnonymousReadFallback(
@@ -41,8 +41,8 @@ export function withAnonymousReadFallback(
       return await authenticatedFetch(...args);
     } catch (error) {
       if (!isUnauthorizedSanityError(error)) throw error;
-      // Leftover tokens from another Sanity project 401 this project.
-      // Fal production is public, so anonymous published reads still work.
+      // A Worker token that cannot read this dataset (wrong project, or
+      // staff-auth-only) 401/403s. Fal production is public, so retry anonymously.
       return publicClient.fetch(...args);
     }
   }) as SanityClient['fetch'];
