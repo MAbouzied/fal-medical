@@ -12,6 +12,11 @@
   "observability": {
     "enabled": true
   },
+  "vars": {
+    "SANITY_PROJECT_ID": "nzy22u9z",
+    "SANITY_DATASET": "production",
+    "SANITY_API_VERSION": "2026-08-03"
+  },
   // Required by astro.config.mjs `cache: { provider: cacheCloudflare() }`.
   "cache": {
     "enabled": true
@@ -50,6 +55,11 @@
       "name": "fal-staging",
       "workers_dev": true,
       "preview_urls": true,
+      "vars": {
+        "SANITY_PROJECT_ID": "nzy22u9z",
+        "SANITY_DATASET": "production",
+        "SANITY_API_VERSION": "2026-08-03"
+      },
       "images": {
         "binding": "IMAGES"
       },

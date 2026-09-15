@@ -1,5 +1,4 @@
 import {
-  SANITY_API_TOKEN,
   SANITY_API_VERSION,
   SANITY_DATASET,
   SANITY_PROJECT_ID,
@@ -9,14 +8,13 @@ import { createSanityBlogRepository } from './sanity-blog-repository.ts';
 
 let cachedRepository: BlogRepository | undefined;
 
-/** Server composition root — uses Astro env and caches the Sanity repository per process. */
+/** Public published reads — no token. Viewer tokens belong on private datasets only. */
 export function getBlogRepository(): BlogRepository {
   if (!cachedRepository) {
     cachedRepository = createSanityBlogRepository({
-      projectId: SANITY_PROJECT_ID,
-      dataset: SANITY_DATASET,
-      apiVersion: SANITY_API_VERSION,
-      token: SANITY_API_TOKEN,
+      projectId: SANITY_PROJECT_ID || 'nzy22u9z',
+      dataset: SANITY_DATASET || 'production',
+      apiVersion: SANITY_API_VERSION || '2026-08-03',
     });
   }
   return cachedRepository;

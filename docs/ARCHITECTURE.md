@@ -145,6 +145,7 @@ Browser
 
 | Date | Change | Paths | Agent |
 |------|--------|-------|-------|
+| 2026-09-15 | Public blog reads Sanity without a token; project/dataset/version set as Worker vars so `/blogs` can load on Cloudflare | `src/modules/blog/repository/get-blog-repository.ts`, `wrangler.jsonc` | blog |
 | 2026-09-15 | Fixed blog editor image dialog showing on load; public `/blogs` no longer 503s when Sanity cover alt is missing | `src/components/admin/AdminShell.astro`, `src/components/admin/BlogEditorApp.tsx`, `src/modules/blog/sanity/image.ts`, `src/modules/blog/repository/sanity-blog-repository.ts` | blog |
 | 2026-09-15 | Analytics consent banner removed; GTM/GA4 loads automatically on public pages | `src/layouts/Layout.astro`, `src/components/analytics/Gtm.astro`, `src/lib/gtm.ts`, `src/pages/privacy.astro`, `src/pages/en/privacy.astro` | site |
 | 2026-09-15 | Removed mock blog provider; public blog and admin editor always use Sanity (`nzy22u9z` / `production`) | `src/modules/blog/repository/`, `src/lib/admin/blog-admin.ts`, `astro.config.mjs` | blog |
