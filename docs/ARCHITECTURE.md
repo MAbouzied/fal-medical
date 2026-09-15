@@ -92,7 +92,7 @@ Browser
 
 | Integration | Config | Used by |
 |-------------|--------|---------|
-| Sanity (blog) | `SANITY_PROJECT_ID`, `SANITY_DATASET`, tokens | Blog module |
+| Sanity (blog) | `SANITY_PROJECT_ID` (`ilyfhm76`), `SANITY_DATASET`, tokens | Blog module |
 | Sanity (staff) | `SANITY_AUTH_DATASET`, `SANITY_AUTH_TOKEN` | Staff access |
 | Better Auth | Auth secrets in env | Login, sessions |
 | Google Sheets | `GOOGLE_*` service account | Bookings, customers |
@@ -145,7 +145,7 @@ Browser
 
 | Date | Change | Paths | Agent |
 |------|--------|-------|-------|
-| 2026-09-15 | Restored `SANITY_API_TOKEN` on public blog reads; `wrangler deploy --keep-vars` so dashboard Worker vars are not wiped | `src/modules/blog/repository/get-blog-repository.ts`, `package.json` | blog |
+| 2026-09-15 | Sanity project default switched from leftover `nzy22u9z` to Fal project `ilyfhm76` | `astro.config.mjs`, `wrangler.jsonc`, `src/modules/blog/repository/get-blog-repository.ts`, `.env.example`, `docs/sanity-and-staff-auth.md` | blog |
 | 2026-09-15 | Fixed blog editor image dialog showing on load; public `/blogs` no longer 503s when Sanity cover alt is missing | `src/components/admin/AdminShell.astro`, `src/components/admin/BlogEditorApp.tsx`, `src/modules/blog/sanity/image.ts`, `src/modules/blog/repository/sanity-blog-repository.ts` | blog |
 | 2026-09-15 | Analytics consent banner removed; GTM/GA4 loads automatically on public pages | `src/layouts/Layout.astro`, `src/components/analytics/Gtm.astro`, `src/lib/gtm.ts`, `src/pages/privacy.astro`, `src/pages/en/privacy.astro` | site |
 | 2026-09-15 | Removed mock blog provider; public blog and admin editor always use Sanity (`nzy22u9z` / `production`) | `src/modules/blog/repository/`, `src/lib/admin/blog-admin.ts`, `astro.config.mjs` | blog |

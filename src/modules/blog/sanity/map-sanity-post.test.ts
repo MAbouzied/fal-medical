@@ -7,7 +7,7 @@ import {
 } from './map-sanity-post.ts';
 import type { SanityBlogPostDoc } from './types.ts';
 
-const imageConfig = { projectId: 'nzy22u9z', dataset: 'production' };
+const imageConfig = { projectId: 'ilyfhm76', dataset: 'production' };
 
 function baseDoc(overrides: Partial<SanityBlogPostDoc> = {}): SanityBlogPostDoc {
   return {
@@ -19,7 +19,7 @@ function baseDoc(overrides: Partial<SanityBlogPostDoc> = {}): SanityBlogPostDoc 
     cover: {
       asset: {
         _id: 'image-cover',
-        url: 'https://cdn.sanity.io/images/nzy22u9z/production/cover.jpg',
+        url: 'https://cdn.sanity.io/images/ilyfhm76/production/cover.jpg',
         metadata: { dimensions: { width: 1600, height: 900 } },
       },
       alt: 'طبيب أسنان أثناء فحص المريض',
@@ -81,7 +81,7 @@ describe('mapSanityPostToBlogPost', () => {
         cover: {
           asset: {
             _id: 'image-cover',
-            url: 'https://cdn.sanity.io/images/nzy22u9z/production/cover.jpg',
+            url: 'https://cdn.sanity.io/images/ilyfhm76/production/cover.jpg',
           },
           alt: ' ',
         },

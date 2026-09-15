@@ -13,7 +13,7 @@
 
 | Variable | Purpose | Required |
 | --- | --- | --- |
-| `SANITY_PROJECT_ID=nzy22u9z` | Sanity project | Yes |
+| `SANITY_PROJECT_ID=ilyfhm76` | Sanity project | Yes |
 | `SANITY_DATASET=production` | Dataset | Yes |
 | `SANITY_API_VERSION=2026-08-03` | Fixed Content Lake API behavior | Yes |
 | `SANITY_API_TOKEN` | Private dataset read token | No, omit currently |

@@ -53,7 +53,7 @@ export default defineConfig({
         context: 'server',
         access: 'secret',
         optional: true,
-        default: 'nzy22u9z',
+        default: 'ilyfhm76',
       }),
       SANITY_DATASET: envField.string({
         context: 'server',

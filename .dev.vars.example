@@ -8,8 +8,8 @@ GOOGLE_SHEET_ID=YOUR_SPREADSHEET_ID
 GOOGLE_BOOKINGS_SHEET_NAME=Bookings
 GOOGLE_CUSTOMERS_SHEET_NAME=Customers
 
-# Blog content is always loaded from Sanity (defaults: project nzy22u9z, dataset production).
-# SANITY_PROJECT_ID=nzy22u9z
+# Blog content is always loaded from Sanity (defaults: project ilyfhm76, dataset production).
+# SANITY_PROJECT_ID=ilyfhm76
 SANITY_DATASET=production
 SANITY_API_VERSION=2026-08-03
 # SANITY_API_TOKEN=

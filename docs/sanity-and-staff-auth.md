@@ -6,7 +6,7 @@ Operational guide for the Fal Clinic blog Content Lake and `/admin` staff area.
 
 | Value | Setting |
 | --- | --- |
-| Project ID | `nzy22u9z` |
+| Project ID | `ilyfhm76` |
 | Dataset | `production` |
 | API version | `2026-08-03` |
 
