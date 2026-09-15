@@ -16,6 +16,8 @@ export function getBlogRepository(): BlogRepository {
       projectId: SANITY_PROJECT_ID || 'ilyfhm76',
       dataset: SANITY_DATASET || 'production',
       apiVersion: SANITY_API_VERSION || '2026-08-03',
+      // Optional Viewer token for a private dataset. A leftover token from
+      // another Sanity project is ignored at fetch time (401 → anonymous read).
       token: SANITY_API_TOKEN,
     });
   }

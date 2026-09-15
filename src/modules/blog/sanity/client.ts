@@ -22,15 +22,52 @@ export function assertSanityConfig(
   }
 }
 
+export function isUnauthorizedSanityError(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+  const statusCode =
+    'statusCode' in error ? Number((error as { statusCode?: unknown }).statusCode) : Number.NaN;
+  if (statusCode === 401) return true;
+  const message = error instanceof Error ? error.message : String(error);
+  return /unauthorized|session not found/i.test(message);
+}
+
+export function withAnonymousReadFallback(
+  authenticatedClient: SanityClient,
+  publicClient: SanityClient,
+): SanityClient {
+  const authenticatedFetch = authenticatedClient.fetch.bind(authenticatedClient);
+  authenticatedClient.fetch = (async (...args: Parameters<SanityClient['fetch']>) => {
+    try {
+      return await authenticatedFetch(...args);
+    } catch (error) {
+      if (!isUnauthorizedSanityError(error)) throw error;
+      // Leftover tokens from another Sanity project 401 this project.
+      // Fal production is public, so anonymous published reads still work.
+      return publicClient.fetch(...args);
+    }
+  }) as SanityClient['fetch'];
+  return authenticatedClient;
+}
+
 export function createSanityClient(config: SanityBlogConfig): SanityClient {
   assertSanityConfig(config);
 
-  return createClient({
+  const publicConfig = {
     projectId: config.projectId,
     dataset: config.dataset,
     apiVersion: config.apiVersion,
-    useCdn: true,
-    perspective: 'published',
-    ...(config.token ? { token: config.token } : {}),
-  });
+    useCdn: true as const,
+    perspective: 'published' as const,
+  };
+
+  const publicClient = createClient(publicConfig);
+  if (!config.token) return publicClient;
+
+  return withAnonymousReadFallback(
+    createClient({
+      ...publicConfig,
+      token: config.token,
+    }),
+    publicClient,
+  );
 }

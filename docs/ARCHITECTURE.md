@@ -145,6 +145,7 @@ Browser
 
 | Date | Change | Paths | Agent |
 |------|--------|-------|-------|
+| 2026-09-15 | Public blog reads retry without `SANITY_API_TOKEN` when the Worker secret 401s (leftover token from another Sanity project) | `src/modules/blog/sanity/client.ts` | blog |
 | 2026-09-15 | Sanity project default switched from leftover `nzy22u9z` to Fal project `ilyfhm76` | `astro.config.mjs`, `wrangler.jsonc`, `src/modules/blog/repository/get-blog-repository.ts`, `.env.example`, `docs/sanity-and-staff-auth.md` | blog |
 | 2026-09-15 | Fixed blog editor image dialog showing on load; public `/blogs` no longer 503s when Sanity cover alt is missing | `src/components/admin/AdminShell.astro`, `src/components/admin/BlogEditorApp.tsx`, `src/modules/blog/sanity/image.ts`, `src/modules/blog/repository/sanity-blog-repository.ts` | blog |
 | 2026-09-15 | Analytics consent banner removed; GTM/GA4 loads automatically on public pages | `src/layouts/Layout.astro`, `src/components/analytics/Gtm.astro`, `src/lib/gtm.ts`, `src/pages/privacy.astro`, `src/pages/en/privacy.astro` | site |
