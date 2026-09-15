@@ -3,7 +3,7 @@ import { describe, it } from 'node:test';
 import { isAllowedCustomerOrigin } from './origin.ts';
 
 describe('isAllowedCustomerOrigin', () => {
-  const origin = 'https://falclinic.com';
+  const origin = 'https://fal-ksa.com';
 
   it('accepts exact same-origin requests', () => {
     assert.equal(isAllowedCustomerOrigin(origin, origin, 'same-origin'), true);

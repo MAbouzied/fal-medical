@@ -30,7 +30,7 @@ const post: BlogPost = {
 
 describe('blog JSON-LD', () => {
   it('builds BlogPosting schema with required fields', () => {
-    const site = new URL('https://falclinic.com');
+    const site = new URL('https://fal-ksa.com');
     const schema = buildBlogPostingSchema({
       site,
       post,
@@ -44,7 +44,7 @@ describe('blog JSON-LD', () => {
     assert.equal(schema.datePublished, post.publishedAt);
     assert.equal(schema.dateModified, post.updatedAt);
     assert.equal(schema.articleSection, 'طب الأسنان');
-    assert.deepEqual(schema.publisher, { '@id': 'https://falclinic.com/#organization' });
+    assert.deepEqual(schema.publisher, { '@id': 'https://fal-ksa.com/#organization' });
     assert.equal(schema.timeRequired, 'PT3M');
   });
 

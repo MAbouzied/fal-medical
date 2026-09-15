@@ -1,5 +1,5 @@
 /** Canonical production host. Indexing, robots, and sitemap allowlists use this. */
-export const productionHost = 'falclinic.com';
+export const productionHost = 'fal-ksa.com';
 
 export const productionHosts = [productionHost, `www.${productionHost}`] as const;
 

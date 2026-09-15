@@ -151,10 +151,10 @@ describe('parseCustomerLeadBody', () => {
 
 describe('assertCustomerRequestAllowed', () => {
   it('requires exact Origin and blocks cross-site Fetch Metadata', () => {
-    const url = new URL('https://falclinic.com/api/customers');
+    const url = new URL('https://fal-ksa.com/api/customers');
     const ok = new Request(url, {
       headers: {
-        Origin: 'https://falclinic.com',
+        Origin: 'https://fal-ksa.com',
         'Sec-Fetch-Site': 'same-origin',
       },
     });
@@ -162,7 +162,7 @@ describe('assertCustomerRequestAllowed', () => {
 
     const cross = new Request(url, {
       headers: {
-        Origin: 'https://falclinic.com',
+        Origin: 'https://fal-ksa.com',
         'Sec-Fetch-Site': 'cross-site',
       },
     });

@@ -9,7 +9,7 @@ function streamRequest(chunks: Uint8Array[], headers?: HeadersInit): Request {
       controller.close();
     },
   });
-  return new Request('https://falclinic.com/api/customers', {
+  return new Request('https://fal-ksa.com/api/customers', {
     method: 'POST',
     headers,
     body: stream,
@@ -20,7 +20,7 @@ function streamRequest(chunks: Uint8Array[], headers?: HeadersInit): Request {
 
 describe('readLimitedRequestBody', () => {
   it('reads bodies under the limit', async () => {
-    const request = new Request('https://falclinic.com/api/customers', {
+    const request = new Request('https://fal-ksa.com/api/customers', {
       method: 'POST',
       body: '{"ok":true}',
     });

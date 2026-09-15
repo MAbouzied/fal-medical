@@ -49,7 +49,7 @@ describe('resolveContactEvent', () => {
   });
 
   it('returns null for non-contact links', () => {
-    assert.equal(resolveContactEvent('https://falclinic.com/services'), null);
+    assert.equal(resolveContactEvent('https://fal-ksa.com/services'), null);
     assert.equal(resolveContactEvent('/book'), null);
   });
 });
