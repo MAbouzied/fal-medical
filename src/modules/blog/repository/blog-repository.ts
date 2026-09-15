@@ -16,5 +16,3 @@ export interface BlogRepository {
   getPostBySlug(slug: string): Promise<BlogPost | null>;
   getRelatedPosts(post: BlogPost, limit?: number): Promise<BlogPost[]>;
 }
-
-export type BlogProvider = 'mock' | 'sanity';

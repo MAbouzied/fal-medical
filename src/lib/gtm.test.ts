@@ -1,14 +1,30 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { GtmEvents, isValidGtmId, resolveContactEvent, resolveGtmId, sanitizeGtmPayload } from './gtm.ts';
+import {
+  DEFAULT_GA_MEASUREMENT_ID,
+  GtmEvents,
+  isGa4MeasurementId,
+  isValidGtmId,
+  resolveContactEvent,
+  resolveGtmId,
+  sanitizeGtmPayload,
+} from './gtm.ts';
 
 describe('resolveGtmId', () => {
   it('accepts a real container id', () => {
     assert.equal(resolveGtmId('GTM-ABC1234'), 'GTM-ABC1234');
   });
 
+  it('accepts a GA4 measurement id', () => {
+    assert.equal(resolveGtmId('G-28Q8393TES'), 'G-28Q8393TES');
+    assert.equal(isGa4MeasurementId('G-28Q8393TES'), true);
+    assert.equal(isGa4MeasurementId('GTM-ABC1234'), false);
+    assert.equal(DEFAULT_GA_MEASUREMENT_ID, 'G-28Q8393TES');
+  });
+
   it('rejects placeholders and empty values', () => {
     assert.equal(resolveGtmId('GTM-XXXXXXX'), '');
+    assert.equal(resolveGtmId('G-XXXXXXX'), '');
     assert.equal(resolveGtmId(''), '');
     assert.equal(resolveGtmId(undefined), '');
     assert.equal(isValidGtmId('GTM-XXXXXXX'), false);
@@ -57,6 +73,6 @@ describe('resolveContactEvent', () => {
 // NOTE: The astro:after-swap page_view listener inside Gtm.astro runs in the
 // browser only and cannot be unit-tested here. The key invariant is:
 //   • astro:after-swap fires ONLY on SPA navigations (View Transitions), never
-//     on initial page load, so the GTM container's own gtm.js page_view on
+//     on initial page load, so gtag config / GTM gtm.js page_view on
 //     first load is not duplicated.
 // This behaviour is covered by E2E smoke tests via the built Cloudflare app.

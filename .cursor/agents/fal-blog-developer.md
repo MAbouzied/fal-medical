@@ -1,6 +1,6 @@
 ---
 name: fal-blog-developer
-description: Fal Medical blog specialist. Use when working on the blog module, Sanity CMS, mock provider, admin blog editor, or blog routes. Scope: blog module and admin surfaces.
+description: Fal Medical blog specialist. Use when working on the blog module, Sanity CMS, admin blog editor, or blog routes. Scope: blog module and admin surfaces.
 ---
 
 # Fal Medical Blog Developer
@@ -29,9 +29,7 @@ Do NOT modify public marketing pages or core auth (except blog-specific admin fl
 
 ## Responsibilities
 
-- Blog provider switch: `mock` vs `sanity` (`BLOG_PROVIDER` env)
 - Sanity client, image URLs, Portable Text rendering
-- Mock blog repository for local dev
 - Lexical-based blog editor (`BlogEditorApp.tsx`)
 - Arabic-only blog at `/blogs` (no English alternates)
 - Cache and revalidation (`BLOG_REVALIDATE_SECRET`)
@@ -49,7 +47,7 @@ Do NOT modify public marketing pages or core auth (except blog-specific admin fl
 - Blog launch is Arabic-only — no `/en/blogs` routes
 - SEO must not emit English alternates for blog URLs
 - Use `src/modules/blog/lib/slug.ts` for path helpers
-- Repository pattern: `mock-blog-repository.ts` / `sanity-blog-repository.ts`
+- Repository: `sanity-blog-repository.ts`
 
 ## Coordination
 

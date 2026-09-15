@@ -1,28 +1,38 @@
-import { isAnalyticsAllowed, readAnalyticsConsent } from './analytics/consent.ts';
+/** Fal Clinic GA4 measurement ID (gtag.js). Override with PUBLIC_GTM_ID. */
+export const DEFAULT_GA_MEASUREMENT_ID = 'G-28Q8393TES';
 
-/** Returns a valid GTM container ID, or empty string when unset/placeholder. */
+const GTM_CONTAINER_RE = /^GTM-[A-Z0-9]+$/i;
+const GA4_MEASUREMENT_RE = /^G-[A-Z0-9]+$/i;
+const PLACEHOLDER_RE = /^(?:GTM|G)-X+$/i;
+
+/** Returns a valid GTM container or GA4 measurement ID, or empty string. */
 export function resolveGtmId(value: unknown): string {
   if (typeof value !== 'string') return '';
   const trimmed = value.trim();
-  if (!/^GTM-[A-Z0-9]+$/i.test(trimmed)) return '';
-  if (/^GTM-X+$/i.test(trimmed)) return '';
-  return trimmed;
+  if (PLACEHOLDER_RE.test(trimmed)) return '';
+  if (GTM_CONTAINER_RE.test(trimmed) || GA4_MEASUREMENT_RE.test(trimmed)) return trimmed;
+  return '';
 }
 
 export function isValidGtmId(value: unknown): boolean {
   return resolveGtmId(value).length > 0;
 }
 
+export function isGa4MeasurementId(value: unknown): boolean {
+  const id = resolveGtmId(value);
+  return id.length > 0 && GA4_MEASUREMENT_RE.test(id);
+}
+
 const envGtmId =
   typeof import.meta.env?.PUBLIC_GTM_ID === 'string' ? import.meta.env.PUBLIC_GTM_ID : '';
 
-/** GTM container ID used by the loader/init script. Set PUBLIC_GTM_ID to enable. */
-export const GTM_ID = resolveGtmId(envGtmId);
+/** Analytics ID used by the loader. Defaults to Fal Clinic GA4. Set PUBLIC_GTM_ID to override. */
+export const GTM_ID = resolveGtmId(envGtmId) || DEFAULT_GA_MEASUREMENT_ID;
 export const isGtmConfigured = GTM_ID.length > 0;
 
-/** True only when a valid container is configured and consent is granted. */
+/** True when a valid analytics ID is configured. */
 export function isGtmEnabled(): boolean {
-  return isGtmConfigured && isAnalyticsAllowed(readAnalyticsConsent());
+  return isGtmConfigured;
 }
 
 export const GtmEvents = {
@@ -59,19 +69,29 @@ export function sanitizeGtmPayload(payload: GtmPayload = {}): GtmPayload {
 
 declare global {
   interface Window {
-    dataLayer: Record<string, unknown>[];
+    dataLayer: unknown[];
+    gtag?: (...args: unknown[]) => void;
   }
 }
 
 export function pushGtmEvent(event: string, payload: GtmPayload = {}): void {
   if (typeof window === 'undefined' || !isGtmEnabled()) return;
 
-  window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push({
-    event,
+  const params = {
     page_path: window.location.pathname,
     locale: document.documentElement.lang || 'ar',
     ...sanitizeGtmPayload(payload),
+  };
+
+  window.dataLayer = window.dataLayer || [];
+  if (typeof window.gtag === 'function') {
+    window.gtag('event', event, params);
+    return;
+  }
+
+  window.dataLayer.push({
+    event,
+    ...params,
   });
 }
 
@@ -99,12 +119,34 @@ export function resolveCtaLocation(element: Element): string {
   return 'page';
 }
 
+function loadGtag(measurementId: string): void {
+  window.dataLayer = window.dataLayer || [];
+  window.gtag =
+    window.gtag ||
+    function gtag() {
+      // Same queue format as Google's snippet: dataLayer.push(arguments)
+      window.dataLayer.push(arguments);
+    };
+  window.gtag('js', new Date());
+  window.gtag('config', measurementId);
+
+  const script = document.createElement('script');
+  script.async = true;
+  script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(measurementId)}`;
+  document.head.appendChild(script);
+}
+
 export function loadGtmContainer(containerId: string): void {
   if (typeof document === 'undefined') return;
   const id = resolveGtmId(containerId);
   if (!id) return;
   if (document.documentElement.dataset.gtmLoaded === 'true') return;
   document.documentElement.dataset.gtmLoaded = 'true';
+
+  if (isGa4MeasurementId(id)) {
+    loadGtag(id);
+    return;
+  }
 
   window.dataLayer = window.dataLayer || [];
   window.dataLayer.push({

@@ -16,8 +16,8 @@ Fal Clinic (مجمع عيادات فال الطبية) is a bilingual clinic mar
 | Styling | Tailwind CSS 4 |
 | Deploy | `@astrojs/cloudflare` + Wrangler |
 | Auth | Better Auth + Sanity staff-auth dataset |
-| Blog | Mock (dev) or Sanity CMS |
-| Analytics | Google Tag Manager |
+| Blog | Sanity CMS |
+| Analytics | Google Analytics 4 (gtag.js, `G-28Q8393TES`) |
 | Leads | WhatsApp + optional Google Sheets |
 
 ---
@@ -82,8 +82,7 @@ Browser
 ### Blog (`fal-blog-developer`)
 
 - Module: `src/modules/blog/`
-  - Repository pattern: `mock-blog-repository.ts` / `sanity-blog-repository.ts`
-  - Provider selected by `BLOG_PROVIDER` env (`mock` | `sanity`)
+  - Repository: `sanity-blog-repository.ts` (Sanity is the only provider)
 - Admin: `src/pages/admin/`, `src/components/admin/BlogEditorApp.tsx`
 - Public: `src/pages/blogs/`
 
@@ -97,7 +96,7 @@ Browser
 | Sanity (staff) | `SANITY_AUTH_DATASET`, `SANITY_AUTH_TOKEN` | Staff access |
 | Better Auth | Auth secrets in env | Login, sessions |
 | Google Sheets | `GOOGLE_*` service account | Bookings, customers |
-| GTM | Public GTM ID | Analytics |
+| GTM / GA4 | `PUBLIC_GTM_ID` (defaults to `G-28Q8393TES`); loads automatically on public pages | Analytics |
 | WhatsApp | `PUBLIC_CLINIC_PHONE` | Booking/contact CTAs |
 
 ---
@@ -146,6 +145,8 @@ Browser
 
 | Date | Change | Paths | Agent |
 |------|--------|-------|-------|
+| 2026-09-15 | Analytics consent banner removed; GTM/GA4 loads automatically on public pages | `src/layouts/Layout.astro`, `src/components/analytics/Gtm.astro`, `src/lib/gtm.ts`, `src/pages/privacy.astro`, `src/pages/en/privacy.astro` | site |
+| 2026-09-15 | Removed mock blog provider; public blog and admin editor always use Sanity (`nzy22u9z` / `production`) | `src/modules/blog/repository/`, `src/lib/admin/blog-admin.ts`, `astro.config.mjs` | blog |
 | 2026-09-14 | Booking specialties limited to dentistry and dermatology; official TikTok `@falclinichfr`; Fal commercial registration PDF and numbers replace Beauty Corner certificate | `src/data/booking-departments.ts`, `src/data/licenses.ts`, `src/data/contact.ts`, `public/assets/licenses/commercial-registration.pdf`, `src/components/site/SiteFooter.astro` | site |
 | 2026-09-08 | Initial architecture doc and agent rules copied from ON-DM fullstack pattern | `.cursor/`, `PROJECT-STRUCTURE.md`, `docs/ARCHITECTURE.md`, `AGENTS.md` | setup |
 

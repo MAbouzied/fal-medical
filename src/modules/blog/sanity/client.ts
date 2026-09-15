@@ -14,10 +14,9 @@ export function assertSanityConfig(
   if (missing.length > 0) {
     throw new Error(
       [
-        'BLOG_PROVIDER=sanity is selected, but Sanity is not fully configured.',
+        'Sanity is the blog source, but it is not fully configured.',
         `Missing: ${missing.join(', ')}.`,
-        'Set the required environment variables, or switch BLOG_PROVIDER to mock.',
-        'Refusing to fall back to mock content while Sanity is selected.',
+        'Set SANITY_PROJECT_ID, SANITY_DATASET, and SANITY_API_VERSION.',
       ].join(' '),
     );
   }

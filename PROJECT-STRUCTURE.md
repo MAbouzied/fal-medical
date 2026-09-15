@@ -74,7 +74,7 @@ astro dev --background
 
 ### Responsibilities
 
-- Blog module (mock + Sanity providers)
+- Blog module (Sanity provider)
 - Arabic-only blog at `/blogs`
 - Lexical admin editor
 - Sanity CMS integration
@@ -125,8 +125,8 @@ See [`.env.example`](./.env.example) and [`.dev.vars.example`](./.dev.vars.examp
 Key groups:
 
 - **SEO:** `SEO_INDEXABLE`, site URL
-- **Analytics:** GTM
-- **Blog:** `BLOG_PROVIDER`, Sanity tokens
+- **Analytics:** GA4 gtag (`G-28Q8393TES`; override with `PUBLIC_GTM_ID`)
+- **Blog:** Sanity (`SANITY_PROJECT_ID`, dataset, tokens)
 - **Auth:** Better Auth secrets, `SANITY_AUTH_*`
 - **Sheets:** Google service account for leads/bookings
 - **Clinic:** `PUBLIC_CLINIC_PHONE`, department phones

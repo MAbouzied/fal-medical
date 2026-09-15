@@ -26,7 +26,7 @@ This repo copies the **structure and SEO system** from Beauty Corner. Visual des
 - Route pairs in `src/lib/i18n/routes.ts` driving sitemap + alternates
 - `/sitemap.xml` and `/robots.txt` gated by `SEO_INDEXABLE` + `falclinic.com`
 - Booking/contact forms → WhatsApp + optional Google Sheets
-- Arabic-only blog module (`/blogs`) with mock provider
+- Arabic-only blog module (`/blogs`) from Sanity
 - Staff `/admin` + Better Auth (optional; needs Fal credentials)
 
 ## Fill in before launch
@@ -35,7 +35,7 @@ This repo copies the **structure and SEO system** from Beauty Corner. Visual des
 - Real doctor names, photos, and hours (`src/data/doctors.ts`, `clinic-facts.ts`)
 - Remaining social URLs if Instagram or Snapchat are confirmed (`src/data/contact.ts`)
 - Photos and `logo.png` / `social-card.png`
-- GTM, Sheets, Sanity, and auth secrets in `.dev.vars`
+- GTM/GA4, Sheets, Sanity, and auth secrets in `.dev.vars`
 
 Production host: **https://falclinic.com** (also allows `www.falclinic.com`).
 

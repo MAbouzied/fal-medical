@@ -13,7 +13,6 @@
 
 | Variable | Purpose | Required |
 | --- | --- | --- |
-| `BLOG_PROVIDER=sanity` | Activates Sanity | Yes |
 | `SANITY_PROJECT_ID=nzy22u9z` | Sanity project | Yes |
 | `SANITY_DATASET=production` | Dataset | Yes |
 | `SANITY_API_VERSION=2026-08-03` | Fixed Content Lake API behavior | Yes |
@@ -221,7 +220,7 @@ The Google consent screen needs an app name, support email, and the approved sta
 
 ## Acceptance Criteria
 
-- `BLOG_PROVIDER=sanity` uses Content Lake and never silently falls back to mock content.
+- Public blog and admin editor always use Sanity Content Lake. There is no mock provider fallback.
 - Missing or malformed Sanity configuration produces a clear error.
 - Empty datasets build successfully and display the existing empty state.
 - Published Sanity articles generate listing, article, pagination, sitemap, canonical, and Arabic-only locale behavior correctly.

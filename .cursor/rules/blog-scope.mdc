@@ -18,4 +18,4 @@ The blog developer works in:
 - `src/pages/admin/`, `src/pages/blogs/`
 - `src/pages/api/admin/blog/`, `src/pages/api/blog/`
 
-Handles: mock/Sanity blog providers, Portable Text, Lexical editor, revalidation, and Arabic-only blog routes.
+Handles: Sanity blog provider, Portable Text, Lexical editor, revalidation, and Arabic-only blog routes.

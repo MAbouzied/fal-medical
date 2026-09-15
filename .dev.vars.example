@@ -1,15 +1,17 @@
 # Copy to .dev.vars for local development. Never commit the real values.
+
+# Optional analytics override. Defaults to GA4 G-28Q8393TES in src/lib/gtm.ts.
+# PUBLIC_GTM_ID=G-28Q8393TES
 GOOGLE_SERVICE_ACCOUNT_EMAIL=fal-sheets@example-project.iam.gserviceaccount.com
 GOOGLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nYOUR_PRIVATE_KEY\n-----END PRIVATE KEY-----\n"
 GOOGLE_SHEET_ID=YOUR_SPREADSHEET_ID
 GOOGLE_BOOKINGS_SHEET_NAME=Bookings
 GOOGLE_CUSTOMERS_SHEET_NAME=Customers
 
-# Blog provider. Mock mode starts empty for local editor testing; use Sanity for database content.
-BLOG_PROVIDER=mock
-# SANITY_PROJECT_ID=
-# SANITY_DATASET=production
-# SANITY_API_VERSION=2026-08-03
+# Blog content is always loaded from Sanity (defaults: project nzy22u9z, dataset production).
+# SANITY_PROJECT_ID=nzy22u9z
+SANITY_DATASET=production
+SANITY_API_VERSION=2026-08-03
 # SANITY_API_TOKEN=
 # SANITY_WRITE_TOKEN=
 

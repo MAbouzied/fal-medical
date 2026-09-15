@@ -9,9 +9,8 @@ Operational guide for the Fal Clinic blog Content Lake and `/admin` staff area.
 | Project ID | `nzy22u9z` |
 | Dataset | `production` |
 | API version | `2026-08-03` |
-| Provider switch | `BLOG_PROVIDER=sanity` |
 
-Published blog reads use the public dataset without `SANITY_API_TOKEN`. If it becomes private, create a Viewer-only token and keep it server-only. Never reuse the staff authorization token for public blog content.
+Published blog reads always use the Sanity dataset. There is no mock provider. Public reads use the dataset without `SANITY_API_TOKEN` unless it is private. If it becomes private, create a Viewer-only token and keep it server-only. Never reuse the staff authorization token for public blog content.
 
 ## Private staff access directory
 

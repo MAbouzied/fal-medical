@@ -1,15 +1,12 @@
 import { createClient, type IdentifiedSanityDocumentStub, type SanityClient } from '@sanity/client';
 import {
   ADMIN_IMAGE_IMPORT_HOSTS,
-  BLOG_PROVIDER,
   SANITY_API_VERSION,
   SANITY_DATASET,
   SANITY_PROJECT_ID,
   SANITY_WRITE_TOKEN,
 } from 'astro:env/server';
 import { clinicServices } from '../../data/services.ts';
-import { calculateReadingTimeMinutes } from '../../modules/blog/lib/reading-time.ts';
-import type { BlogPost } from '../../modules/blog/model/blog-types.ts';
 import { createBlogSlug, isValidBlogSlug } from '../../modules/blog/lib/slug.ts';
 import {
   adminAuthorDocumentId,
@@ -83,10 +80,6 @@ function nowIso(): string {
 
 function slugify(value: string): string { return createBlogSlug(value); }
 
-// Local mode starts empty by design. It is only an in-memory workspace for testing
-// the admin editor when a database provider is not configured; no fixture posts are seeded.
-const mockStore = new Map<string, AdminPost>();
-
 function emptyAdminDraft(id: string): AdminPost {
   return {
     id,
@@ -113,16 +106,6 @@ function emptyAdminDraft(id: string): AdminPost {
 export async function reserveAdminDraft(reservationId: string): Promise<AdminPost> {
   const id = reservationId.trim();
   if (!id || !/^[a-zA-Z0-9_-]{8,100}$/.test(id)) throw new Error('معرف المسودة غير صالح.');
-  if (BLOG_PROVIDER !== 'sanity') {
-    const existing = mockStore.get(id);
-    if (existing) {
-      if (existing.status !== 'draft') throw new Error('لا يمكن استخدام معرف مقال منشور لمسودة جديدة.');
-      return existing;
-    }
-    const draft = emptyAdminDraft(id);
-    mockStore.set(id, draft);
-    return draft;
-  }
 
   const existing = await getAdminPost(id);
   if (existing) {
@@ -163,54 +146,6 @@ export async function reserveAdminDraft(reservationId: string): Promise<AdminPos
   return (await getAdminPost(id)) ?? emptyAdminDraft(id);
 }
 
-function toPublicPost(post: AdminPost): BlogPost | null {
-  if (post.status !== 'published' || !post.title.trim() || !post.excerpt.trim() || (!post.contentHtml.trim() && !post.contentJson.trim())) return null;
-  const publishedAt = post.publishedAt ?? post.updatedAt;
-  return {
-    id: post.id,
-    slug: post.slug,
-    locale: 'ar',
-    title: post.title,
-    excerpt: post.excerpt,
-    category: { id: 'general', label: post.category || 'عام' },
-    author: { name: post.author || 'فريق فال' },
-    cover: {
-      src: post.coverUrl || '/assets/devices/dental-treatment-unit.jpg',
-      alt: post.coverAlt || post.title,
-      width: post.coverWidth ?? 1600,
-      height: post.coverHeight ?? 1067,
-    },
-    publishedAt,
-    updatedAt: post.updatedAt,
-    featured: post.featured,
-    draft: false,
-    seo: {},
-    body: post.contentJson
-      ? { format: 'lexical', version: 1, json: post.contentJson }
-      : { format: 'html', html: sanitizeBlogHtml(post.contentHtml) },
-    relatedServiceId: post.relatedServiceId || undefined,
-    readingTimeMinutes: calculateReadingTimeMinutes(post.contentJson ? lexicalJsonToPlainText(post.contentJson) : htmlToPlainText(post.contentHtml)),
-  };
-}
-
-export function getMockAdminPublishedPostsSync(): BlogPost[] {
-  return Array.from(mockStore.values())
-    .map(toPublicPost)
-    .filter((post): post is BlogPost => Boolean(post))
-    .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt));
-}
-
-function listMock(options: AdminPostListOptions = {}): AdminPost[] {
-  const search = options.search?.trim().toLocaleLowerCase('ar') ?? '';
-  const status = options.status ?? 'all';
-  return Array.from(mockStore.values())
-    .filter((post) => {
-      const searchable = `${post.title} ${post.slug} ${post.excerpt} ${post.contentHtml}`.toLocaleLowerCase('ar');
-      return (!search || searchable.includes(search)) && (status === 'all' || post.status === status);
-    })
-    .sort((a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt));
-}
-
 function assertPublishFields(input: {
   title: string;
   excerpt: string;
@@ -228,42 +163,6 @@ function assertPublishFields(input: {
   if (!isValidBlogSlug(input.slug)) throw new Error(`الرابط المختصر غير صالح: ${input.slug || 'أدخل رابطاً مختصراً صالحاً.'}`);
   if (!input.coverUrl?.trim()) throw new Error('صورة الغلاف مطلوبة قبل النشر.');
   if (!input.coverAlt?.trim()) throw new Error('النص البديل لصورة الغلاف مطلوب قبل النشر.');
-}
-
-function assertMockUniqueSlug(slug: string, id?: string): void {
-  if (!slug) return;
-  const duplicate = Array.from(mockStore.values()).find((post) => post.id !== id && post.slug === slug);
-  if (duplicate) throw new Error('هذا الرابط المختصر مستخدم بالفعل. اختر رابطاً آخر.');
-}
-
-function saveMock(id: string | undefined, input: AdminPostInput, publish: boolean): AdminPost {
-  const timestamp = nowIso();
-  const existing = id ? mockStore.get(id) : undefined;
-  const slug = input.slug.trim() ? slugify(input.slug) : (input.title.trim() ? slugify(input.title) : '');
-  if (publish) assertPublishFields({ ...input, slug });
-  assertMockUniqueSlug(slug, id);
-  const post: AdminPost = {
-    id: id ?? `post-${crypto.randomUUID()}`,
-    title: input.title.trim(),
-    slug,
-    excerpt: input.excerpt.trim(),
-    contentJson: input.contentJson ? normalizeLexicalJson(input.contentJson) : '',
-    contentHtml: input.contentJson ? lexicalJsonToHtml(input.contentJson) : sanitizeBlogHtml(input.contentHtml),
-    status: publish ? 'published' : 'draft',
-    publishedAt: resolveAdminPublishedAt(publish, existing?.publishedAt, timestamp) ?? null,
-    updatedAt: timestamp,
-    featured: input.featured === true,
-    category: input.category?.trim() || existing?.category || 'عام',
-    author: input.author?.trim() || existing?.author || 'فريق فال',
-    coverUrl: input.coverUrl?.trim() || existing?.coverUrl || '/assets/devices/dental-treatment-unit.jpg',
-    coverAlt: input.coverAlt?.trim() || existing?.coverAlt || input.title.trim(),
-    coverAssetId: input.coverAssetId?.trim() || existing?.coverAssetId || '',
-    coverWidth: input.coverWidth ?? existing?.coverWidth ?? null,
-    coverHeight: input.coverHeight ?? existing?.coverHeight ?? null,
-    relatedServiceId: input.relatedServiceId?.trim() || existing?.relatedServiceId || '',
-  };
-  mockStore.set(post.id, post);
-  return post;
 }
 
 function getSanityClient(): SanityClient {
@@ -296,7 +195,6 @@ function mapSanityAdmin(raw: Record<string, unknown>): AdminPost {
 }
 
 export async function listAdminPosts(options: AdminPostListOptions = {}): Promise<AdminPost[]> {
-  if (BLOG_PROVIDER !== 'sanity') return listMock(options);
   const client = getSanityClient();
   const search = options.search?.trim().replace(/\*/g, '').slice(0, 120) ?? '';
   const searchPattern = search ? `*${search}*` : '';
@@ -317,7 +215,6 @@ export async function listAdminPosts(options: AdminPostListOptions = {}): Promis
 }
 
 export async function getAdminPost(id: string): Promise<AdminPost | null> {
-  if (BLOG_PROVIDER !== 'sanity') return mockStore.get(id) ?? null;
   const client = getSanityClient();
   const row = await client.fetch<Record<string, unknown> | null>(`coalesce(*[_id == $draftId][0], *[_id == $id][0]) ${sanityProjection()}`, { id, draftId: `drafts.${id}` });
   return row ? mapSanityAdmin(row) : null;
@@ -329,7 +226,6 @@ export async function saveAdminPost(
   publish: boolean,
   options: { deletePublished?: boolean } = {},
 ): Promise<AdminPost> {
-  if (BLOG_PROVIDER !== 'sanity') return saveMock(id, input, publish);
   const client = getSanityClient();
   const documentId = id ?? crypto.randomUUID();
   const existing = id ? await getAdminPost(documentId) : null;
@@ -388,19 +284,18 @@ export async function setAdminPostStatus(id: string, publish: boolean): Promise<
   const existing = await getAdminPost(id);
   if (!existing) return null;
   if (publish) assertPublishFields(existing);
-  if (publish && BLOG_PROVIDER === 'sanity' && !existing.coverAssetId && !existing.coverUrl.trim()) {
+  if (publish && !existing.coverAssetId && !existing.coverUrl.trim()) {
     throw new Error('أضف صورة رئيسية من خلال رفع ملف أو إدخال رابط صورة قبل نشر المقال.');
   }
   return saveAdminPost(
     id,
     { ...existing, contentHtml: existing.contentHtml, contentJson: existing.contentJson || undefined },
     publish,
-    { deletePublished: !publish && BLOG_PROVIDER === 'sanity' && existing.status === 'published' },
+    { deletePublished: !publish && existing.status === 'published' },
   );
 }
 
 export async function deleteAdminPost(id: string): Promise<void> {
-  if (BLOG_PROVIDER !== 'sanity') { mockStore.delete(id); return; }
   await getSanityClient()
     .transaction()
     .delete(id)
@@ -413,9 +308,6 @@ export function listAdminServices(): Array<{ id: string; title: string }> {
 }
 
 export async function uploadAdminImage(file: File): Promise<{ assetId: string; url: string; width: number | null; height: number | null }> {
-  if (BLOG_PROVIDER !== 'sanity') {
-    throw new Error('رفع الصور يحتاج BLOG_PROVIDER=sanity مع إعدادات Sanity كاملة.');
-  }
   const client = getSanityClient();
   // Sanity's Node client rejects browser File objects ("must be a string, buffer or stream").
   const body = Buffer.from(await file.arrayBuffer());

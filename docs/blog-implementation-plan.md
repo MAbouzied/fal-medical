@@ -52,9 +52,8 @@ src/
         blog-schema.ts
       repository/
         blog-repository.ts
-        mock-blog-repository.ts
         sanity-blog-repository.ts
-        create-blog-repository.ts
+        get-blog-repository.ts
       content/
         mock-posts.ts
         content-renderers.ts
@@ -170,7 +169,7 @@ interface BlogRepository {
 }
 ```
 
-Use an explicit provider setting such as `BLOG_PROVIDER=mock|sanity`.
+Use Sanity as the only blog source (`SANITY_PROJECT_ID`, `SANITY_DATASET`, `SANITY_API_VERSION`). The mock provider has been removed.
 
 Behavior:
 

@@ -1,6 +1,5 @@
 ---
 import { ClientRouter } from 'astro:transitions';
-import AnalyticsConsent from '../components/analytics/AnalyticsConsent.astro';
 import Gtm from '../components/analytics/Gtm.astro';
 import JsonLd from '../components/seo/JsonLd.astro';
 import SiteFooter from '../components/site/SiteFooter.astro';
@@ -204,7 +203,6 @@ const skipLabel = isEnglish ? 'Skip to main content' : 'تجاوز إلى الم
       <slot />
     </main>
     {!hideChrome && <SiteFooter locale={locale} />}
-    {analyticsEnabled && <AnalyticsConsent locale={locale} />}
   </body>
 </html>
 

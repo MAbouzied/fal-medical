@@ -5,10 +5,6 @@ import { isGtmConfigured } from '../../lib/gtm';
 {isGtmConfigured && (
   <script>
     import {
-      ANALYTICS_CONSENT_GRANTED_EVENT,
-      readAnalyticsConsent,
-    } from '../../lib/analytics/consent';
-    import {
       GTM_ID,
       GtmEvents,
       isGtmEnabled,
@@ -18,21 +14,21 @@ import { isGtmConfigured } from '../../lib/gtm';
       resolveCtaLocation,
     } from '../../lib/gtm';
 
-    const scheduleLoad = () => {
+    const load = () => {
       if (!isGtmEnabled()) return;
-      const run = () => loadGtmContainer(GTM_ID);
-      const idle = (window as Window & {
-        requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
-      }).requestIdleCallback;
-      if (typeof idle === 'function') {
-        idle(run, { timeout: 2_000 });
-      } else {
-        globalThis.setTimeout(run, 1);
-      }
+      loadGtmContainer(GTM_ID);
     };
 
-    if (readAnalyticsConsent() === 'granted') scheduleLoad();
-    window.addEventListener(ANALYTICS_CONSENT_GRANTED_EVENT, scheduleLoad);
+    const idle = (
+      window as Window & {
+        requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      }
+    ).requestIdleCallback;
+    if (typeof idle === 'function') {
+      idle(load, { timeout: 2_000 });
+    } else {
+      globalThis.setTimeout(load, 1);
+    }
 
     const bindContactTracking = () => {
       if (document.documentElement.dataset.gtmContactBound === 'true') return;
@@ -70,9 +66,8 @@ import { isGtmConfigured } from '../../lib/gtm';
     bindContactTracking();
 
     // astro:after-swap fires only on SPA navigations (View Transitions), not on
-    // the initial page load. GTM's own gtm.js handles the first page_view when
-    // the container script is loaded, avoiding a double send for returning
-    // consented users who would otherwise see two page_view hits on first load.
+    // the initial page load. gtag config / GTM gtm.js handles the first page_view
+    // when the script is loaded, avoiding a double send on first load.
     document.addEventListener('astro:after-swap', () => {
       if (!isGtmEnabled()) return;
       pushGtmEvent('page_view', {

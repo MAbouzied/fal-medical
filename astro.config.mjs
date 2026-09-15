@@ -22,7 +22,7 @@ export default defineConfig({
   security: {
     csp: {
       scriptDirective: {
-        resources: ["'self'", 'https://www.googletagmanager.com'],
+        resources: ["'self'", 'https://www.googletagmanager.com', 'https://www.google-analytics.com'],
       },
       styleDirective: {
         resources: ["'self'"],
@@ -49,16 +49,24 @@ export default defineConfig({
       GOOGLE_SHEET_ID: envField.string({ context: 'server', access: 'secret', optional: true }),
       GOOGLE_BOOKINGS_SHEET_NAME: envField.string({ context: 'server', access: 'secret', optional: true }),
       GOOGLE_CUSTOMERS_SHEET_NAME: envField.string({ context: 'server', access: 'secret', optional: true }),
-      BLOG_PROVIDER: envField.enum({
+      SANITY_PROJECT_ID: envField.string({
         context: 'server',
-        access: 'public',
-        values: ['mock', 'sanity'],
+        access: 'secret',
         optional: true,
-        default: 'mock',
+        default: 'nzy22u9z',
       }),
-      SANITY_PROJECT_ID: envField.string({ context: 'server', access: 'secret', optional: true }),
-      SANITY_DATASET: envField.string({ context: 'server', access: 'secret', optional: true }),
-      SANITY_API_VERSION: envField.string({ context: 'server', access: 'secret', optional: true }),
+      SANITY_DATASET: envField.string({
+        context: 'server',
+        access: 'secret',
+        optional: true,
+        default: 'production',
+      }),
+      SANITY_API_VERSION: envField.string({
+        context: 'server',
+        access: 'secret',
+        optional: true,
+        default: '2026-08-03',
+      }),
       SANITY_API_TOKEN: envField.string({ context: 'server', access: 'secret', optional: true }),
       SANITY_WRITE_TOKEN: envField.string({ context: 'server', access: 'secret', optional: true }),
       BLOG_REVALIDATE_SECRET: envField.string({ context: 'server', access: 'secret', optional: true }),
@@ -84,6 +92,11 @@ export default defineConfig({
         default: false,
       }),
       PUBLIC_SANITY_STUDIO_URL: envField.string({
+        context: 'client',
+        access: 'public',
+        optional: true,
+      }),
+      PUBLIC_GTM_ID: envField.string({
         context: 'client',
         access: 'public',
         optional: true,
