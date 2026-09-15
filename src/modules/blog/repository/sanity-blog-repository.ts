@@ -1,5 +1,9 @@
 import { createSanityClient } from '../sanity/client.ts';
-import { mapSanityPostToBlogPost, mapSanityPosts } from '../sanity/map-sanity-post.ts';
+import {
+  SanityBlogPostMappingError,
+  mapSanityPostToBlogPost,
+  mapSanityPosts,
+} from '../sanity/map-sanity-post.ts';
 import {
   featuredPublishedPostQuery,
   listingPostsPageQuery,
@@ -49,9 +53,24 @@ export function createSanityBlogRepository(config: SanityBlogConfig = {}): BlogR
           (await client.fetch<SanityBlogPostDoc | null>(newestPublishedPostQuery)) ?? null;
       }
 
-      const featured = featuredDoc
-        ? mapSanityPostToBlogPost(featuredDoc, imageConfig, { summary: true })
-        : null;
+      let featured: BlogPost | null = null;
+      if (featuredDoc) {
+        try {
+          featured = mapSanityPostToBlogPost(featuredDoc, imageConfig, { summary: true });
+        } catch (error) {
+          const mappingError =
+            error instanceof SanityBlogPostMappingError
+              ? error
+              : new SanityBlogPostMappingError(
+                  featuredDoc._id,
+                  error instanceof Error ? error.message : String(error),
+                );
+          console.error(
+            `[blog] Skipping malformed featured Sanity document ${mappingError.documentId}.`,
+            mappingError,
+          );
+        }
+      }
       const excludeSlug = featured?.slug ?? '';
       const recentTotal = Math.max(0, totalPublished - (featured ? 1 : 0));
       const totalPages = Math.max(1, Math.ceil(recentTotal / pageSize) || 1);
@@ -82,7 +101,22 @@ export function createSanityBlogRepository(config: SanityBlogConfig = {}): BlogR
         slug: canonicalSlug,
       });
       if (!doc) return null;
-      return mapSanityPostToBlogPost(doc, imageConfig);
+      try {
+        return mapSanityPostToBlogPost(doc, imageConfig);
+      } catch (error) {
+        const mappingError =
+          error instanceof SanityBlogPostMappingError
+            ? error
+            : new SanityBlogPostMappingError(
+                doc._id,
+                error instanceof Error ? error.message : String(error),
+              );
+        console.error(
+          `[blog] Skipping malformed published Sanity document ${mappingError.documentId}.`,
+          mappingError,
+        );
+        return null;
+      }
     },
     async getRelatedPosts(post: BlogPost, limit = 3) {
       const docs = await client.fetch<SanityBlogPostDoc[]>(relatedPostsQuery, {

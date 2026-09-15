@@ -444,7 +444,7 @@ export default function BlogEditorApp({ post, services }: Props) {
         <button type="button" className={inlineMode === 'url' ? 'is-active' : ''} onClick={() => setInlineMode('url')}>من رابط</button>
       </div>
       {inlineMode === 'device' ? (
-        <label>اختر صورة<input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(e) => setInlineFile(e.target.files?.[0] || null)} /></label>
+        <label className="file-upload-label">اختر صورة<input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(e) => setInlineFile(e.target.files?.[0] || null)} /><span className="file-upload-control"><span>{inlineFile ? inlineFile.name : 'اختيار صورة'}</span><small>PNG أو JPG أو WEBP حتى 10MB</small></span></label>
       ) : (
         <label>رابط الصورة<input value={inlineUrl} onChange={(e) => setInlineUrl(e.target.value)} placeholder="https://…" /></label>
       )}

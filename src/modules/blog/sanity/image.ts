@@ -60,7 +60,7 @@ export function mapSanityImage(
     throw new Error(`Sanity document ${documentId}: missing ${field} image asset`);
   }
 
-  const alt = value?.alt?.trim();
+  const alt = value?.alt?.trim() || fallbackAlt.trim();
   if (!alt) {
     throw new Error(`Sanity document ${documentId}: missing ${field}.alt`);
   }
@@ -71,7 +71,7 @@ export function mapSanityImage(
 
   const image: BlogImage = {
     src,
-    alt: alt || fallbackAlt,
+    alt,
     width,
     height,
   };

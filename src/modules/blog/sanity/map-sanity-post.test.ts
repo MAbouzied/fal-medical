@@ -75,23 +75,20 @@ describe('mapSanityPostToBlogPost', () => {
     );
   });
 
-  it('rejects cover images without alternative text', () => {
-    assert.throws(
-      () =>
-        mapSanityPostToBlogPost(
-          baseDoc({
-            cover: {
-              asset: {
-                _id: 'image-cover',
-                url: 'https://cdn.sanity.io/images/nzy22u9z/production/cover.jpg',
-              },
-              alt: ' ',
-            },
-          }),
-          imageConfig,
-        ),
-      /cover\.alt/,
+  it('uses the post title when cover alt is missing', () => {
+    const post = mapSanityPostToBlogPost(
+      baseDoc({
+        cover: {
+          asset: {
+            _id: 'image-cover',
+            url: 'https://cdn.sanity.io/images/nzy22u9z/production/cover.jpg',
+          },
+          alt: ' ',
+        },
+      }),
+      imageConfig,
     );
+    assert.equal(post.cover.alt, 'دليل تنظيف الأسنان في الرياض');
   });
 });
 
