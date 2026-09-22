@@ -26,6 +26,10 @@ describe('site header Figma contact nav', () => {
     assert.match(mobileNav, /\{contactLabel\}/);
     assert.match(mobileNav, /data-nav="contact"/);
     assert.doesNotMatch(desktopNav, /href=\{contactHref\}[\s\S]*href=\{servicesHref\}/);
+    assert.match(desktopNav, /href=\{blogsHref\}/);
+    assert.match(desktopNav, /data-nav="blogs"/);
+    assert.match(mobileNav, /href=\{blogsHref\}/);
+    assert.match(mobileNav, /data-nav="blogs"/);
   });
 
   it('sends department dropdown links to the services catalog with the matching tab', async () => {

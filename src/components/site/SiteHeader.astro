@@ -23,15 +23,18 @@ const languageHref = languageSwitchHref(
 const allServicesHref = servicesCatalogPath('كل الخدمات', locale);
 const homeHref = en ? '/en' : '/';
 const servicesHref = allServicesHref;
+const blogsHref = '/blogs';
 const contactHref = en ? '/en/contact' : '/contact';
 const bookHref = en ? '/en/book' : '/book';
 const languageLabel = en ? 'العربية' : 'English';
 const bookLabel = en ? copy!.nav.bookConsultation : 'احجز استشارتك الآن';
 const servicesLabel = en ? copy!.nav.services : 'الخدمات';
+const blogsLabel = en ? 'Blog' : 'المدونة';
 const contactLabel = en ? copy!.nav.contact : 'تواصل معنا';
 const path = Astro.url.pathname.replace(/\/+$/, '') || '/';
 const contactActive = path === contactHref || path.endsWith('/contact');
 const servicesActive = path === '/services' || path === '/en/services' || path.includes('/services');
+const blogsActive = path === '/blogs' || path.startsWith('/blogs/');
 
 const serviceLinks = homeServiceDepartments.map((department) => ({
   label: localizeDepartment(department, locale),
@@ -70,6 +73,17 @@ const serviceLinks = homeServiceDepartments.map((department) => ({
             </div>
           </div>
         </div>
+        <a
+          href={blogsHref}
+          data-nav="blogs"
+          aria-current={blogsActive ? 'page' : undefined}
+          class:list={[
+            'rounded-lg px-3 py-2 text-sm font-bold',
+            blogsActive ? 'text-gold-text' : 'text-ink hover:bg-surface-soft',
+          ]}
+        >
+          {blogsLabel}
+        </a>
         <a
           href={contactHref}
           data-nav="contact"
@@ -116,6 +130,14 @@ const serviceLinks = homeServiceDepartments.map((department) => ({
               {item.label}
             </a>
           ))}
+          <a
+            href={blogsHref}
+            data-nav="blogs"
+            class="rounded-lg px-3 py-2.5 text-sm font-bold hover:bg-surface-soft"
+            data-mobile-nav-link
+          >
+            {blogsLabel}
+          </a>
           <a
             href={contactHref}
             data-nav="contact"
