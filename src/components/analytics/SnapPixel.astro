@@ -1,0 +1,32 @@
+---
+import { isSnapConfigured } from '../../lib/snap';
+---
+
+{isSnapConfigured && (
+  <script>
+    import {
+      SNAP_PIXEL_ID,
+      installSnapPixel,
+      parseSnapViewMeta,
+      trackSnapPageView,
+      trackSnapViewContent,
+    } from '../../lib/snap';
+
+    const trackCurrentView = () => {
+      const raw = document
+        .querySelector('meta[name="snap-view-content"]')
+        ?.getAttribute('content');
+      const content = parseSnapViewMeta(raw);
+      if (content) trackSnapViewContent(content);
+    };
+
+    installSnapPixel(SNAP_PIXEL_ID);
+    trackCurrentView();
+
+    // astro:after-swap fires only on client navigations, not the first load.
+    document.addEventListener('astro:after-swap', () => {
+      trackSnapPageView();
+      trackCurrentView();
+    });
+  </script>
+)}

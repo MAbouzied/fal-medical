@@ -57,6 +57,7 @@ const relatedDoctors = doctors
     ]),
     buildPhysicianSchema(site, doctor),
   ]}
+  snapContent={{ itemIds: [doctor.id], itemCategory: 'doctor' }}
 >
   <Breadcrumbs
     items={[

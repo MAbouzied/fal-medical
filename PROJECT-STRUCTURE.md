@@ -125,7 +125,7 @@ See [`.env.example`](./.env.example) and [`.dev.vars.example`](./.dev.vars.examp
 Key groups:
 
 - **SEO:** `SEO_INDEXABLE`, site URL
-- **Analytics:** GA4 gtag (`G-28Q8393TES`; override with `PUBLIC_GTM_ID`)
+- **Analytics:** GA4 gtag (`G-28Q8393TES`; override with `PUBLIC_GTM_ID`) and Snapchat Pixel (`a2740512-1e69-4f48-8c46-f15320b6fd7d`; override with `PUBLIC_SNAP_PIXEL_ID`)
 - **Blog:** Sanity (`SANITY_PROJECT_ID`, dataset, tokens)
 - **Auth:** Better Auth secrets, `SANITY_AUTH_*`
 - **Sheets:** Google service account for leads/bookings

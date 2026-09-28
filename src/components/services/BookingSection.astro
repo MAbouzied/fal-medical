@@ -201,6 +201,7 @@ const labels = en
   } from '../../data/contact';
   import { saveCustomerLead } from '../../lib/customer-leads';
   import { GtmEvents, pushGtmEvent } from '../../lib/gtm';
+  import { trackSnapLead } from '../../lib/snap';
 
   const bindBookingSection = () => {
     const bookingForm = document.querySelector<HTMLFormElement>('#booking-form');
@@ -272,6 +273,7 @@ const labels = en
         form_id: formId,
         method: 'whatsapp',
       });
+      trackSnapLead();
 
       void (async () => {
         const result = await saveCustomerLead({

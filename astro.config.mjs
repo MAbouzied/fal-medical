@@ -22,7 +22,12 @@ export default defineConfig({
   security: {
     csp: {
       scriptDirective: {
-        resources: ["'self'", 'https://www.googletagmanager.com', 'https://www.google-analytics.com'],
+        resources: [
+          "'self'",
+          'https://www.googletagmanager.com',
+          'https://www.google-analytics.com',
+          'https://sc-static.net',
+        ],
       },
       styleDirective: {
         resources: ["'self'"],
@@ -33,8 +38,8 @@ export default defineConfig({
         "object-src 'none'",
         "form-action 'self' https://wa.me https://api.whatsapp.com",
         "font-src 'self' data:",
-        "img-src 'self' data: blob: https://cdn.sanity.io https://lh3.googleusercontent.com https://*.googleusercontent.com https://www.googletagmanager.com https://*.google-analytics.com",
-        "connect-src 'self' https://*.sanity.io https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com",
+        "img-src 'self' data: blob: https://cdn.sanity.io https://lh3.googleusercontent.com https://*.googleusercontent.com https://www.googletagmanager.com https://*.google-analytics.com https://tr.snapchat.com https://*.snapchat.com",
+        "connect-src 'self' https://*.sanity.io https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://tr.snapchat.com https://tr6.snapchat.com https://*.snapchat.com",
         "frame-src https://www.google.com https://maps.google.com https://youtube.com https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com",
         "media-src 'self' https://cdn.sanity.io",
         "worker-src 'self' blob:",
@@ -97,6 +102,11 @@ export default defineConfig({
         optional: true,
       }),
       PUBLIC_GTM_ID: envField.string({
+        context: 'client',
+        access: 'public',
+        optional: true,
+      }),
+      PUBLIC_SNAP_PIXEL_ID: envField.string({
         context: 'client',
         access: 'public',
         optional: true,

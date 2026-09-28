@@ -199,6 +199,7 @@ const callHref = buildPhoneUrl();
   } from '../../data/contact';
   import { saveCustomerLead } from '../../lib/customer-leads';
   import { GtmEvents, pushGtmEvent } from '../../lib/gtm';
+  import { trackSnapLead } from '../../lib/snap';
 
   const bindFormLanding = () => {
     const form = document.getElementById('contact-form');
@@ -255,6 +256,7 @@ const callHref = buildPhoneUrl();
       if (whatsappWindow) whatsappWindow.opener = null;
 
       pushGtmEvent(GtmEvents.formSubmit, { form_id: 'form_landing', method: 'whatsapp' });
+      trackSnapLead();
       if (submit) submit.disabled = true;
       if (status) status.textContent = form.dataset.saving ?? '';
 
