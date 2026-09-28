@@ -59,6 +59,7 @@ const doctorsToShow = relatedDoctors.length > 0 ? relatedDoctors : doctors.slice
     ]),
     buildServiceSchema(site, service),
   ]}
+  snapContent={{ itemIds: [service.id], itemCategory: 'service' }}
 >
   <Breadcrumbs
     items={[

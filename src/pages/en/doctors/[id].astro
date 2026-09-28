@@ -55,6 +55,7 @@ const title = `${localized.name} — ${localized.seoRole} | Fal Clinic`;
     ]),
     buildPhysicianSchema(site, localized, 'en'),
   ]}
+  snapContent={{ itemIds: [doctor.id], itemCategory: 'doctor' }}
 >
   <Breadcrumbs
     locale="en"

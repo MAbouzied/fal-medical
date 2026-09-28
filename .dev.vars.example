@@ -2,6 +2,8 @@
 
 # Optional analytics override. Defaults to GA4 G-28Q8393TES in src/lib/gtm.ts.
 # PUBLIC_GTM_ID=G-28Q8393TES
+# Optional Snapchat Pixel override. Defaults to the Fal Clinic pixel in src/lib/snap.ts.
+# PUBLIC_SNAP_PIXEL_ID=a2740512-1e69-4f48-8c46-f15320b6fd7d
 GOOGLE_SERVICE_ACCOUNT_EMAIL=fal-sheets@example-project.iam.gserviceaccount.com
 GOOGLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nYOUR_PRIVATE_KEY\n-----END PRIVATE KEY-----\n"
 GOOGLE_SHEET_ID=YOUR_SPREADSHEET_ID

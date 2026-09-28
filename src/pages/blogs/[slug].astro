@@ -105,6 +105,7 @@ const mainEntityId = `${new URL(path, site).href}#blogposting`;
         readingTimeMinutes,
       }),
     ]}
+    snapContent={{ itemIds: [post.slug], itemCategory: 'article' }}
   >
     <Breadcrumbs
       items={[

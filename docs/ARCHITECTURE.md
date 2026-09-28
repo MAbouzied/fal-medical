@@ -17,7 +17,7 @@ Fal Clinic (مجمع عيادات فال الطبية) is a bilingual clinic mar
 | Deploy | `@astrojs/cloudflare` + Wrangler |
 | Auth | Better Auth + Sanity staff-auth dataset |
 | Blog | Sanity CMS |
-| Analytics | Google Analytics 4 (gtag.js, `G-28Q8393TES`) |
+| Analytics | Google Analytics 4 (gtag.js, `G-28Q8393TES`) and Snapchat Pixel (`a2740512-1e69-4f48-8c46-f15320b6fd7d`) |
 | Leads | WhatsApp + optional Google Sheets |
 
 ---
@@ -97,6 +97,7 @@ Browser
 | Better Auth | Auth secrets in env | Login, sessions |
 | Google Sheets | `GOOGLE_*` service account | Bookings, customers |
 | GTM / GA4 | `PUBLIC_GTM_ID` (defaults to `G-28Q8393TES`); loads automatically on public pages | Analytics |
+| Snapchat Pixel | `PUBLIC_SNAP_PIXEL_ID` (defaults to `a2740512-1e69-4f48-8c46-f15320b6fd7d`); `PAGE_VIEW` on public pages, `VIEW_CONTENT` on service/doctor/article pages, `SIGN_UP` on booking and contact form success. No cart, so `ADD_CART` and `PURCHASE` are not sent. Visitor name, phone, and email are never attached. | Analytics |
 | WhatsApp | `PUBLIC_CLINIC_PHONE` | Booking/contact CTAs |
 
 ---
@@ -145,6 +146,7 @@ Browser
 
 | Date | Change | Paths | Agent |
 |------|--------|-------|-------|
+| 2026-09-28 | Snapchat Pixel on public pages: base `PAGE_VIEW`, `VIEW_CONTENT` on service, doctor, and article pages, `SIGN_UP` when a booking or contact form succeeds. Admin and login stay untracked. | `src/lib/snap.ts`, `src/components/analytics/SnapPixel.astro`, `src/layouts/Layout.astro`, `astro.config.mjs` | site |
 | 2026-09-15 | Public `/blogs` reads Fal `production` without `SANITY_API_TOKEN` (admin tokens are separate; a token without production Viewer access 403s the listing) | `src/modules/blog/repository/get-blog-repository.ts`, `src/modules/blog/sanity/client.ts` | blog |
 | 2026-09-15 | Sanity project default switched from leftover `nzy22u9z` to Fal project `ilyfhm76` | `astro.config.mjs`, `wrangler.jsonc`, `src/modules/blog/repository/get-blog-repository.ts`, `.env.example`, `docs/sanity-and-staff-auth.md` | blog |
 | 2026-09-15 | Fixed blog editor image dialog showing on load; public `/blogs` no longer 503s when Sanity cover alt is missing | `src/components/admin/AdminShell.astro`, `src/components/admin/BlogEditorApp.tsx`, `src/modules/blog/sanity/image.ts`, `src/modules/blog/repository/sanity-blog-repository.ts` | blog |

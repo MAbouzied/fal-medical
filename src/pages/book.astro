@@ -124,6 +124,7 @@ const fieldClass =
   } from '../data/contact';
   import { saveCustomerLead } from '../lib/customer-leads';
   import { GtmEvents, pushGtmEvent } from '../lib/gtm';
+  import { trackSnapLead } from '../lib/snap';
 
   const bindLeadForm = () => {
     const form = document.querySelector<HTMLFormElement>('[data-lead-form]');
@@ -191,6 +192,7 @@ const fieldClass =
         form_id: formId,
         method: 'whatsapp',
       });
+      trackSnapLead();
 
       void (async () => {
         const result = await saveCustomerLead({
