@@ -1,0 +1,23 @@
+---
+import { isMetaConfigured, META_PIXEL_ID, metaNoscriptSrc } from '../../lib/meta';
+
+const noscriptSrc = metaNoscriptSrc(META_PIXEL_ID);
+---
+
+{isMetaConfigured && noscriptSrc && (
+  <>
+    <script>
+      import { META_PIXEL_ID, installMetaPixel, trackMetaPageView } from '../../lib/meta';
+
+      installMetaPixel(META_PIXEL_ID);
+
+      // astro:after-swap fires only on client navigations, not the first load.
+      document.addEventListener('astro:after-swap', () => {
+        trackMetaPageView();
+      });
+    </script>
+    <noscript>
+      <img height="1" width="1" style="display:none" src={noscriptSrc} alt="" />
+    </noscript>
+  </>
+)}

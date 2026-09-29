@@ -35,7 +35,7 @@ This repo copies the **structure and SEO system** from Beauty Corner. Visual des
 - Real doctor names, photos, and hours (`src/data/doctors.ts`, `clinic-facts.ts`)
 - Remaining social URLs if Instagram or Snapchat are confirmed (`src/data/contact.ts`)
 - Photos and `logo.png` / `social-card.png`
-- GTM/GA4, Snapchat Pixel, Sheets, Sanity, and auth secrets in `.dev.vars`
+- GTM/GA4, Snapchat Pixel, Meta Pixel, Sheets, Sanity, and auth secrets in `.dev.vars`
 
 Production host: **https://falclinic.com** (also allows `www.falclinic.com`).
 
