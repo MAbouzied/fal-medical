@@ -1,7 +1,6 @@
 ---
 import { ClientRouter } from 'astro:transitions';
 import Gtm from '../components/analytics/Gtm.astro';
-import MetaPixel from '../components/analytics/MetaPixel.astro';
 import SnapPixel from '../components/analytics/SnapPixel.astro';
 import JsonLd from '../components/seo/JsonLd.astro';
 import SiteFooter from '../components/site/SiteFooter.astro';
@@ -10,7 +9,6 @@ import { organization } from '../data/organization';
 import { imageMimeType, socialCard } from '../data/seo';
 import { SEO_INDEXABLE } from 'astro:env/server';
 import { isGtmConfigured } from '../lib/gtm';
-import { isMetaConfigured } from '../lib/meta';
 import { encodeSnapViewContent, isSnapConfigured, type SnapItemCategory } from '../lib/snap';
 import {
   getAlternatePaths,
@@ -117,7 +115,6 @@ const resolvedImageAlt = imageAlt ?? (isEnglish ? socialCard.altEn : socialCard.
 const structuredData = omitStructuredData ? null : buildGraph(site, schemas, locale);
 const trackPublic = !disableAnalytics;
 const analyticsEnabled = trackPublic && isGtmConfigured;
-const metaEnabled = trackPublic && isMetaConfigured;
 const snapEnabled = trackPublic && isSnapConfigured;
 const snapViewMeta = snapContent
   ? encodeSnapViewContent({
@@ -208,7 +205,6 @@ const skipLabel = isEnglish ? 'Skip to main content' : 'تجاوز إلى الم
 
     {structuredData && <JsonLd data={structuredData} />}
     {snapEnabled && snapViewMeta && <meta name="snap-view-content" content={snapViewMeta} />}
-    {metaEnabled && <MetaPixel />}
     {snapEnabled && <SnapPixel />}
     <!-- Soft client navigations (Next.js-like) — avoids full reload / favicon spinner. -->
     <ClientRouter fallback="swap" />
