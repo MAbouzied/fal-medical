@@ -5,7 +5,8 @@ import ClinicPhoneList from '../components/contact/ClinicPhoneList.astro';
 import AssetIcon from '../components/ui/AssetIcon.astro';
 import BookingServiceFields from '../components/contact/BookingServiceFields.astro';
 import { organization } from '../data/organization';
-import { buildWebPageSchema } from '../lib/schema';
+import Breadcrumbs from '../components/seo/Breadcrumbs.astro';
+import { buildBreadcrumbSchema, buildReserveAction, buildWebPageSchema } from '../lib/schema';
 import Layout from '../layouts/Layout.astro';
 
 const contactMessage = 'مرحباً، أود الاستفسار عن خدمات فال.';
@@ -22,9 +23,25 @@ const fieldClass =
   description={description}
   noindex={false}
   schemas={[
-    buildWebPageSchema({ site, path: '/book', name: title, description }),
+    buildWebPageSchema({
+      site,
+      path: '/book',
+      name: title,
+      description,
+      potentialAction: buildReserveAction(site, 'ar'),
+    }),
+    buildBreadcrumbSchema(site, [
+      { name: 'الرئيسية', path: '/' },
+      { name: 'احجز موعدك', path: '/book' },
+    ]),
   ]}
 >
+  <Breadcrumbs
+    items={[
+      { name: 'الرئيسية', href: '/' },
+      { name: 'احجز موعدك' },
+    ]}
+  />
   <section class="relative overflow-hidden border-b border-border bg-gradient-to-bl from-surface-accent via-surface to-surface-soft py-10 sm:py-16">
     <div class="page-container mx-auto max-w-xl">
       <div class="mb-8 text-center">

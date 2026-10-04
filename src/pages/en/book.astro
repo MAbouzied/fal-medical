@@ -4,9 +4,11 @@ import ClinicPhoneList from '../../components/contact/ClinicPhoneList.astro';
 import AssetIcon from '../../components/ui/AssetIcon.astro';
 import BookingServiceFields from '../../components/contact/BookingServiceFields.astro';
 import { organization } from '../../data/organization';
+import Breadcrumbs from '../../components/seo/Breadcrumbs.astro';
 import { localizeContact, ui } from '../../lib/i18n/localize';
 import {
   buildBreadcrumbSchema,
+  buildReserveAction,
   buildWebPageSchema,
 } from '../../lib/schema';
 import Layout from '../../layouts/Layout.astro';
@@ -32,6 +34,7 @@ const fieldClass =
       name: title,
       description,
       locale: 'en',
+      potentialAction: buildReserveAction(site, 'en'),
     }),
     buildBreadcrumbSchema(site, [
       { name: copy.nav.home, path: '/en' },
@@ -39,6 +42,13 @@ const fieldClass =
     ]),
   ]}
 >
+  <Breadcrumbs
+    locale="en"
+    items={[
+      { name: 'Home', href: '/en' },
+      { name: 'Quick book' },
+    ]}
+  />
   <section class="relative overflow-hidden border-b border-border bg-gradient-to-br from-surface-accent via-surface to-surface-soft py-10 sm:py-16">
     <div class="page-container mx-auto max-w-xl">
       <div class="mb-8 text-center">

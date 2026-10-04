@@ -9,6 +9,7 @@ import { doctors, getDoctorById } from '../../data/doctors';
 import { faqItems } from '../../data/faq';
 import {
   buildBreadcrumbSchema,
+  buildFaqSchema,
   buildPhysicianSchema,
   buildWebPageSchema,
 } from '../../lib/schema';
@@ -56,6 +57,7 @@ const relatedDoctors = doctors
       { name: doctor.name, path: doctorPath },
     ]),
     buildPhysicianSchema(site, doctor),
+    buildFaqSchema(faqItems),
   ]}
   snapContent={{ itemIds: [doctor.id], itemCategory: 'doctor' }}
 >

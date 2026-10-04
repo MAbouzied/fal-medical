@@ -1,5 +1,6 @@
 ---
 import ContactPage from '../../components/contact/ContactPage.astro';
+import Breadcrumbs from '../../components/seo/Breadcrumbs.astro';
 import { ui } from '../../lib/i18n/localize';
 import {
   buildBreadcrumbSchema,
@@ -32,5 +33,12 @@ const description = copy.pages.contactDescription;
     ]),
   ]}
 >
+  <Breadcrumbs
+    locale="en"
+    items={[
+      { name: 'Home', href: '/en' },
+      { name: 'Contact Us' },
+    ]}
+  />
   <ContactPage locale="en" />
 </Layout>

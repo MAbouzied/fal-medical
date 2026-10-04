@@ -5,6 +5,8 @@
 **Total indexable URLs:** 44 (22 bilingual route pairs)  
 **Manifest source:** `src/lib/i18n/routes.ts`
 
+Structured data follows the 3baq LMS graph pattern (`WebSite`, `WebPage` / `CollectionPage` / `ContactPage`, `ItemList`, `BreadcrumbList`, `FAQPage`, `Blog`, `BlogPosting`) with clinic types in place of course types. See `docs/ARCHITECTURE.md` for the page-to-schema map. `Course`, `EducationalOrganization`, `EducationEvent`, and `AggregateRating` are not used.
+
 ---
 
 ## Summary of SEO Decisions

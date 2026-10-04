@@ -1,6 +1,7 @@
 ---
 import { clinicFacts, formatClinicLocation } from '../data/clinic-facts';
 import ContactPage from '../components/contact/ContactPage.astro';
+import Breadcrumbs from '../components/seo/Breadcrumbs.astro';
 import {
   buildBreadcrumbSchema,
   buildWebPageSchema,
@@ -29,5 +30,11 @@ const description = `تواصل مع فال في ${clinicFacts.cityAr}، ${forma
     ]),
   ]}
 >
+  <Breadcrumbs
+    items={[
+      { name: 'الرئيسية', href: '/' },
+      { name: 'تواصل معنا' },
+    ]}
+  />
   <ContactPage />
 </Layout>

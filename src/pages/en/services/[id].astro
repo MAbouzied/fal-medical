@@ -11,8 +11,11 @@ import { clinicServices, getServiceById } from '../../../data/services';
 import { localizeFaq, localizeService, ui } from '../../../lib/i18n/localize';
 import {
   buildBreadcrumbSchema,
+  buildFaqSchema,
+  buildMedicalProcedureSchema,
   buildServiceSchema,
   buildWebPageSchema,
+  medicalSpecialtyUrl,
 } from '../../../lib/schema';
 import Layout from '../../../layouts/Layout.astro';
 
@@ -30,7 +33,8 @@ const site = Astro.site!;
 const copy = ui('en')!;
 const faqItems = localizeFaq('en');
 const servicePath = `/en/services/${service.id}`;
-const mainEntityId = `${new URL(servicePath, site).href}#service`;
+const serviceEntityId = `${new URL(servicePath, site).href}#service`;
+const procedureId = `${new URL(servicePath, site).href}#procedure`;
 const title = `${localized.title} in ${clinicFacts.cityEn} | Fal Clinic`;
 const description =
   localized.description.length < 140
@@ -48,15 +52,20 @@ const description =
       path: servicePath,
       name: title,
       description,
+      type: 'MedicalWebPage',
       locale: 'en',
-      mainEntityId,
+      mainEntityId: procedureId,
+      aboutId: serviceEntityId,
+      specialty: medicalSpecialtyUrl(service.department),
     }),
     buildBreadcrumbSchema(site, [
       { name: copy.nav.home, path: '/en' },
       { name: copy.nav.services, path: '/en/services' },
       { name: localized.title, path: servicePath },
     ]),
+    buildMedicalProcedureSchema(site, localized, 'en'),
     buildServiceSchema(site, localized, 'en'),
+    buildFaqSchema(faqItems),
   ]}
   snapContent={{ itemIds: [service.id], itemCategory: 'service' }}
 >

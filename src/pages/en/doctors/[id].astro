@@ -9,6 +9,7 @@ import { doctors, getDoctorById } from '../../../data/doctors';
 import { localizeDoctor, localizeFaq, ui } from '../../../lib/i18n/localize';
 import {
   buildBreadcrumbSchema,
+  buildFaqSchema,
   buildPhysicianSchema,
   buildWebPageSchema,
 } from '../../../lib/schema';
@@ -54,6 +55,7 @@ const title = `${localized.name} — ${localized.seoRole} | Fal Clinic`;
       { name: localized.name, path: doctorPath },
     ]),
     buildPhysicianSchema(site, localized, 'en'),
+    buildFaqSchema(faqItems),
   ]}
   snapContent={{ itemIds: [doctor.id], itemCategory: 'doctor' }}
 >

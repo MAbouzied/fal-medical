@@ -1,11 +1,13 @@
 ---
 import { clinicFacts } from '../data/clinic-facts';
+import Breadcrumbs from '../components/seo/Breadcrumbs.astro';
 import ServicesPage from '../components/services/ServicesPage.astro';
 import { clinicServices } from '../data/services';
 import {
   buildBreadcrumbSchema,
   buildItemListSchema,
   buildWebPageSchema,
+  itemListId,
 } from '../lib/schema';
 import Layout from '../layouts/Layout.astro';
 
@@ -13,13 +15,21 @@ const site = Astro.site!;
 const title = `خدمات الأسنان والجلدية في ${clinicFacts.cityAr} | فال`;
 const description =
   `تصفح خدمات طب الأسنان والجلدية في عيادة فال ب${clinicFacts.cityAr} واحجز موعدك مع فريق متخصص.`;
+const listId = itemListId(site, '/services');
 ---
 
 <Layout
   title={title}
   description={description}
   schemas={[
-    buildWebPageSchema({ site, path: '/services', name: title, description }),
+    buildWebPageSchema({
+      site,
+      path: '/services',
+      name: title,
+      description,
+      type: 'CollectionPage',
+      mainEntityId: listId,
+    }),
     buildBreadcrumbSchema(site, [
       { name: 'الرئيسية', path: '/' },
       { name: 'الخدمات', path: '/services' },
@@ -39,5 +49,11 @@ const description =
     }),
   ]}
 >
+  <Breadcrumbs
+    items={[
+      { name: 'الرئيسية', href: '/' },
+      { name: 'الخدمات' },
+    ]}
+  />
   <ServicesPage />
 </Layout>

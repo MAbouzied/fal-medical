@@ -1,14 +1,17 @@
 ---
 import DoctorsDirectory from '../components/doctors/DoctorsDirectory.astro';
 import FaqSection from '../components/sections/FaqSection.astro';
+import Breadcrumbs from '../components/seo/Breadcrumbs.astro';
 import SectionHeading from '../components/ui/SectionHeading.astro';
 import { clinicFacts } from '../data/clinic-facts';
 import { doctors } from '../data/doctors';
 import { faqItems } from '../data/faq';
 import {
   buildBreadcrumbSchema,
+  buildFaqSchema,
   buildItemListSchema,
   buildWebPageSchema,
+  itemListId,
 } from '../lib/schema';
 import Layout from '../layouts/Layout.astro';
 
@@ -16,13 +19,21 @@ const site = Astro.site!;
 const title = `أطباء الأسنان والجلدية في ${clinicFacts.cityAr} | فال`;
 const description =
   `تعرّف على أطباء الأسنان والجلدية في عيادة فال ب${clinicFacts.cityAr} واختر الطبيب المناسب لخطة علاجك.`;
+const listId = itemListId(site, '/doctors');
 ---
 
 <Layout
   title={title}
   description={description}
   schemas={[
-    buildWebPageSchema({ site, path: '/doctors', name: title, description }),
+    buildWebPageSchema({
+      site,
+      path: '/doctors',
+      name: title,
+      description,
+      type: 'CollectionPage',
+      mainEntityId: listId,
+    }),
     buildBreadcrumbSchema(site, [
       { name: 'الرئيسية', path: '/' },
       { name: 'الأطباء', path: '/doctors' },
@@ -40,8 +51,15 @@ const description =
         image: doctor.image,
       })),
     }),
+    buildFaqSchema(faqItems),
   ]}
 >
+  <Breadcrumbs
+    items={[
+      { name: 'الرئيسية', href: '/' },
+      { name: 'الأطباء' },
+    ]}
+  />
   <section class="py-14 sm:py-24">
     <div class="page-container">
       <SectionHeading

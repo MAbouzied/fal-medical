@@ -11,8 +11,11 @@ import { faqItems } from '../../data/faq';
 import { clinicServices, getServiceById } from '../../data/services';
 import {
   buildBreadcrumbSchema,
+  buildFaqSchema,
+  buildMedicalProcedureSchema,
   buildServiceSchema,
   buildWebPageSchema,
+  medicalSpecialtyUrl,
 } from '../../lib/schema';
 import Layout from '../../layouts/Layout.astro';
 
@@ -31,7 +34,8 @@ if (!service) {
 
 const site = Astro.site!;
 const servicePath = `/services/${service.id}`;
-const mainEntityId = `${new URL(servicePath, site).href}#service`;
+const serviceEntityId = `${new URL(servicePath, site).href}#service`;
+const procedureId = `${new URL(servicePath, site).href}#procedure`;
 const title = `${service.title} في ${clinicFacts.cityAr} | فال`;
 const description =
   service.description.length < 140
@@ -50,14 +54,19 @@ const doctorsToShow = relatedDoctors.length > 0 ? relatedDoctors : doctors.slice
       path: servicePath,
       name: title,
       description,
-      mainEntityId,
+      type: 'MedicalWebPage',
+      mainEntityId: procedureId,
+      aboutId: serviceEntityId,
+      specialty: medicalSpecialtyUrl(service.department),
     }),
     buildBreadcrumbSchema(site, [
       { name: 'الرئيسية', path: '/' },
       { name: 'الخدمات', path: '/services' },
       { name: service.title, path: servicePath },
     ]),
+    buildMedicalProcedureSchema(site, service),
     buildServiceSchema(site, service),
+    buildFaqSchema(faqItems),
   ]}
   snapContent={{ itemIds: [service.id], itemCategory: 'service' }}
 >

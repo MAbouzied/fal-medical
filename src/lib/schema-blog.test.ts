@@ -39,8 +39,12 @@ describe('blog JSON-LD', () => {
     });
 
     assert.equal(schema['@type'], 'BlogPosting');
-    assert.equal(schema.headline, post.title);
-    assert.equal(schema.inLanguage, 'ar-SA');
+    assert.equal(schema.headline, 'عنوان يحتوي');
+    assert.equal(schema.inLanguage, 'ar');
+    assert.deepEqual(schema.image, {
+      '@type': 'ImageObject',
+      url: 'https://falclinic.com/assets/devices/dental-treatment-unit.jpg',
+    });
     assert.equal(schema.datePublished, post.publishedAt);
     assert.equal(schema.dateModified, post.updatedAt);
     assert.equal(schema.articleSection, 'طب الأسنان');

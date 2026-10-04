@@ -1,4 +1,4 @@
-import type { Specialty } from './doctors';
+import type { Specialty } from './doctors.ts';
 
 export const serviceDepartments = ['كل الخدمات', 'أسنان', 'جلدية'] as const;
 

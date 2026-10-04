@@ -1,5 +1,6 @@
 ---
 import { clinicFacts } from '../../data/clinic-facts';
+import Breadcrumbs from '../../components/seo/Breadcrumbs.astro';
 import {
   buildBreadcrumbSchema,
   buildWebPageSchema,
@@ -30,6 +31,13 @@ const description =
     ]),
   ]}
 >
+  <Breadcrumbs
+    locale="en"
+    items={[
+      { name: 'Home', href: '/en' },
+      { name: 'Privacy Policy' },
+    ]}
+  />
   <section class="py-14 sm:py-24">
     <div class="page-container mx-auto max-w-3xl">
       <h1 class="text-display font-black text-ink">Privacy Policy</h1>

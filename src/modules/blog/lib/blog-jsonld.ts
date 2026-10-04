@@ -1,9 +1,17 @@
+import { stripSchemaText } from '../../../lib/seo/schema-text.ts';
 import type { BlogPost } from '../model/blog-types.ts';
 import { blogPath } from './slug.ts';
 
 type JsonLd = Record<string, unknown>;
 
 const absoluteUrl = (site: URL, path = '/'): string => new URL(path, site).href;
+
+function imageObject(site: URL, src: string): JsonLd {
+  return {
+    '@type': 'ImageObject',
+    url: absoluteUrl(site, src),
+  };
+}
 
 export function organizationId(site: URL): string {
   return `${site.origin}/#organization`;
@@ -26,16 +34,24 @@ export function buildBlogPostingSchema(options: {
 }): JsonLd {
   const url = absoluteUrl(options.site, options.path);
   const { post } = options;
+  const keywords = [
+    post.seo.focusKeyword,
+    ...(post.tags ?? []).map((tag) => tag.label),
+  ]
+    .map((keyword) => keyword?.trim() ?? '')
+    .filter(Boolean);
+
   return {
     '@type': 'BlogPosting',
     '@id': `${url}#blogposting`,
-    headline: post.title,
-    description: post.seo.description?.trim() || post.excerpt.trim(),
-    image: absoluteUrl(options.site, post.cover.src),
+    headline: stripSchemaText(post.title, 110),
+    description: stripSchemaText(post.seo.description?.trim() || post.excerpt.trim(), 500),
+    image: imageObject(options.site, post.cover.src),
     datePublished: post.publishedAt,
     dateModified: post.updatedAt ?? post.publishedAt,
-    inLanguage: 'ar-SA',
+    inLanguage: 'ar',
     articleSection: post.category.label,
+    ...(keywords.length > 0 ? { keywords } : {}),
     author: {
       '@type': 'Person',
       name: post.author.name,
@@ -57,17 +73,52 @@ export function buildCollectionPageSchema(options: {
   path: string;
   name: string;
   description: string;
+  mainEntityId?: string;
 }): JsonLd {
   const url = absoluteUrl(options.site, options.path);
   return {
     '@type': 'CollectionPage',
-    '@id': `${url}#collection`,
+    '@id': `${url}#webpage`,
     url,
     name: options.name,
-    description: options.description,
-    inLanguage: 'ar-SA',
+    description: stripSchemaText(options.description, 500),
+    inLanguage: 'ar',
     isPartOf: { '@id': websiteId(options.site) },
     about: { '@id': organizationId(options.site) },
+    publisher: { '@id': organizationId(options.site) },
+    ...(options.mainEntityId ? { mainEntity: { '@id': options.mainEntityId } } : {}),
+  };
+}
+
+/** Blog node matching the LMS listing graph. Arabic-only, so no English alternate. */
+export function buildBlogSchema(options: {
+  site: URL;
+  path: string;
+  name: string;
+  description: string;
+  posts: readonly BlogPost[];
+}): JsonLd {
+  const url = absoluteUrl(options.site, options.path);
+  const visiblePosts = options.posts.slice(0, 10);
+  return {
+    '@type': 'Blog',
+    '@id': `${url}#blog`,
+    name: options.name,
+    description: stripSchemaText(options.description, 300),
+    url,
+    inLanguage: 'ar',
+    publisher: { '@id': organizationId(options.site) },
+    ...(visiblePosts.length > 0
+      ? {
+          blogPost: visiblePosts.map((post) => ({
+            '@type': 'BlogPosting',
+            headline: stripSchemaText(post.title, 110),
+            url: absoluteUrl(options.site, blogPath(post.slug)),
+            datePublished: post.publishedAt,
+          })),
+          mainEntity: { '@id': `${url}#itemlist` },
+        }
+      : {}),
   };
 }
 
@@ -77,25 +128,29 @@ export function buildBlogItemListSchema(options: {
   name: string;
   description: string;
   posts: readonly BlogPost[];
+  startPosition?: number;
 }): JsonLd {
   const url = absoluteUrl(options.site, options.path);
+  const start = options.startPosition ?? 1;
   return {
     '@type': 'ItemList',
     '@id': `${url}#itemlist`,
     name: options.name,
-    description: options.description,
+    description: stripSchemaText(options.description, 300),
+    inLanguage: 'ar',
     numberOfItems: options.posts.length,
     itemListElement: options.posts.map((post, index) => ({
       '@type': 'ListItem',
-      position: index + 1,
-      name: post.title,
+      position: start + index,
+      name: stripSchemaText(post.title, 110),
       url: absoluteUrl(options.site, blogPath(post.slug)),
       item: {
         '@type': 'BlogPosting',
-        name: post.title,
-        description: post.excerpt,
+        headline: stripSchemaText(post.title, 110),
+        description: stripSchemaText(post.excerpt, 500),
         url: absoluteUrl(options.site, blogPath(post.slug)),
-        image: absoluteUrl(options.site, post.cover.src),
+        image: imageObject(options.site, post.cover.src),
+        datePublished: post.publishedAt,
       },
     })),
   };
@@ -127,9 +182,12 @@ export function buildBlogCollectionSchemas(options: {
   name: string;
   description: string;
   posts: readonly BlogPost[];
+  startPosition?: number;
 }): JsonLd[] {
+  const listId = `${absoluteUrl(options.site, options.path)}#itemlist`;
   return [
-    buildCollectionPageSchema(options),
+    buildCollectionPageSchema({ ...options, mainEntityId: listId }),
+    buildBlogSchema(options),
     buildBlogBreadcrumbSchema(options.site),
     buildBlogItemListSchema(options),
   ];
