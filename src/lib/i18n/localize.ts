@@ -1,9 +1,9 @@
 import { clinicOpeningHoursRows } from '../../data/clinic-facts.ts';
-import { clinicContact } from '../../data/contact';
-import { clinicDevices, type ClinicDevice } from '../../data/devices';
-import { doctors, type Doctor } from '../../data/doctors';
-import { faqItems, type FaqItem } from '../../data/faq';
-import { clinicServices, type ClinicService } from '../../data/services';
+import { clinicContact } from '../../data/contact.ts';
+import { clinicDevices, type ClinicDevice } from '../../data/devices.ts';
+import { doctors, type Doctor } from '../../data/doctors.ts';
+import { faqItems, type FaqItem } from '../../data/faq.ts';
+import { clinicServices, type ClinicService } from '../../data/services.ts';
 import {
   categoriesEn,
   departmentsEn,
@@ -14,15 +14,15 @@ import {
   servicesEn,
   specialtiesEn,
   uiEn,
-} from './content-en';
+} from './content-en.ts';
 import {
   findRoutePair,
   getAlternateLocalePath,
   isBlogPath,
   type Locale,
-} from './routes';
+} from './routes.ts';
 
-export type { Locale } from './routes';
+export type { Locale } from './routes.ts';
 
 export function isEnglish(locale: Locale | undefined): locale is 'en' {
   return locale === 'en';

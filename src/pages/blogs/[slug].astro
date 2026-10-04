@@ -19,6 +19,7 @@ import {
   readingTimeForPost,
   type BlogPost,
 } from '../../modules/blog';
+import { resolveCanonicalPath } from '../../lib/seo/metadata';
 import {
   BLOG_CACHE_MAX_AGE_SECONDS,
   BLOG_CACHE_SWR_SECONDS,
@@ -63,6 +64,7 @@ if (post) {
 
 const site = Astro.site!;
 const path = post ? blogPath(post.slug) : '/blogs';
+const canonicalPath = post ? resolveCanonicalPath(post.seo.canonicalUrl, path) : path;
 const title = post ? articleSeoTitle(post) : 'المقال غير متاح مؤقتاً | فال';
 const description = post ? articleSeoDescription(post) : 'تعذر تحميل المقال حالياً.';
 const readingTimeMinutes = post ? readingTimeForPost(post) : 1;
@@ -77,6 +79,7 @@ const mainEntityId = `${new URL(path, site).href}#blogposting`;
     imageWidth={post.cover.width}
     imageHeight={post.cover.height}
     imageAlt={post.cover.alt}
+    canonicalPath={canonicalPath}
     ogType="article"
     article={{
       publishedTime: post.publishedAt,

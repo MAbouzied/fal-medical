@@ -1,15 +1,14 @@
-import { doctors } from '../../data/doctors';
-import { clinicServices } from '../../data/services';
+import { doctors } from '../../data/doctors.ts';
+import { clinicServices } from '../../data/services.ts';
+import { lastmodForPost } from '../../modules/blog/lib/date-format.ts';
 import {
-  BLOG_PAGE_SIZE,
-  lastmodForPost,
   listingPathForPage,
   paginatePosts,
   selectListing,
-} from '../../modules/blog';
+} from '../../modules/blog/lib/blog-selectors.ts';
 import { blogPath } from '../../modules/blog/lib/slug.ts';
-import type { BlogPost } from '../../modules/blog';
-import { doctorsEn, servicesEn } from './content-en';
+import { BLOG_PAGE_SIZE, type BlogPost } from '../../modules/blog/model/blog-types.ts';
+import { doctorsEn, servicesEn } from './content-en.ts';
 
 export type Locale = 'ar' | 'en';
 
@@ -292,6 +291,6 @@ export function assertTranslationCompleteness(): void {
   }
 }
 
-if (import.meta.env.PROD) {
+if (import.meta.env?.PROD) {
   assertTranslationCompleteness();
 }

@@ -9,6 +9,7 @@ import Layout from '../../../layouts/Layout.astro';
 import { buildBlogCollectionSchemas } from '../../../lib/schema';
 import BlogListing from '../../../modules/blog/components/BlogListing.astro';
 import {
+  BLOG_PAGE_SIZE,
   DEFAULT_BLOG_LISTING_LABELS,
   listingPathForPage,
 } from '../../../modules/blog';
@@ -62,6 +63,7 @@ const description =
       name: title,
       description,
       posts: listing.items,
+      startPosition: (pageNumber - 1) * BLOG_PAGE_SIZE + 2,
     })}
   >
     <Breadcrumbs

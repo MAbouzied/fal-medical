@@ -1,4 +1,5 @@
 ---
+import Breadcrumbs from '../../../components/seo/Breadcrumbs.astro';
 import ServicesPage from '../../../components/services/ServicesPage.astro';
 import { clinicServices } from '../../../data/services';
 import { localizeService, ui } from '../../../lib/i18n/localize';
@@ -6,6 +7,7 @@ import {
   buildBreadcrumbSchema,
   buildItemListSchema,
   buildWebPageSchema,
+  itemListId,
 } from '../../../lib/schema';
 import Layout from '../../../layouts/Layout.astro';
 
@@ -14,6 +16,7 @@ const copy = ui('en')!;
 const title = copy.pages.servicesTitle;
 const description = copy.pages.servicesDescription;
 const localizedServices = clinicServices.map((service) => localizeService(service, 'en'));
+const listId = itemListId(site, '/en/services');
 ---
 
 <Layout
@@ -26,7 +29,9 @@ const localizedServices = clinicServices.map((service) => localizeService(servic
       path: '/en/services',
       name: title,
       description,
+      type: 'CollectionPage',
       locale: 'en',
+      mainEntityId: listId,
     }),
     buildBreadcrumbSchema(site, [
       { name: copy.nav.home, path: '/en' },
@@ -37,6 +42,7 @@ const localizedServices = clinicServices.map((service) => localizeService(servic
       path: '/en/services',
       name: 'Fal Clinic services',
       description,
+      locale: 'en',
       itemType: 'Service',
       items: localizedServices.map((service) => ({
         name: service.title,
@@ -47,5 +53,12 @@ const localizedServices = clinicServices.map((service) => localizeService(servic
     }),
   ]}
 >
+  <Breadcrumbs
+    locale="en"
+    items={[
+      { name: 'Home', href: '/en' },
+      { name: 'Services' },
+    ]}
+  />
   <ServicesPage locale="en" />
 </Layout>

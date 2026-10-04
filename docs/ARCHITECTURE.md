@@ -109,6 +109,24 @@ Browser
 - Route matrix: `docs/seo-route-matrix.md`
 - Post-build checks: `npm run seo:verify`
 - Legacy WordPress redirects: `public/_redirects` + `src/lib/seo/legacy-redirects.ts`
+- Metadata limits match the LMS public pages: titles are capped at 60 characters and descriptions at 155. Blog canonicals accept only `https://falclinic.com` URLs.
+- Sitemap lists indexable Arabic/English route pairs plus published Arabic blog posts and listing pages. Drafts and future posts stay out. A failed blog read returns 503 instead of a partial sitemap. Non-production hosts get no sitemap.
+- Robots on the production host allows `/` and disallows `/api/`, `/admin`, `/login`, and `/form`. Other hosts block crawlers but still allow WhatsApp and Facebook link previews.
+- JSON-LD graph on every public page: `MedicalClinic` + `WebSite`, then page nodes. LMS course types are not used.
+
+| Page | Schema types |
+|------|----------------|
+| Home | `WebPage`, `ItemList` of visible specialties, `FAQPage` |
+| Services, doctors, devices | `CollectionPage` + `ItemList` + `BreadcrumbList`. Doctors and devices also include `FAQPage` |
+| Service detail | `MedicalWebPage`, `MedicalProcedure`, `Service`, `FAQPage`, `BreadcrumbList` |
+| Doctor profile | `ProfilePage`, `Physician`, `FAQPage`, `BreadcrumbList` |
+| Contact | `ContactPage`, `BreadcrumbList` |
+| Book | `WebPage` with `ReserveAction`, `BreadcrumbList` |
+| Privacy | `WebPage`, `BreadcrumbList` |
+| Blog listing | `CollectionPage`, `Blog`, `ItemList`, `BreadcrumbList` |
+| Blog article | `WebPage`, `BlogPosting`, `BreadcrumbList` |
+
+Not used from the LMS app: `EducationalOrganization`, `Course`, `CourseInstance`, `EducationEvent`, and `AggregateRating`. The clinic does not sell courses and does not publish verified ratings. `MedicalProcedure`, `MedicalWebPage`, `MedicalDevice`, `Physician`, and `ReserveAction` are clinic-only.
 
 ---
 
@@ -146,6 +164,7 @@ Browser
 
 | Date | Change | Paths | Agent |
 |------|--------|-------|-------|
+| 2026-10-04 | Aligned public SEO with the LMS app: title/description limits, safe blog canonicals, production robots rules, and JSON-LD graphs. Clinic pages use `MedicalClinic`, `MedicalWebPage`, `MedicalProcedure`, `Physician`, `MedicalDevice`, and `ReserveAction`. Course and rating schemas are not emitted. | `src/lib/schema.ts`, `src/lib/seo/`, `src/modules/blog/lib/blog-jsonld.ts`, `src/layouts/Layout.astro`, `src/pages/` | site |
 | 2026-10-01 | Removed the Meta Pixel from public pages, privacy copy, and the content security policy. Snapchat Pixel and Google Analytics stay. | `src/layouts/Layout.astro`, `astro.config.mjs`, `src/pages/privacy.astro`, `src/pages/en/privacy.astro` | site |
 | 2026-09-29 | Meta Pixel on public pages: base `PageView` (and again on client navigations). Admin and login stay untracked. CSP allows `connect.facebook.net` and `facebook.com`. | `src/lib/meta.ts`, `src/components/analytics/MetaPixel.astro`, `src/layouts/Layout.astro`, `astro.config.mjs` | site |
 | 2026-09-28 | Snapchat Pixel on public pages: base `PAGE_VIEW`, `VIEW_CONTENT` on service, doctor, and article pages, `SIGN_UP` when a booking or contact form succeeds. Admin and login stay untracked. | `src/lib/snap.ts`, `src/components/analytics/SnapPixel.astro`, `src/layouts/Layout.astro`, `astro.config.mjs` | site |

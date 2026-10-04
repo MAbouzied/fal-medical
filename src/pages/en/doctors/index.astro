@@ -1,13 +1,16 @@
 ---
 import DoctorsDirectory from '../../../components/doctors/DoctorsDirectory.astro';
 import FaqSection from '../../../components/sections/FaqSection.astro';
+import Breadcrumbs from '../../../components/seo/Breadcrumbs.astro';
 import SectionHeading from '../../../components/ui/SectionHeading.astro';
 import { doctors } from '../../../data/doctors';
 import { localizeDoctor, localizeFaq, ui } from '../../../lib/i18n/localize';
 import {
   buildBreadcrumbSchema,
+  buildFaqSchema,
   buildItemListSchema,
   buildWebPageSchema,
+  itemListId,
 } from '../../../lib/schema';
 import Layout from '../../../layouts/Layout.astro';
 
@@ -17,6 +20,7 @@ const title = copy.pages.doctorsTitle;
 const description = copy.pages.doctorsDescription;
 const faqItems = localizeFaq('en');
 const localizedDoctors = doctors.map((doctor) => localizeDoctor(doctor, 'en'));
+const listId = itemListId(site, '/en/doctors');
 ---
 
 <Layout
@@ -29,7 +33,9 @@ const localizedDoctors = doctors.map((doctor) => localizeDoctor(doctor, 'en'));
       path: '/en/doctors',
       name: title,
       description,
+      type: 'CollectionPage',
       locale: 'en',
+      mainEntityId: listId,
     }),
     buildBreadcrumbSchema(site, [
       { name: copy.nav.home, path: '/en' },
@@ -40,6 +46,7 @@ const localizedDoctors = doctors.map((doctor) => localizeDoctor(doctor, 'en'));
       path: '/en/doctors',
       name: 'Fal Clinic doctors',
       description,
+      locale: 'en',
       itemType: 'Physician',
       items: localizedDoctors.map((doctor) => ({
         name: doctor.name,
@@ -48,8 +55,16 @@ const localizedDoctors = doctors.map((doctor) => localizeDoctor(doctor, 'en'));
         image: doctor.image,
       })),
     }),
+    buildFaqSchema(faqItems),
   ]}
 >
+  <Breadcrumbs
+    locale="en"
+    items={[
+      { name: 'Home', href: '/en' },
+      { name: 'Doctors' },
+    ]}
+  />
   <section class="py-14 sm:py-24">
     <div class="page-container">
       <SectionHeading eyebrow={copy.nav.doctors} title={copy.pages.doctorsHeading} description={description} level={1} />

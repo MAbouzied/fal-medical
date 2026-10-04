@@ -2,12 +2,15 @@
 import { clinicFacts } from '../../data/clinic-facts';
 import DevicesGrid from '../../components/devices/DevicesGrid.astro';
 import FaqSection from '../../components/sections/FaqSection.astro';
+import Breadcrumbs from '../../components/seo/Breadcrumbs.astro';
 import { clinicDevices } from '../../data/devices';
 import { localizeDevice, localizeFaq, ui } from '../../lib/i18n/localize';
 import {
   buildBreadcrumbSchema,
+  buildFaqSchema,
   buildItemListSchema,
   buildWebPageSchema,
+  itemListId,
 } from '../../lib/schema';
 import Layout from '../../layouts/Layout.astro';
 
@@ -17,6 +20,7 @@ const title = `Clinic Devices in ${clinicFacts.cityEn} | Fal Clinic`;
 const description = copy.pages.devicesDescription;
 const faqItems = localizeFaq('en');
 const localizedDevices = clinicDevices.map((device) => localizeDevice(device, 'en'));
+const listId = itemListId(site, '/en/devices');
 ---
 
 <Layout
@@ -29,7 +33,9 @@ const localizedDevices = clinicDevices.map((device) => localizeDevice(device, 'e
       path: '/en/devices',
       name: title,
       description,
+      type: 'CollectionPage',
       locale: 'en',
+      mainEntityId: listId,
     }),
     buildBreadcrumbSchema(site, [
       { name: copy.nav.home, path: '/en' },
@@ -40,16 +46,25 @@ const localizedDevices = clinicDevices.map((device) => localizeDevice(device, 'e
       path: '/en/devices',
       name: 'Fal Clinic devices',
       description,
+      locale: 'en',
       itemType: 'MedicalDevice',
       items: localizedDevices.map((device) => ({
         name: device.name,
-        path: '/en/devices',
+        path: `/en/devices#${device.id}`,
         description: device.description,
         image: device.image,
       })),
     }),
+    buildFaqSchema(faqItems),
   ]}
 >
+  <Breadcrumbs
+    locale="en"
+    items={[
+      { name: 'Home', href: '/en' },
+      { name: 'Devices' },
+    ]}
+  />
   <DevicesGrid locale="en" headingLevel={1} />
   <FaqSection items={faqItems} locale="en" />
 </Layout>

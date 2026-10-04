@@ -3,14 +3,16 @@ import LandingHero from '../components/landing/LandingHero.astro';
 import LandingSections from '../components/landing/LandingSections.astro';
 import { clinicFacts, formatClinicDescription } from '../data/clinic-facts';
 import { faqItems } from '../data/faq';
+import { resolveLandingPage } from '../data/landing';
 import {
-  buildBreadcrumbSchema,
   buildFaqSchema,
+  buildItemListSchema,
   buildWebPageSchema,
 } from '../lib/schema';
 import Layout from '../layouts/Layout.astro';
 
 const site = Astro.site!;
+const landing = resolveLandingPage('ar');
 const title = `مجمع عيادات فال الطبية في ${clinicFacts.cityAr} | فال`;
 const description = `${formatClinicDescription('ar')} احجز موعدك عبر الموقع أو واتساب.`;
 ---
@@ -26,7 +28,20 @@ const description = `${formatClinicDescription('ar')} احجز موعدك عبر
       description,
       locale: 'ar',
     }),
-    buildBreadcrumbSchema(site, [{ name: 'الرئيسية', path: '/' }]),
+    buildItemListSchema({
+      site,
+      path: '/',
+      name: landing.specialties.title,
+      description: landing.specialties.intro,
+      locale: 'ar',
+      itemType: 'Service',
+      items: landing.specialties.items.map((item) => ({
+        name: item.title,
+        path: item.href,
+        description: item.text,
+        image: item.imageSrc,
+      })),
+    }),
     buildFaqSchema(faqItems),
   ]}
 >

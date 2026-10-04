@@ -20,6 +20,7 @@ import {
 } from '../lib/i18n/localize';
 import { findRoutePair } from '../lib/i18n/routes';
 import { buildGraph } from '../lib/schema';
+import { truncateMetaDescription, truncateMetaTitle } from '../lib/seo/metadata';
 import '../styles/global.css';
 
 export interface ArticleMeta {
@@ -110,7 +111,8 @@ const socialImageUrl = new URL(image, site).href;
 const socialImageSecureUrl = socialImageUrl.replace(/^http:\/\//i, 'https://');
 const socialMime = imageMimeType(image);
 const brandName = isEnglish ? organization.alternateName : organization.name;
-const fullTitle = title;
+const fullTitle = truncateMetaTitle(title);
+const metaDescription = truncateMetaDescription(description);
 const resolvedImageAlt = imageAlt ?? (isEnglish ? socialCard.altEn : socialCard.altAr);
 const structuredData = omitStructuredData ? null : buildGraph(site, schemas, locale);
 const trackPublic = !disableAnalytics;
@@ -150,7 +152,7 @@ const skipLabel = isEnglish ? 'Skip to main content' : 'تجاوز إلى الم
     <meta name="theme-color" content="#12a394" />
     {analyticsEnabled && <Gtm />}
     <title>{fullTitle}</title>
-    <meta name="description" content={description} />
+    <meta name="description" content={metaDescription} />
     <meta name="author" content={brandName} />
     <meta name="application-name" content={organization.alternateName} />
     <meta name="robots" content={robotsContent} />
@@ -160,7 +162,7 @@ const skipLabel = isEnglish ? 'Skip to main content' : 'تجاوز إلى الم
     <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={brandName} />
     <meta property="og:title" content={fullTitle} />
-    <meta property="og:description" content={description} />
+    <meta property="og:description" content={metaDescription} />
     <meta property="og:image" content={socialImageSecureUrl} />
     <meta property="og:image:secure_url" content={socialImageSecureUrl} />
     <meta property="og:image:alt" content={resolvedImageAlt} />
@@ -182,7 +184,7 @@ const skipLabel = isEnglish ? 'Skip to main content' : 'تجاوز إلى الم
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
-    <meta name="twitter:description" content={description} />
+    <meta name="twitter:description" content={metaDescription} />
     <meta name="twitter:image" content={socialImageSecureUrl} />
     <meta name="twitter:image:alt" content={resolvedImageAlt} />
 
