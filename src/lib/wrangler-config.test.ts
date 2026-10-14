@@ -29,7 +29,11 @@ describe('Wrangler deploy config', () => {
     assert.equal(assets.binding, 'ASSETS');
     assert.equal(assets.directory, './dist');
     assert.equal(assets.not_found_handling, 'none');
-    assert.equal(assets.run_worker_first, false);
+    assert.deepEqual(assets.run_worker_first, [
+      '/googleb1cfedf0fc1535b8',
+      '/googleb1cfedf0fc1535b8/',
+      '/googleb1cfedf0fc1535b8.html',
+    ]);
     assert.equal(assets.html_handling, 'drop-trailing-slash');
     assert.ok(kv.some((item) => item.binding === 'SESSION'));
     assert.equal(images.binding, 'IMAGES');

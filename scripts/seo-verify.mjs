@@ -330,8 +330,16 @@ function main() {
       if (assets.not_found_handling !== 'none') {
         errors.push('wrangler.jsonc must set assets.not_found_handling to none so Worker handles misses');
       }
-      if (assets.run_worker_first !== false) {
-        errors.push('wrangler.jsonc must set assets.run_worker_first to false so _redirects apply before Worker');
+      const workerFirst = assets.run_worker_first;
+      const workerFirstPaths = Array.isArray(workerFirst) ? workerFirst : null;
+      if (
+        !workerFirstPaths ||
+        workerFirstPaths.includes(true) ||
+        workerFirstPaths.some((path) => path === '/*' || path === '*')
+      ) {
+        errors.push(
+          'wrangler.jsonc assets.run_worker_first must list only the Google verification paths so _redirects stay assets-first',
+        );
       }
       if (assets.html_handling !== 'drop-trailing-slash') {
         errors.push('wrangler.jsonc must set assets.html_handling to drop-trailing-slash');

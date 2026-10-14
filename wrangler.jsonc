@@ -31,7 +31,13 @@
     "directory": "./dist",
     "not_found_handling": "none",
     "html_handling": "drop-trailing-slash",
-    "run_worker_first": false
+    // html_handling strips .html before the Worker. These paths must hit the
+    // Worker first so Search Console can fetch the verification file with .html.
+    "run_worker_first": [
+      "/googleb1cfedf0fc1535b8",
+      "/googleb1cfedf0fc1535b8/",
+      "/googleb1cfedf0fc1535b8.html"
+    ]
   },
   "images": {
     "binding": "IMAGES"

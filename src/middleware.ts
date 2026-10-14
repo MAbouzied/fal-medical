@@ -1,5 +1,6 @@
 import { defineMiddleware } from 'astro:middleware';
 import { assertStaffAccess, sanitizeReturnUrl } from './lib/auth/authorization.ts';
+import { googleSiteVerificationResponse } from './lib/seo/google-site-verification.ts';
 import {
   buildLegacyRedirectLocation,
   resolveLegacyRedirect,
@@ -49,6 +50,11 @@ function forbiddenResponse(isApi: boolean): Response {
 }
 
 export const onRequest = defineMiddleware(async (context, next) => {
+  const verification = googleSiteVerificationResponse(context.url.pathname);
+  if (verification && (context.request.method === 'GET' || context.request.method === 'HEAD')) {
+    return withSecurityHeaders(verification);
+  }
+
   if (shouldApplyLegacyRedirect(context.request.method)) {
     const legacyTarget = resolveLegacyRedirect(context.url.pathname);
     if (legacyTarget) {
