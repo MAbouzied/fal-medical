@@ -5,6 +5,7 @@ import {
   BLOG_CACHE_SWR_SECONDS,
   blogListingCacheTags,
 } from '../modules/blog/cache';
+import { isProductionHost } from '../data/site';
 import { getSitemapRoutePairs } from '../lib/i18n/routes';
 import {
   buildSitemapXml,
@@ -40,7 +41,10 @@ export const GET: APIRoute = async (context) => {
       });
     }
 
-    const body = buildSitemapXml(site, pairs);
+    const sitemapSite = isProductionHost(context.url.hostname)
+      ? new URL(`${context.url.protocol}//${context.url.host}`)
+      : site;
+    const body = buildSitemapXml(sitemapSite, pairs);
     return new Response(body, {
       headers: {
         'Content-Type': 'application/xml; charset=utf-8',

@@ -47,6 +47,14 @@ describe('sitemap XML helpers', () => {
       true,
     );
     assert.equal(
+      isSitemapHostIndexable({ indexable: true, host: 'fal-ksa.com' }),
+      true,
+    );
+    assert.equal(
+      isSitemapHostIndexable({ indexable: true, host: 'www.fal-ksa.com' }),
+      true,
+    );
+    assert.equal(
       isSitemapHostIndexable({ indexable: false, host: 'falclinic.com' }),
       false,
     );

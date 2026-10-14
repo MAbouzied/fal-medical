@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { SEO_INDEXABLE } from 'astro:env/server';
+import { isProductionHost } from '../data/site';
 import { buildRobotsTxt } from '../lib/seo/robots';
 
 export const prerender = false;
@@ -12,7 +13,10 @@ export const GET: APIRoute = async ({ site, url }) => {
   const body = buildRobotsTxt({
     indexable: SEO_INDEXABLE === true,
     host: url.hostname,
-    sitemapUrl: new URL('/sitemap.xml', site).href,
+    sitemapUrl: new URL(
+      '/sitemap.xml',
+      isProductionHost(url.hostname) ? new URL(`${url.protocol}//${url.host}`) : site,
+    ).href,
   });
 
   return new Response(body, {

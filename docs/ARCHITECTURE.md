@@ -147,7 +147,7 @@ Not used from the LMS app: `EducationalOrganization`, `Course`, `CourseInstance`
 - Build: `npm run build` → `./dist`
 - Deploy: `npm run deploy` (Wrangler)
 - Config: `wrangler.jsonc`, `astro.config.mjs`
-- Production host: `https://falclinic.com`
+- Production host: `https://falclinic.com` (sitemap and robots also allow `fal-ksa.com` and `www.fal-ksa.com`)
 
 ---
 
@@ -164,6 +164,7 @@ Not used from the LMS app: `EducationalOrganization`, `Course`, `CourseInstance`
 
 | Date | Change | Paths | Agent |
 |------|--------|-------|-------|
+| 2026-10-14 | Sitemap and robots treated `fal-ksa.com` as non-production, so `/sitemap.xml` returned 404. Allow `fal-ksa.com` and `www.fal-ksa.com`, emit sitemap URLs on the request host, and set `SEO_INDEXABLE=true` in the Worker vars. | `src/data/site.ts`, `src/pages/sitemap.xml.ts`, `src/pages/robots.txt.ts`, `wrangler.jsonc` | site |
 | 2026-10-04 | Aligned public SEO with the LMS app: title/description limits, safe blog canonicals, production robots rules, and JSON-LD graphs. Clinic pages use `MedicalClinic`, `MedicalWebPage`, `MedicalProcedure`, `Physician`, `MedicalDevice`, and `ReserveAction`. Course and rating schemas are not emitted. | `src/lib/schema.ts`, `src/lib/seo/`, `src/modules/blog/lib/blog-jsonld.ts`, `src/layouts/Layout.astro`, `src/pages/` | site |
 | 2026-10-01 | Removed the Meta Pixel from public pages, privacy copy, and the content security policy. Snapchat Pixel and Google Analytics stay. | `src/layouts/Layout.astro`, `astro.config.mjs`, `src/pages/privacy.astro`, `src/pages/en/privacy.astro` | site |
 | 2026-09-29 | Meta Pixel on public pages: base `PageView` (and again on client navigations). Admin and login stay untracked. CSP allows `connect.facebook.net` and `facebook.com`. | `src/lib/meta.ts`, `src/components/analytics/MetaPixel.astro`, `src/layouts/Layout.astro`, `astro.config.mjs` | site |

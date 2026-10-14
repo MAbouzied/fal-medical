@@ -15,7 +15,8 @@
   "vars": {
     "SANITY_PROJECT_ID": "ilyfhm76",
     "SANITY_DATASET": "production",
-    "SANITY_API_VERSION": "2026-08-03"
+    "SANITY_API_VERSION": "2026-08-03",
+    "SEO_INDEXABLE": "true"
   },
   // Required by astro.config.mjs `cache: { provider: cacheCloudflare() }`.
   "cache": {
